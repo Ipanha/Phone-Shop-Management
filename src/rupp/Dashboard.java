@@ -51,6 +51,7 @@ public class Dashboard {
         JButton btnExit = new JButton("Exit");
         JButton btnInvoice = new JButton("Invoice");
         JTextArea txtDisplay = new JTextArea();
+        JButton btnBack = new JButton("Back");
 
         Font labelFont1 = new Font("Arial", Font.PLAIN, 40);
         Font labelFont2 = new Font("Arial", Font.PLAIN, 30);
@@ -63,9 +64,9 @@ public class Dashboard {
         lblPayment.setForeground(Color.BLUE);
         navPaymentPanel.setBounds(10, 10, 900, 100);
         navPaymentPanel.setBackground(Color.white);
-        
+
         // Use a JTable for the payment details
-        String[] columnNames = {"No.", "Name", "Price", "Qty", "Total"};
+        String[] columnNames = { "No.", "Name", "Price", "Qty", "Total" };
         paymentTableModel = new DefaultTableModel(columnNames, 0);
         paymentTable = new JTable(paymentTableModel);
         JScrollPane paymentScrollPane = new JScrollPane(paymentTable);
@@ -81,12 +82,18 @@ public class Dashboard {
         txtDisplay.setBorder(padding);
 
         // Buttons
-        btnClear.setBounds(80, 900, 150, 40);
+        btnBack.setBounds(10, 900, 150, 40);
+        btnBack.setFont(labelFont2);
+        btnBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnClear.setBounds(250, 900, 150, 40);
         btnClear.setFont(labelFont2);
+        btnClear.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnInvoice.setBounds(500, 900, 150, 40);
+        btnInvoice.setFont(labelFont2);
+        btnInvoice.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnExit.setBounds(750, 900, 150, 40);
         btnExit.setFont(labelFont2);
-        btnInvoice.setBounds(400, 900, 150, 40);
-        btnInvoice.setFont(labelFont2);
+        btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         // Product side
         lblProduct.setBounds(1350, 30, 500, 50);
@@ -97,21 +104,40 @@ public class Dashboard {
         navListProductPanel.setBounds(990, 10, 900, 100);
         navListProductPanel.setBackground(Color.white);
 
+        // Assuming scrollPane is your JScrollPane object
+        JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
+        JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
+
+        // Set the unit increment to a higher value for faster scrolling
+        verticalScrollBar.setUnitIncrement(16);
+        horizontalScrollBar.setUnitIncrement(16);
+
+        // Optionally, you can also set the block increment for even faster scrolling
+        verticalScrollBar.setBlockIncrement(100);
+        horizontalScrollBar.setBlockIncrement(100);
 
         // Sample phone data
         Phone[] phones = {
-            new Phone("iPhone 12", 559.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-12.png"),
-            new Phone("iPhone 12 Pro LL/A", 659.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro.png"),
-            new Phone("iPhone 12 Pro Max LL/A", 759.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro_Max.png"),
-            new Phone("iPhone 13 128G", 619.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13.png"),
-            new Phone("iPhone 13 Pro 128G", 719.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro.png"),
-            new Phone("iPhone 13 Pro Max 128G USA (New)", 859.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro-Max.png"),
-            new Phone("iPhone 14 ZP/A", 789.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14.png"),
-            new Phone("iPhone 14 Pro 128G", 999.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro.png"),
-            new Phone("iPhone 14 Pro MAX LL/A", 1049.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro-Max.png"),
-            new Phone("iPhone 15 Plus", 919.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15.png"),
-            new Phone("iPhone 15 Pro USA", 999.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro.png"),
-            new Phone("iPhone 15 Pro Max", 1269.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro-Max.png"),
+                new Phone("iPhone 12", 559.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-12.png"),
+                new Phone("iPhone 12 Pro LL/A", 659.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro.png"),
+                new Phone("iPhone 12 Pro Max LL/A", 759.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro_Max.png"),
+                new Phone("iPhone 13 128G", 619.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13.png"),
+                new Phone("iPhone 13 Pro 128G", 719.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro.png"),
+                new Phone("iPhone 13 Pro Max 128G USA (New)", 859.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro-Max.png"),
+                new Phone("iPhone 14 ZP/A", 789.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14.png"),
+                new Phone("iPhone 14 Pro 128G", 999.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro.png"),
+                new Phone("iPhone 14 Pro MAX LL/A", 1049.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro-Max.png"),
+                new Phone("iPhone 15 Plus", 919.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15.png"),
+                new Phone("iPhone 15 Pro USA", 999.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro.png"),
+                new Phone("iPhone 15 Pro Max", 1269.00,
+                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro-Max.png"),
         };
 
         // Add products
@@ -133,6 +159,7 @@ public class Dashboard {
             JLabel priceLabel = new JLabel("$" + phone.getPrice());
             JLabel nameLabel = new JLabel(phone.getName());
             JButton addToCartButton = new JButton("Add To Cart");
+            addToCartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             picLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -163,6 +190,7 @@ public class Dashboard {
         dashboardPanel.add(lblPayment);
         dashboardPanel.add(navPaymentPanel);
         dashboardPanel.add(paymentScrollPane);
+        dashboardPanel.add(btnBack);
         dashboardPanel.add(btnClear);
         dashboardPanel.add(btnExit);
         dashboardPanel.add(btnInvoice);
@@ -174,7 +202,6 @@ public class Dashboard {
 
         // Add menu bar
         menuBar = new JMenuBar();
-
 
         menuInventory = new JMenu("Inventory");
         menuItemAddProduct = new JMenuItem("Add Product");
@@ -209,6 +236,12 @@ public class Dashboard {
         frame.setJMenuBar(menuBar);
 
         // Button actions
+        btnBack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new PhoneShopManagementSystem();
+            }
+        });
         btnClear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -232,36 +265,35 @@ public class Dashboard {
     }
 
     private void addPhoneToCart(Phone phone) {
-    boolean found = false;
-    int rowCount = paymentTableModel.getRowCount();
-    for (int i = 0; i < rowCount; i++) {
-        if (paymentTableModel.getValueAt(i, 1).equals(phone.getName())) {
-            int qty = (int) paymentTableModel.getValueAt(i, 3);
-            double price = (double) paymentTableModel.getValueAt(i, 2);
-            paymentTableModel.setValueAt(qty + 1, i, 3);
-            paymentTableModel.setValueAt(price * (qty + 1), i, 4);
-            found = true;
-            break;
+        boolean found = false;
+        int rowCount = paymentTableModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            if (paymentTableModel.getValueAt(i, 1).equals(phone.getName())) {
+                int qty = (int) paymentTableModel.getValueAt(i, 3);
+                double price = (double) paymentTableModel.getValueAt(i, 2);
+                paymentTableModel.setValueAt(qty + 1, i, 3);
+                paymentTableModel.setValueAt(price * (qty + 1), i, 4);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            Object[] row = { rowCount + 1, phone.getName(), phone.getPrice(), 1, phone.getPrice() };
+            paymentTableModel.addRow(row);
         }
     }
-    if (!found) {
-        Object[] row = {rowCount + 1, phone.getName(), phone.getPrice(), 1, phone.getPrice()};
-        paymentTableModel.addRow(row);
-    }
-}
 
-   private void generateInvoice() {
-    double totalPrice = 0.0;
-    int rowCount = paymentTableModel.getRowCount();
-    for (int i = 0; i < rowCount; i++) {
-        double totalForRow = (double) paymentTableModel.getValueAt(i, 4);
-        totalPrice += totalForRow;
-    }
-    
-    String message = "Total Price: $" + totalPrice;
-    JOptionPane.showMessageDialog(frame, message, "Invoice", JOptionPane.INFORMATION_MESSAGE);
-}
+    private void generateInvoice() {
+        double totalPrice = 0.0;
+        int rowCount = paymentTableModel.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
+            double totalForRow = (double) paymentTableModel.getValueAt(i, 4);
+            totalPrice += totalForRow;
+        }
 
+        String message = "Total Price: $" + totalPrice;
+        JOptionPane.showMessageDialog(frame, message, "Invoice", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     public static void main(String[] args) {
         new Dashboard();
