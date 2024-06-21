@@ -134,7 +134,8 @@ public class PhoneShopManagementSystem {
                 String username = txtUsername.getText();
                 String password = new String(txtPassword.getPassword());
                 if (users.containsKey(username) && users.get(username).equals(password)) {
-                    new Dashboard();
+                    frame.dispose(); // Close the login window
+                    new Dashboard(); // Go to Fram Dashboard
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -149,7 +150,7 @@ public class PhoneShopManagementSystem {
             }
         });
     }
-
+    
     private void createRegisterPanel() {
         registerPanel = new JPanel(null);
 

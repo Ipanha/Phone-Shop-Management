@@ -7,10 +7,15 @@ import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import javax.imageio.ImageIO;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import java.util.ArrayList;
 
 public class Dashboard {
     private JFrame frame;
@@ -23,6 +28,9 @@ public class Dashboard {
     private JMenuItem menuItemAddCustomer, menuItemViewCustomers, menuItemGenerateReport;
     private JTable paymentTable;
     private DefaultTableModel paymentTableModel;
+    private ArrayList<Phone> phonesList;
+    private JPanel navProductPanel;
+    private JScrollPane scrollPane;
 
     public Dashboard() {
         frame = new JFrame("Phone Shop Management System");
@@ -45,8 +53,8 @@ public class Dashboard {
         JPanel navPaymentPanel = new JPanel();
         JLabel lblProduct = new JLabel("List Product");
         JPanel navListProductPanel = new JPanel();
-        JPanel navProductPanel = new JPanel(new GridLayout(0, 3, 10, 10));
-        JScrollPane scrollPane = new JScrollPane(navProductPanel);
+        navProductPanel = new JPanel(new GridLayout(0, 3, 10, 10));
+        scrollPane = new JScrollPane(navProductPanel);
         JButton btnClear = new JButton("Clear all");
         JButton btnExit = new JButton("Exit");
         JButton btnInvoice = new JButton("Invoice");
@@ -55,7 +63,6 @@ public class Dashboard {
 
         Font labelFont1 = new Font("Arial", Font.PLAIN, 40);
         Font labelFont2 = new Font("Arial", Font.PLAIN, 30);
-        Font labelFont3 = new Font("Arial", Font.PLAIN, 20);
         Font labelFont4 = new Font("Arial", Font.PLAIN, 17);
 
         // Payment side
@@ -117,74 +124,34 @@ public class Dashboard {
         horizontalScrollBar.setBlockIncrement(100);
 
         // Sample phone data
-        Phone[] phones = {
-                new Phone("iPhone 12", 559.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-12.png"),
-                new Phone("iPhone 12 Pro LL/A", 659.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro.png"),
-                new Phone("iPhone 12 Pro Max LL/A", 759.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro_Max.png"),
-                new Phone("iPhone 13 128G", 619.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13.png"),
-                new Phone("iPhone 13 Pro 128G", 719.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro.png"),
-                new Phone("iPhone 13 Pro Max 128G USA (New)", 859.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro-Max.png"),
-                new Phone("iPhone 14 ZP/A", 789.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14.png"),
-                new Phone("iPhone 14 Pro 128G", 999.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro.png"),
-                new Phone("iPhone 14 Pro MAX LL/A", 1049.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro-Max.png"),
-                new Phone("iPhone 15 Plus", 919.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15.png"),
-                new Phone("iPhone 15 Pro USA", 999.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro.png"),
-                new Phone("iPhone 15 Pro Max", 1269.00,
-                        "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro-Max.png"),
-        };
+        phonesList = new ArrayList<>();
+        phonesList.add(new Phone("iPhone 12", 559.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-12.png"));
+        phonesList.add(new Phone("iPhone 12", 559.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-12.png"));
+        phonesList.add(new Phone("iPhone 12 Pro LL/A", 659.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro.png"));
+        phonesList.add(new Phone("iPhone 12 Pro Max LL/A", 759.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro_Max.png"));
+        phonesList.add(
+                new Phone("iPhone 13 128G", 619.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13.png"));
+        phonesList.add(new Phone("iPhone 13 Pro 128G", 719.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro.png"));
+        phonesList.add(new Phone("iPhone 13 Pro Max 128G USA (New)", 859.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro-Max.png"));
+        phonesList.add(
+                new Phone("iPhone 14 ZP/A", 789.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14.png"));
+        phonesList.add(new Phone("iPhone 14 Pro 128G", 999.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro.png"));
+        phonesList.add(new Phone("iPhone 14 Pro MAX LL/A", 1049.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro-Max.png"));
+        phonesList.add(
+                new Phone("iPhone 15 Plus", 919.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15.png"));
+        phonesList.add(new Phone("iPhone 15 Pro USA", 999.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro.png"));
+        phonesList.add(new Phone("iPhone 15 Pro Max", 1269.00,
+                "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro-Max.png"));
 
         // Add products
-        for (Phone phone : phones) {
-            JPanel productPanel = new JPanel();
-            productPanel.setLayout(new BoxLayout(productPanel, BoxLayout.Y_AXIS));
-
-            JLabel picLabel;
-            try {
-                BufferedImage productImage = ImageIO.read(new File(phone.getImagePath()));
-                Image scaledImage = productImage.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
-                ImageIcon productIcon = new ImageIcon(scaledImage);
-                picLabel = new JLabel(productIcon);
-            } catch (IOException e) {
-                e.printStackTrace();
-                picLabel = new JLabel("Image not found");
-            }
-
-            JLabel priceLabel = new JLabel("$" + phone.getPrice());
-            JLabel nameLabel = new JLabel(phone.getName());
-            JButton addToCartButton = new JButton("Add To Cart");
-            addToCartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-            picLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            priceLabel.setFont(labelFont3);
-            nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            nameLabel.setFont(labelFont4);
-            addToCartButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            productPanel.add(Box.createVerticalStrut(10));
-            productPanel.add(picLabel);
-            productPanel.add(Box.createVerticalStrut(10));
-            productPanel.add(priceLabel);
-            productPanel.add(nameLabel);
-            productPanel.add(Box.createVerticalStrut(10));
-            productPanel.add(addToCartButton);
-
-            navProductPanel.add(productPanel);
-
-            addToCartButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    addPhoneToCart(phone);
-                }
-            });
-        }
+        updateProductList();
 
         // Adding components to dashboard panel
         dashboardPanel.add(lblPayment);
@@ -217,7 +184,7 @@ public class Dashboard {
 
         menuCustomers = new JMenu("Customers");
         menuItemAddCustomer = new JMenuItem("Add Customer");
-        menuItemViewCustomers = new JMenuItem("View Customers");
+                menuItemViewCustomers = new JMenuItem("View Customers");
         menuCustomers.add(menuItemAddCustomer);
         menuCustomers.add(menuItemViewCustomers);
 
@@ -239,6 +206,7 @@ public class Dashboard {
         btnBack.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                frame.dispose();
                 new PhoneShopManagementSystem();
             }
         });
@@ -262,6 +230,181 @@ public class Dashboard {
                 generateInvoice();
             }
         });
+
+        menuItemAddProduct.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showAddProductDialog();
+            }
+        });
+    }
+
+    private void updateProductList() {
+        navProductPanel.removeAll();
+
+        for (Phone phone : phonesList) {
+            JPanel productPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+
+            JLabel picLabel;
+            try {
+                BufferedImage productImage = ImageIO.read(new File(phone.getImagePath()));
+                Image scaledImage = productImage.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+                ImageIcon productIcon = new ImageIcon(scaledImage);
+                picLabel = new JLabel(productIcon);
+            } catch (IOException e) {
+                e.printStackTrace();
+                picLabel = new JLabel("Image not found");
+            }
+
+            JLabel priceLabel = new JLabel("$" + phone.getPrice());
+            JLabel nameLabel = new JLabel(phone.getName());
+            JButton addToCartButton = new JButton("Add To Cart");
+            addToCartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+            priceLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+            nameLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+
+            // Set constraints and add components
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.gridwidth = GridBagConstraints.REMAINDER;
+            gbc.insets = new Insets(10, 0, 10, 0);
+            productPanel.add(picLabel, gbc);
+
+            gbc.gridy = 1;
+            productPanel.add(priceLabel, gbc);
+
+            gbc.gridy = 2;
+            productPanel.add(nameLabel, gbc);
+
+            gbc.gridy = 3;
+            productPanel.add(addToCartButton, gbc);
+
+            navProductPanel.add(productPanel);
+
+            addToCartButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    addPhoneToCart(phone);
+                }
+            });
+        }
+
+        navProductPanel.revalidate();
+        navProductPanel.repaint();
+    }
+
+    private void copyImageFile(File source, File dest) throws IOException {
+        Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+    
+    //Add Product Menu
+    private void showAddProductDialog() {
+        JDialog dialog = new JDialog(frame, "Add Product", true);
+        dialog.setSize(500, 400);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(null);
+
+        JLabel lblName = new JLabel("Product Name:");
+        JTextField txtName = new JTextField();
+        JLabel lblPrice = new JLabel("Price:");
+        JTextField txtPrice = new JTextField();
+        JLabel lblImagePath = new JLabel("Image Path:");
+        JTextField txtImagePath = new JTextField();
+        JButton btnBrowse = new JButton("Browse");
+        JButton btnAdd = new JButton("Add");
+        JButton btnCancel = new JButton("Cancel");
+        
+         // Set bounds for components
+        lblName.setBounds(30, 30, 100, 30);
+        txtName.setBounds(150, 30, 200, 30);
+        lblPrice.setBounds(30, 70, 100, 30);
+        txtPrice.setBounds(150, 70, 200, 30);
+        lblImagePath.setBounds(30, 110, 100, 30);
+        txtImagePath.setBounds(150, 110, 200, 30);
+        btnBrowse.setBounds(360, 110, 80, 30);
+        btnAdd.setBounds(150, 160, 80, 30);
+        btnCancel.setBounds(240, 160, 80, 30);
+        
+        btnBrowse.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                int returnValue = fileChooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    txtImagePath.setText(selectedFile.getAbsolutePath());
+                }
+            }
+        });
+
+        btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String name = txtName.getText();
+                double price;
+                try {
+                    price = Double.parseDouble(txtPrice.getText());
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Please enter a valid price.", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                String imagePath = txtImagePath.getText();
+                if (name.isEmpty() || imagePath.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "Please fill all fields.", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Copy the image to a new location within the project
+                File sourceFile = new File(imagePath);
+                String fileName = sourceFile.getName();
+                File destFile = new File("D:/RUPP/Java Programming/RUPP/src/rupp/images/" + fileName);
+                try {
+                    copyImageFile(sourceFile, destFile);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Failed to copy the image.", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Save product details to a file
+                try (PrintWriter out = new PrintWriter(new FileWriter("products.txt", true))) {
+                    out.println(name + ";" + price + ";" + destFile.getAbsolutePath());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Failed to save product details.", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Phone newPhone = new Phone(name, price, destFile.getAbsolutePath());
+                phonesList.add(newPhone);
+                updateProductList();
+                dialog.dispose();
+            }
+        });
+
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        });
+
+        dialog.add(lblName);
+        dialog.add(txtName);
+        dialog.add(lblPrice);
+        dialog.add(txtPrice);
+        dialog.add(lblImagePath);
+        dialog.add(txtImagePath);
+        dialog.add(btnBrowse);
+        dialog.add(new JLabel());
+        dialog.add(btnAdd);
+        dialog.add(btnCancel);
+
+        dialog.setVisible(true);
     }
 
     private void addPhoneToCart(Phone phone) {
@@ -299,3 +442,29 @@ public class Dashboard {
         new Dashboard();
     }
 }
+
+class Phone {
+    private String name;
+    private double price;
+    private String imagePath;
+
+    public Phone(String name, double price, String imagePath) {
+        this.name = name;
+        this.price = price;
+        this.imagePath = imagePath;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+}
+
+       
