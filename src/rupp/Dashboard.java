@@ -6,16 +6,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import javax.imageio.ImageIO;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Dashboard {
     private JFrame frame;
@@ -37,6 +35,9 @@ public class Dashboard {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1920, 1080);
         frame.setLocationRelativeTo(null); // Center the frame on the screen
+
+        phonesList = new ArrayList<>();
+        readProductsFromFile();
 
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
@@ -122,33 +123,6 @@ public class Dashboard {
         // Optionally, you can also set the block increment for even faster scrolling
         verticalScrollBar.setBlockIncrement(100);
         horizontalScrollBar.setBlockIncrement(100);
-
-        // Sample phone data
-        phonesList = new ArrayList<>();
-        phonesList.add(new Phone("iPhone 12", 559.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-12.png"));
-        phonesList.add(new Phone("iPhone 12", 559.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-12.png"));
-        phonesList.add(new Phone("iPhone 12 Pro LL/A", 659.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro.png"));
-        phonesList.add(new Phone("iPhone 12 Pro Max LL/A", 759.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-12-Pro_Max.png"));
-        phonesList.add(
-                new Phone("iPhone 13 128G", 619.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13.png"));
-        phonesList.add(new Phone("iPhone 13 Pro 128G", 719.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro.png"));
-        phonesList.add(new Phone("iPhone 13 Pro Max 128G USA (New)", 859.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-13-Pro-Max.png"));
-        phonesList.add(
-                new Phone("iPhone 14 ZP/A", 789.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14.png"));
-        phonesList.add(new Phone("iPhone 14 Pro 128G", 999.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro.png"));
-        phonesList.add(new Phone("iPhone 14 Pro MAX LL/A", 1049.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/iPhone-14-Pro-Max.png"));
-        phonesList.add(
-                new Phone("iPhone 15 Plus", 919.00, "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15.png"));
-        phonesList.add(new Phone("iPhone 15 Pro USA", 999.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro.png"));
-        phonesList.add(new Phone("iPhone 15 Pro Max", 1269.00,
-                "D:/RUPP/Java Programming/RUPP/src/rupp/images/Iphone-15-Pro-Max.png"));
 
         // Add products
         updateProductList();
@@ -238,7 +212,57 @@ public class Dashboard {
             }
         });
     }
-
+//private void updateProductList() {
+//        navProductPanel.removeAll();
+//
+//        for (Phone phone : phonesList) {
+//            JPanel productPanel = new JPanel(new GridBagLayout());
+//            GridBagConstraints gbc = new GridBagConstraints();
+//
+//            JLabel picLabel;
+//            try {
+//                BufferedImage productImage = ImageIO.read(new File(phone.getImagePath()));
+//                Image scaledImage = productImage.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+//                ImageIcon productIcon = new ImageIcon(scaledImage);
+//                picLabel = new JLabel(productIcon);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                picLabel = new JLabel("Image not found");
+//            }
+//
+//            JLabel priceLabel = new JLabel("$" + phone.getPrice());
+//            JLabel nameLabel = new JLabel(phone.getName());
+//            JButton addToCartButton = new JButton("Add To Cart");
+//            addToCartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//
+//            priceLabel.setFont(new Font("Arial", Font.PLAIN, 20));
+//            nameLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+//
+//            // Set constraints and add components
+//            gbc.gridx = 0;
+//            gbc.gridy = 0;
+//            gbc.gridwidth = GridBagConstraints.REMAINDER;
+//            gbc.insets = new Insets(10, 0, 10, 0);
+//            productPanel.add(picLabel, gbc);
+//
+//            gbc.gridy = 1;
+//            productPanel.add(priceLabel, gbc);
+//
+//            gbc.gridy = 2;
+//            productPanel.add(nameLabel, gbc);
+//
+//            gbc.gridy = 3;
+//            productPanel.add(addToCartButton, gbc);
+//
+//            navProductPanel.add(productPanel);
+//
+//            addToCartButton.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    addToPaymentTable(phone);
+//                }
+//            });
+//        }
     private void updateProductList() {
         navProductPanel.removeAll();
 
@@ -262,10 +286,9 @@ public class Dashboard {
             JButton addToCartButton = new JButton("Add To Cart");
             addToCartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-            priceLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-            nameLabel.setFont(new Font("Arial", Font.PLAIN, 17));
+            priceLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+            nameLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
-            // Set constraints and add components
             gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -286,7 +309,7 @@ public class Dashboard {
             addToCartButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    addPhoneToCart(phone);
+                    addToPaymentTable(phone);
                 }
             });
         }
@@ -295,11 +318,29 @@ public class Dashboard {
         navProductPanel.repaint();
     }
 
-    private void copyImageFile(File source, File dest) throws IOException {
-        Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    private void addToPaymentTable(Phone phone) {
+        boolean found = false;
+        for (int i = 0; i < paymentTableModel.getRowCount(); i++) {
+            if (paymentTableModel.getValueAt(i, 1).equals(phone.getName())) {
+                int qty = (int) paymentTableModel.getValueAt(i, 3) + 1;
+                paymentTableModel.setValueAt(qty, i, 3);
+                paymentTableModel.setValueAt(qty * phone.getPrice(), i, 4);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            Object[] rowData = new Object[5];
+            rowData[0] = paymentTableModel.getRowCount() + 1;
+            rowData[1] = phone.getName();
+            rowData[2] = phone.getPrice();
+            rowData[3] = 1;
+            rowData[4] = phone.getPrice();
+            paymentTableModel.addRow(rowData);
+        }
     }
-    
-    //Add Product Menu
+
     private void showAddProductDialog() {
         JDialog dialog = new JDialog(frame, "Add Product", true);
         dialog.setSize(500, 400);
@@ -310,8 +351,8 @@ public class Dashboard {
         JTextField txtName = new JTextField();
         JLabel lblPrice = new JLabel("Price:");
         JTextField txtPrice = new JTextField();
-        JLabel lblImagePath = new JLabel("Image Path:");
-        JTextField txtImagePath = new JTextField();
+        JLabel lblImage = new JLabel("Image Path:");
+        JTextField txtImage = new JTextField();
         JButton btnBrowse = new JButton("Browse");
         JButton btnAdd = new JButton("Add");
         JButton btnCancel = new JButton("Cancel");
@@ -321,12 +362,23 @@ public class Dashboard {
         txtName.setBounds(150, 30, 200, 30);
         lblPrice.setBounds(30, 70, 100, 30);
         txtPrice.setBounds(150, 70, 200, 30);
-        lblImagePath.setBounds(30, 110, 100, 30);
-        txtImagePath.setBounds(150, 110, 200, 30);
+        lblImage.setBounds(30, 110, 100, 30);
+        txtImage.setBounds(150, 110, 200, 30);
         btnBrowse.setBounds(360, 110, 80, 30);
         btnAdd.setBounds(150, 160, 80, 30);
         btnCancel.setBounds(240, 160, 80, 30);
         
+
+        dialog.add(lblName);
+        dialog.add(txtName);
+        dialog.add(lblPrice);
+        dialog.add(txtPrice);
+        dialog.add(lblImage);
+        dialog.add(txtImage);
+        dialog.add(btnBrowse);
+        dialog.add(btnAdd);
+        dialog.add(btnCancel);
+
         btnBrowse.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -334,53 +386,20 @@ public class Dashboard {
                 int returnValue = fileChooser.showOpenDialog(null);
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    txtImagePath.setText(selectedFile.getAbsolutePath());
+                    txtImage.setText(selectedFile.getAbsolutePath());
                 }
             }
         });
-
+        
         btnAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = txtName.getText();
-                double price;
-                try {
-                    price = Double.parseDouble(txtPrice.getText());
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(dialog, "Please enter a valid price.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                String imagePath = txtImagePath.getText();
-                if (name.isEmpty() || imagePath.isEmpty()) {
-                    JOptionPane.showMessageDialog(dialog, "Please fill all fields.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Copy the image to a new location within the project
-                File sourceFile = new File(imagePath);
-                String fileName = sourceFile.getName();
-                File destFile = new File("D:/RUPP/Java Programming/RUPP/src/rupp/images/" + fileName);
-                try {
-                    copyImageFile(sourceFile, destFile);
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(dialog, "Failed to copy the image.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Save product details to a file
-                try (PrintWriter out = new PrintWriter(new FileWriter("products.txt", true))) {
-                    out.println(name + ";" + price + ";" + destFile.getAbsolutePath());
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(dialog, "Failed to save product details.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                Phone newPhone = new Phone(name, price, destFile.getAbsolutePath());
+                double price = Double.parseDouble(txtPrice.getText());
+                String imagePath = txtImage.getText();
+                Phone newPhone = new Phone(name, price, imagePath);
                 phonesList.add(newPhone);
+                writeProductToFile(newPhone);
                 updateProductList();
                 dialog.dispose();
             }
@@ -393,78 +412,63 @@ public class Dashboard {
             }
         });
 
-        dialog.add(lblName);
-        dialog.add(txtName);
-        dialog.add(lblPrice);
-        dialog.add(txtPrice);
-        dialog.add(lblImagePath);
-        dialog.add(txtImagePath);
-        dialog.add(btnBrowse);
-        dialog.add(new JLabel());
-        dialog.add(btnAdd);
-        dialog.add(btnCancel);
-
+        dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
     }
 
-    private void addPhoneToCart(Phone phone) {
-        boolean found = false;
-        int rowCount = paymentTableModel.getRowCount();
-        for (int i = 0; i < rowCount; i++) {
-            if (paymentTableModel.getValueAt(i, 1).equals(phone.getName())) {
-                int qty = (int) paymentTableModel.getValueAt(i, 3);
-                double price = (double) paymentTableModel.getValueAt(i, 2);
-                paymentTableModel.setValueAt(qty + 1, i, 3);
-                paymentTableModel.setValueAt(price * (qty + 1), i, 4);
-                found = true;
-                break;
-            }
+    private void writeProductToFile(Phone phone) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("products.txt", true))) {
+            writer.write(phone.getName() + "," + phone.getPrice() + "," + phone.getImagePath());
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        if (!found) {
-            Object[] row = { rowCount + 1, phone.getName(), phone.getPrice(), 1, phone.getPrice() };
-            paymentTableModel.addRow(row);
+    }
+
+    private void readProductsFromFile() {
+        File file = new File("products.txt");
+        if (file.exists()) {
+            try (Scanner scanner = new Scanner(file)) {
+                while (scanner.hasNextLine()) {
+                    String[] productData = scanner.nextLine().split(",");
+                    if (productData.length == 3) {
+                        String name = productData[0];
+                        double price = Double.parseDouble(productData[1]);
+                        String imagePath = productData[2];
+                        phonesList.add(new Phone(name, price, imagePath));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private void generateInvoice() {
-        double totalPrice = 0.0;
-        int rowCount = paymentTableModel.getRowCount();
-        for (int i = 0; i < rowCount; i++) {
-            double totalForRow = (double) paymentTableModel.getValueAt(i, 4);
-            totalPrice += totalForRow;
+        try (PrintWriter writer = new PrintWriter("invoice.txt")) {
+            writer.println("Invoice:");
+            writer.println("===========================================");
+            for (int i = 0; i < paymentTableModel.getRowCount(); i++) {
+                String name = (String) paymentTableModel.getValueAt(i, 1);
+                double price = (double) paymentTableModel.getValueAt(i, 2);
+                int qty = (int) paymentTableModel.getValueAt(i, 3);
+                double total = (double) paymentTableModel.getValueAt(i, 4);
+                writer.printf("%s - $%.2f x %d = $%.2f%n", name, price, qty, total);
+            }
+            writer.println("===========================================");
+            writer.println("Thank you for your purchase!");
+            JOptionPane.showMessageDialog(frame, "Invoice generated successfully!", "Invoice", JOptionPane.INFORMATION_MESSAGE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-
-        String message = "Total Price: $" + totalPrice;
-        JOptionPane.showMessageDialog(frame, message, "Invoice", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public static void main(String[] args) {
-        new Dashboard();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Dashboard();
+            }
+        });
     }
 }
-
-class Phone {
-    private String name;
-    private double price;
-    private String imagePath;
-
-    public Phone(String name, double price, String imagePath) {
-        this.name = name;
-        this.price = price;
-        this.imagePath = imagePath;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-}
-
-       

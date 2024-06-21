@@ -1,1 +1,7 @@
 Testing;1222.0;D:\RUPP\Java Programming\RUPP\src\rupp\images\test.jpg
+123;1200.0;D:\RUPP\Java Programming\RUPP\src\rupp\images\photo_2024-03-04_11-26-20.jpg
+iPhone 12,999.0,D:\ImageIphone\iPhone-12.png
+iPhone 12 Pro,1000.0,D:\ImageIphone\iPhone-12-Pro.png
+iPhone 13,1999.0,D:\ImageIphone\iPhone-13.png
+iPhone 12 Pro Max,2000.0,D:\ImageIphone\iPhone-12-Pro_Max.png
+iPhone 13 Pro,1999.0,D:\ImageIphone\iPhone-13-Pro.png
