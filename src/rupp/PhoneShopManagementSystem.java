@@ -14,7 +14,7 @@ public class PhoneShopManagementSystem {
     private final JPanel mainPanel;
     private final CardLayout cardLayout;
     private JPanel loginPanel, registerPanel;
-
+    private String usernameLogin;
     // In-memory user storage
     private final String USERS_FILE = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
     private final Map<String, String> users = new HashMap<>();
@@ -36,7 +36,6 @@ public class PhoneShopManagementSystem {
         frame.setVisible(true);
     }
 
-
     private void createLoginPanel() {
         loginPanel = new JPanel(null);
 
@@ -56,7 +55,7 @@ public class PhoneShopManagementSystem {
         JPasswordField txtPassword = new JPasswordField();
 
         // Load and resize the eye icons
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");                                                                                                  // // here
+        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png"); // // here
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
@@ -131,11 +130,11 @@ public class PhoneShopManagementSystem {
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String username = txtUsername.getText();
+                usernameLogin = txtUsername.getText();
                 String password = new String(txtPassword.getPassword());
-                if (users.containsKey(username) && users.get(username).equals(password)) {
+                if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
                     frame.dispose(); // Close the login window
-                    new Dashboard(); // Go to Fram Dashboard
+                    new Dashboard(usernameLogin, password);
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -150,7 +149,7 @@ public class PhoneShopManagementSystem {
             }
         });
     }
-    
+
     private void createRegisterPanel() {
         registerPanel = new JPanel(null);
 
@@ -200,11 +199,11 @@ public class PhoneShopManagementSystem {
         btnBack.setFont(labelFont2);
 
         // Load and resize the eye icons
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");                                                                                              // icon
+        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png"); // icon
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
-        ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png"); 
+        ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
         Image hideImg = hideIcon.getImage();
         Image resizedHideImg = hideImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedHideIcon = new ImageIcon(resizedHideImg);
@@ -328,6 +327,6 @@ public class PhoneShopManagementSystem {
     }
 
     public static void main(String[] args) {
-        new PhoneShopManagementSystem();
+        SwingUtilities.invokeLater(() -> new PhoneShopManagementSystem());
     }
 }

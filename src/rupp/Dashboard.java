@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,17 +16,20 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 public class Dashboard {
-    private JFrame frame;
-    private JPanel mainPanel;
-    private CardLayout cardLayout;
-    private JPanel dashboardPanel;
+    private final JFrame frame;
+    private final JPanel mainPanel;
+    private final CardLayout cardLayout;
+
+    private JPanel dashboard;
+    private JPanel newsalePanel;
     private JTable paymentTable;
     private DefaultTableModel paymentTableModel;
-    private ArrayList<Phone> phonesList;
+    private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
     private JScrollPane scrollPane;
+    
 
-    public Dashboard() {
+    public Dashboard(String username, String password) {
         frame = new JFrame("Phone Shop Management System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1920, 1080);
@@ -36,16 +41,234 @@ public class Dashboard {
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         frame.add(mainPanel);
+
         createDashboardPanel();
-        mainPanel.add(dashboardPanel, "Dashboard");
+        mainPanel.add(dashboard, "Dashboard");
+        createNewSalePanel();
+        mainPanel.add(newsalePanel, "NewSale");
 
         createSidebar();
 
         frame.setVisible(true);
+
+        updateProductList();
+    }
+
+    private JLabel createSummaryLabel(String title, String value, Color color) {
+        JLabel label = new JLabel(
+                "<html><div style='text-align: center;'><h2>" + value + "</h2><p>" + title + "</p></div></html>");
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setVerticalAlignment(SwingConstants.CENTER);
+        label.setBorder(BorderFactory.createLineBorder(color, 2));
+        label.setBackground(color);
+        label.setOpaque(true);
+        label.setPreferredSize(new Dimension(100, 100));
+        return label;
     }
 
     private void createDashboardPanel() {
-        dashboardPanel = new JPanel(null);
+        dashboard = new JPanel(new BorderLayout());
+        updateDashboardPanels();
+    }
+
+    private void updateDashboardPanels() {
+        dashboard.removeAll();
+        updateSummaryPanel();
+        updateRecentPurchasesPanel();
+        updateTopProductsPanel();
+        dashboard.revalidate();
+        dashboard.repaint();
+    }
+
+    private void updateSummaryPanel() {
+        // Ensure the products are loaded into phonesList
+        readProductsFromFile();
+
+        // Create a navigation title
+        JLabel navTitle = new JLabel("Dashboard");
+        navTitle.setFont(new Font("Arial", Font.BOLD, 24));
+        navTitle.setForeground(Color.BLUE);
+        navTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        navTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        // Create user info panel (right side)
+        JPanel userInfoPanel = new JPanel(new BorderLayout());
+        userInfoPanel.setBackground(Color.WHITE);
+        userInfoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        // Simulated user data (replace with actual user data retrieval logic)
+        ImageIcon userLogo = new ImageIcon("path_to_user_logo.png"); // Replace with actual path
+        // String userName = "John Doe"; // Replace with actual user name
+
+        // User info components
+        JLabel userLogoLabel = new JLabel(userLogo);
+        JLabel userNameLabel = new JLabel(usernameLogin);
+        JButton profileButton = new JButton("Profile");
+        JButton signOutButton = new JButton("Sign Out");
+
+        // Add action listeners to profile and sign out buttons
+        profileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Handle profile button click (open profile dialog)
+                showProfileDialog("Panha", userLogo);
+            }
+        });
+
+        signOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Handle sign out button click (perform sign out logic)
+                performSignOut();
+            }
+        });
+
+        // Add components to user info panel
+        userInfoPanel.add(userLogoLabel, BorderLayout.WEST);
+        userInfoPanel.add(userNameLabel, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 0)); // Adjust layout as needed
+        buttonPanel.add(profileButton);
+        buttonPanel.add(signOutButton);
+        userInfoPanel.add(buttonPanel, BorderLayout.EAST);
+
+        // Header Panel (navigation title + user info panel)
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.add(navTitle, BorderLayout.WEST);
+        headerPanel.add(Box.createRigidArea(new Dimension(20, 0))); // Add space between navTitle and userInfoPanel
+        headerPanel.add(userInfoPanel, BorderLayout.EAST);
+
+        // Summary Panel
+        JPanel summaryPanel = new JPanel(new GridLayout(1, 5, 10, 10));
+        summaryPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        int totalProductsCount = phonesList.size();
+        int lowStockCount = (int) phonesList.stream().filter(p -> p.getQty() > 0 && p.getQty() < 5).count();
+        int outOfStockCount = (int) phonesList.stream().filter(p -> p.getQty() == 0).count();
+        Phone mostStockProduct = phonesList.stream()
+                .max((p1, p2) -> Integer.compare(p1.getQty(), p2.getQty())).orElse(null);
+
+        JLabel totalProducts = createSummaryLabel("Total Products", String.valueOf(totalProductsCount), Color.ORANGE);
+        JLabel lowStockProducts = createSummaryLabel("Low Stock Products", String.valueOf(lowStockCount),
+                Color.MAGENTA);
+        JLabel outOfStockProducts = createSummaryLabel("Out of Stock Products", String.valueOf(outOfStockCount),
+                Color.RED);
+        JLabel mostStockProductLabel = createSummaryLabel("Most Stock Product",
+                mostStockProduct != null ? mostStockProduct.getName() : "N/A", Color.GREEN);
+
+        summaryPanel.add(totalProducts);
+        summaryPanel.add(lowStockProducts);
+        summaryPanel.add(outOfStockProducts);
+        summaryPanel.add(mostStockProductLabel);
+
+        // Add header panel and summary panel to the dashboard
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(summaryPanel, BorderLayout.CENTER);
+        dashboard.add(mainPanel, BorderLayout.NORTH);
+    }
+
+    // Method to show profile dialog
+    private void showProfileDialog(String userName, ImageIcon userLogo) {
+        // Create dialog
+        JDialog profileDialog = new JDialog();
+        profileDialog.setTitle("User Profile");
+        profileDialog.setSize(300, 200);
+        profileDialog.setResizable(false);
+        profileDialog.setLocationRelativeTo(null);
+        profileDialog.setLayout(new BorderLayout());
+
+        // Panel for user info
+        JPanel userInfoPanel = new JPanel(new BorderLayout());
+        userInfoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        // Add user logo
+        JLabel userLogoLabel = new JLabel(userLogo);
+        userInfoPanel.add(userLogoLabel, BorderLayout.WEST);
+
+        // Add user name
+        JLabel userNameLabel = new JLabel("User: " + userName);
+        userInfoPanel.add(userNameLabel, BorderLayout.CENTER);
+
+        // Panel for buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+        // Add profile button
+        JButton profileButton = new JButton("Profile");
+        profileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Handle profile button action (if needed)
+            }
+        });
+        buttonPanel.add(profileButton);
+
+        // Add sign out button
+        JButton signOutButton = new JButton("Sign Out");
+        signOutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Handle sign out button action (if needed)
+                profileDialog.dispose(); // Close dialog
+                performSignOut(); // Perform sign out logic
+            }
+        });
+        buttonPanel.add(signOutButton);
+
+        // Add panels to dialog
+        profileDialog.add(userInfoPanel, BorderLayout.CENTER);
+        profileDialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Show dialog
+        profileDialog.setVisible(true);
+    }
+
+    // Method to perform sign out
+    private void performSignOut() {
+        // Implement your sign out logic here
+    }
+
+    private void updateRecentPurchasesPanel() {
+        JPanel recentPurchasePanel = new JPanel(new BorderLayout());
+        recentPurchasePanel.setBorder(BorderFactory.createTitledBorder("Recent Purchase Invoice"));
+
+        String[] recentColumns = { "Purchase Date", "Reference No.", "Vendor Name", "Order Subtotal",
+                "Other Charges Total", "Order Total" };
+        Object[][] recentData = {
+                { "2017-01-11", "P00019S", "Mike", 1500, 10, 1510 },
+                { "2017-01-09", "P00020S", "John", 200, 20, 220 },
+                { "2017-01-04", "P00015S", "Emma", 1000, 20, 1020 },
+                { "2017-01-01", "P00016S", "Noel", 2500, 10, 2510 },
+                { "2016-12-29", "P00017S", "Ruby", 100, 10, 110 }
+        };
+
+        JTable recentTable = new JTable(recentData, recentColumns);
+        JScrollPane recentScrollPane = new JScrollPane(recentTable);
+        recentPurchasePanel.add(recentScrollPane, BorderLayout.CENTER);
+
+        dashboard.add(recentPurchasePanel, BorderLayout.CENTER);
+    }
+
+    private void updateTopProductsPanel() {
+        JPanel topProductsPanel = new JPanel(new BorderLayout());
+        topProductsPanel.setBorder(BorderFactory.createTitledBorder("Top 5 Purchase Product"));
+
+        String[] topProductsColumns = { "SKU", "Product Name", "Category", "Qty.", "Price", "Total" };
+        Object[][] topProductsData = {
+                { "509-GRPH", "Kaplan Melton Coat Navy", "Jackets", 50, 50, 2500 },
+                { "307-CARB", "Patch Rugger LS Shirt Taupe", "Shirts", 10, 100, 1000 },
+                { "409-CARB", "Waffle Hood Knit Olive", "Jackets", 15, 20, 300 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 }
+        };
+
+        JTable topProductsTable = new JTable(topProductsData, topProductsColumns);
+        JScrollPane topProductsScrollPane = new JScrollPane(topProductsTable);
+        topProductsPanel.add(topProductsScrollPane, BorderLayout.CENTER);
+
+        dashboard.add(topProductsPanel, BorderLayout.SOUTH);
+    }
+
+    private void createNewSalePanel() {
+        newsalePanel = new JPanel(null);
 
         JLabel lblPayment = new JLabel("Payment");
         JPanel navPaymentPanel = new JPanel();
@@ -125,18 +348,17 @@ public class Dashboard {
         updateProductList();
 
         // Adding components to dashboard panel
-        dashboardPanel.add(lblPayment);
-        dashboardPanel.add(navPaymentPanel);
-        dashboardPanel.add(paymentScrollPane);
-        dashboardPanel.add(btnBack);
-        dashboardPanel.add(btnClear);
-        dashboardPanel.add(btnExit);
-        dashboardPanel.add(btnInvoice);
-        dashboardPanel.add(lblProduct);
-        dashboardPanel.add(navListProductPanel);
-        dashboardPanel.add(scrollPane);
-
-        dashboardPanel.setBackground(Color.cyan);
+        newsalePanel.add(lblPayment);
+        newsalePanel.add(navPaymentPanel);
+        newsalePanel.add(paymentScrollPane);
+        newsalePanel.add(btnBack);
+        newsalePanel.add(btnClear);
+        newsalePanel.add(btnExit);
+        newsalePanel.add(btnInvoice);
+        newsalePanel.add(lblProduct);
+        newsalePanel.add(navListProductPanel);
+        newsalePanel.add(scrollPane);
+        newsalePanel.setBackground(Color.cyan);
 
         // Button actions
         btnBack.addActionListener(new ActionListener() {
@@ -225,7 +447,6 @@ public class Dashboard {
         sidebar.add(btnViewCustomers);
         sidebar.add(btnGenerateReport);
         sidebar.add(btnSettings);
-
         frame.add(sidebar, BorderLayout.WEST);
 
         btnAddProduct.addActionListener(new ActionListener() {
@@ -244,10 +465,17 @@ public class Dashboard {
             }
         });
 
-        btnNewSale.addActionListener(new ActionListener() {
+        btnDashboard.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 cardLayout.show(mainPanel, "Dashboard");
+                updateProductList();
+            }
+        });
+        btnNewSale.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cardLayout.show(mainPanel, "NewSale");
             }
         });
 
@@ -346,27 +574,20 @@ public class Dashboard {
             for (int i = 0; i < paymentTableModel.getRowCount(); i++) {
                 String name = (String) paymentTableModel.getValueAt(i, 1);
                 double price = (double) paymentTableModel.getValueAt(i, 2);
-                int qty = (int) paymentTableModel.getValueAt(i, 3);
+                int quantity = (int) paymentTableModel.getValueAt(i, 3);
                 double total = (double) paymentTableModel.getValueAt(i, 4);
 
-                // Find the product in the phonesList
-                for (Phone phone : phonesList) {
-                    if (phone.getName().equals(name)) {
-                        // Deduct the sold quantity from the inventory
-                        phone.setQty(phone.getQty() - qty);
-                        break;
-                    }
-                }
-
-                writer.printf("%s - $%.2f x %d = $%.2f%n", name, price, qty, total);
+                writer.printf("%s - $%.2f x %d = $%.2f%n", name, price, quantity, total);
             }
             writer.println("===========================================");
             writer.println("Thank you for your purchase!");
             JOptionPane.showMessageDialog(frame, "Invoice generated successfully!", "Invoice",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            // After generating invoice, update the products file with new quantities
             writeProductsToFile();
+
+            // Update the dashboard panels after generating the invoice
+            updateDashboardPanels();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -484,10 +705,10 @@ public class Dashboard {
 
                     // Update the product list display
                     updateProductList();
-
                     // Write the updated product list to file
                     writeProductsToFile();
-
+                    // Update the dashboard panels after generating the invoice
+                    updateDashboardPanels();
                     // Close the dialog
                     dialog.dispose();
                 } catch (NumberFormatException ex) {
@@ -507,6 +728,7 @@ public class Dashboard {
     }
 
     private void readProductsFromFile() {
+        phonesList.clear();
         File file = new File("products.txt");
         if (file.exists()) {
             try (Scanner scanner = new Scanner(file)) {
