@@ -134,13 +134,14 @@ public class PhoneShopManagementSystem {
                 String password = new String(txtPassword.getPassword());
                 if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
                     frame.dispose(); // Close the login window
-                    new Dashboard(usernameLogin, password);
+                    SwingUtilities.invokeLater(() -> new Dashboard());
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
+
 
         btnRegister.addActionListener(new ActionListener() {
             @Override
@@ -149,6 +150,8 @@ public class PhoneShopManagementSystem {
             }
         });
     }
+    
+
 
     private void createRegisterPanel() {
         registerPanel = new JPanel(null);

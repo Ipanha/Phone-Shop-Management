@@ -3,15 +3,15 @@ package rupp;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
@@ -27,9 +27,8 @@ public class Dashboard {
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
     private JScrollPane scrollPane;
-    
 
-    public Dashboard(String username, String password) {
+    public Dashboard() {
         frame = new JFrame("Phone Shop Management System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1920, 1080);
@@ -50,7 +49,6 @@ public class Dashboard {
         createSidebar();
 
         frame.setVisible(true);
-
         updateProductList();
     }
 
@@ -80,63 +78,74 @@ public class Dashboard {
         dashboard.repaint();
     }
 
+    private void navigation() {
+
+    }
+
     private void updateSummaryPanel() {
         // Ensure the products are loaded into phonesList
         readProductsFromFile();
-
+        Font font1 = new Font("Arial", Font.BOLD, 24);
         // Create a navigation title
         JLabel navTitle = new JLabel("Dashboard");
-        navTitle.setFont(new Font("Arial", Font.BOLD, 24));
+        navTitle.setFont(font1);
         navTitle.setForeground(Color.BLUE);
         navTitle.setHorizontalAlignment(SwingConstants.CENTER);
         navTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Create user info panel (right side)
+        // User info panel (right side)
         JPanel userInfoPanel = new JPanel(new BorderLayout());
         userInfoPanel.setBackground(Color.WHITE);
         userInfoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Simulated user data (replace with actual user data retrieval logic)
-        ImageIcon userLogo = new ImageIcon("path_to_user_logo.png"); // Replace with actual path
-        // String userName = "John Doe"; // Replace with actual user name
+        ImageIcon userLogo = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\p1.png");
+        // Scale the image to the desired size (e.g., 50x50 pixels)
+        Image scaledImage = userLogo.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        // Create a new ImageIcon with the scaled image
+        ImageIcon scaledUserLogo = new ImageIcon(scaledImage);
+        String userName = "CHET PANHA"; // Replace with actual user name
 
         // User info components
-        JLabel userLogoLabel = new JLabel(userLogo);
-        JLabel userNameLabel = new JLabel(usernameLogin);
-        JButton profileButton = new JButton("Profile");
-        JButton signOutButton = new JButton("Sign Out");
+        JLabel userLogoLabel = new JLabel(scaledUserLogo);
+        userLogoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        userLogoLabel.setToolTipText("Click to view profile");
 
-        // Add action listeners to profile and sign out buttons
-        profileButton.addActionListener(new ActionListener() {
+        // userLogoLabel.addMouseListener(new MouseAdapter() {
+        // @Override
+        // public void mouseClicked(MouseEvent e) {
+        // showProfileDialog(userName, scaledUserLogo);
+        // }
+        // });
+
+        JButton userNamebtn = new JButton(userName);
+        userNamebtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        userNamebtn.setBorderPainted(false); // Remove border
+        userNamebtn.setFocusPainted(false); // Remove focus border
+        userNamebtn.setContentAreaFilled(false); // Remove background
+
+        userNamebtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle profile button click (open profile dialog)
-                showProfileDialog("Panha", userLogo);
-            }
-        });
-
-        signOutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Handle sign out button click (perform sign out logic)
-                performSignOut();
+                Image scaledImage = userLogo.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+                // Create a new ImageIcon with the scaled image
+                ImageIcon scaledUserLogo = new ImageIcon(scaledImage);
+                // userNamebtn.setSize(140);
+                showProfileDialog(userName, scaledUserLogo);
             }
         });
 
         // Add components to user info panel
         userInfoPanel.add(userLogoLabel, BorderLayout.WEST);
-        userInfoPanel.add(userNameLabel, BorderLayout.CENTER);
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 0)); // Adjust layout as needed
-        buttonPanel.add(profileButton);
-        buttonPanel.add(signOutButton);
-        userInfoPanel.add(buttonPanel, BorderLayout.EAST);
+        userInfoPanel.add(userNamebtn, BorderLayout.CENTER);
 
         // Header Panel (navigation title + user info panel)
         JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
         headerPanel.add(navTitle, BorderLayout.WEST);
         headerPanel.add(Box.createRigidArea(new Dimension(20, 0))); // Add space between navTitle and userInfoPanel
         headerPanel.add(userInfoPanel, BorderLayout.EAST);
-
+        Font font2 = new Font("Arial", Font.BOLD, 20);
         // Summary Panel
         JPanel summaryPanel = new JPanel(new GridLayout(1, 5, 10, 10));
         summaryPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -148,12 +157,16 @@ public class Dashboard {
                 .max((p1, p2) -> Integer.compare(p1.getQty(), p2.getQty())).orElse(null);
 
         JLabel totalProducts = createSummaryLabel("Total Products", String.valueOf(totalProductsCount), Color.ORANGE);
+        totalProducts.setFont(font2);
         JLabel lowStockProducts = createSummaryLabel("Low Stock Products", String.valueOf(lowStockCount),
                 Color.MAGENTA);
+        lowStockProducts.setFont(font2);
         JLabel outOfStockProducts = createSummaryLabel("Out of Stock Products", String.valueOf(outOfStockCount),
                 Color.RED);
+        outOfStockProducts.setFont(font2);
         JLabel mostStockProductLabel = createSummaryLabel("Most Stock Product",
                 mostStockProduct != null ? mostStockProduct.getName() : "N/A", Color.GREEN);
+        mostStockProductLabel.setFont(font2);
 
         summaryPanel.add(totalProducts);
         summaryPanel.add(lowStockProducts);
@@ -170,12 +183,34 @@ public class Dashboard {
     // Method to show profile dialog
     private void showProfileDialog(String userName, ImageIcon userLogo) {
         // Create dialog
-        JDialog profileDialog = new JDialog();
-        profileDialog.setTitle("User Profile");
-        profileDialog.setSize(300, 200);
+        JDialog profileDialog = new JDialog(frame, "User Profile");
+        profileDialog.setSize(380, 350);
         profileDialog.setResizable(false);
-        profileDialog.setLocationRelativeTo(null);
         profileDialog.setLayout(new BorderLayout());
+
+        // Add WindowFocusListener to dispose dialog when it loses focus
+        profileDialog.addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                // No action needed when the window gains focus
+            }
+
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                profileDialog.dispose();
+            }
+        });
+
+        // Calculate position to set dialog at top-right corner
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int dialogWidth = profileDialog.getSize().width;
+        int dialogHeight = profileDialog.getSize().height;
+        int x = screenSize.width - dialogWidth - 10; // Adjust 10 pixels from the right edge
+        int y = 100; // 10 pixels from the top edge
+        profileDialog.setLocation(x, y);
+
+        // Set dialog to stay on top
+        profileDialog.setAlwaysOnTop(true);
 
         // Panel for user info
         JPanel userInfoPanel = new JPanel(new BorderLayout());
@@ -183,17 +218,27 @@ public class Dashboard {
 
         // Add user logo
         JLabel userLogoLabel = new JLabel(userLogo);
-        userInfoPanel.add(userLogoLabel, BorderLayout.WEST);
+        userLogoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        userInfoPanel.add(userLogoLabel, BorderLayout.NORTH);
 
         // Add user name
-        JLabel userNameLabel = new JLabel("User: " + userName);
+        JLabel userNameLabel = new JLabel(userName);
+        int fontSize = 30; // Example size, adjust as needed
+        Font nameFont = new Font(userNameLabel.getFont().getName(), Font.BOLD, fontSize);
+        userNameLabel.setFont(nameFont);
+        userNameLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align user name
         userInfoPanel.add(userNameLabel, BorderLayout.CENTER);
 
         // Panel for buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buttonPanel.setBorder(new EmptyBorder(10, 0, 20, 10)); // Add space above buttons
 
         // Add profile button
         JButton profileButton = new JButton("Profile");
+        profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        Font buttonFont = new Font(profileButton.getFont().getName(), Font.BOLD, 18);
+        profileButton.setFont(buttonFont); // Set the font for profileButton
+        profileButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         profileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -202,14 +247,20 @@ public class Dashboard {
         });
         buttonPanel.add(profileButton);
 
+        // Add space between buttons
+        buttonPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add 10 pixels of horizontal space
+
         // Add sign out button
         JButton signOutButton = new JButton("Sign Out");
+        signOutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        signOutButton.setFont(buttonFont);
+        signOutButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         signOutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle sign out button action (if needed)
-                profileDialog.dispose(); // Close dialog
-                performSignOut(); // Perform sign out logic
+                profileDialog.dispose();
+                frame.dispose();
+                SwingUtilities.invokeLater(() -> new PhoneShopManagementSystem());
             }
         });
         buttonPanel.add(signOutButton);
@@ -222,26 +273,47 @@ public class Dashboard {
         profileDialog.setVisible(true);
     }
 
-    // Method to perform sign out
-    private void performSignOut() {
-        // Implement your sign out logic here
-    }
-
     private void updateRecentPurchasesPanel() {
         JPanel recentPurchasePanel = new JPanel(new BorderLayout());
-        recentPurchasePanel.setBorder(BorderFactory.createTitledBorder("Recent Purchase Invoice"));
 
-        String[] recentColumns = { "Purchase Date", "Reference No.", "Vendor Name", "Order Subtotal",
-                "Other Charges Total", "Order Total" };
+        // Create a custom font for the title
+        Font titleFont = new Font("Poppins", Font.BOLD, 20);
+        TitledBorder titledBorder = BorderFactory.createTitledBorder("Recent Purchase Invoice");
+        titledBorder.setTitleFont(titleFont);
+        recentPurchasePanel.setBorder(titledBorder);
+
+        // Updated columns
+        String[] recentColumns = { "No.", "Products Name", "Vendor Name", "Price", "Qty.", "Total", "Discount",
+                "Net Total", "Purchase Date" };
         Object[][] recentData = {
-                { "2017-01-11", "P00019S", "Mike", 1500, 10, 1510 },
-                { "2017-01-09", "P00020S", "John", 200, 20, 220 },
-                { "2017-01-04", "P00015S", "Emma", 1000, 20, 1020 },
-                { "2017-01-01", "P00016S", "Noel", 2500, 10, 2510 },
-                { "2016-12-29", "P00017S", "Ruby", 100, 10, 110 }
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
+
         };
 
         JTable recentTable = new JTable(recentData, recentColumns);
+
+        // Set font size for table cells
+        Font tableFont = new Font("Poppins", Font.PLAIN, 18);
+        recentTable.setFont(tableFont);
+        recentTable.setRowHeight(30);
+
+        // Set font size for table header
+        JTableHeader tableHeader = recentTable.getTableHeader();
+        tableHeader.setFont(new Font("Poppins", Font.BOLD, 20));
+
         JScrollPane recentScrollPane = new JScrollPane(recentTable);
         recentPurchasePanel.add(recentScrollPane, BorderLayout.CENTER);
 
@@ -250,17 +322,43 @@ public class Dashboard {
 
     private void updateTopProductsPanel() {
         JPanel topProductsPanel = new JPanel(new BorderLayout());
-        topProductsPanel.setBorder(BorderFactory.createTitledBorder("Top 5 Purchase Product"));
 
-        String[] topProductsColumns = { "SKU", "Product Name", "Category", "Qty.", "Price", "Total" };
+        // Create a custom font for the title
+        Font titleFont = new Font("Poppins", Font.BOLD, 20);
+        TitledBorder titledBorder = BorderFactory.createTitledBorder("Top Purchase Product");
+        titledBorder.setTitleFont(titleFont);
+        topProductsPanel.setBorder(titledBorder);
+
+        String[] topProductsColumns = { "No.", "Product Name", "Price", "Qty.", "Total", "Total" };
         Object[][] topProductsData = {
                 { "509-GRPH", "Kaplan Melton Coat Navy", "Jackets", 50, 50, 2500 },
                 { "307-CARB", "Patch Rugger LS Shirt Taupe", "Shirts", 10, 100, 1000 },
                 { "409-CARB", "Waffle Hood Knit Olive", "Jackets", 15, 20, 300 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 }
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
+                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
         };
 
         JTable topProductsTable = new JTable(topProductsData, topProductsColumns);
+
+        // Set font size for table cells
+        Font tableFont = new Font("Poppins", Font.PLAIN, 18);
+        topProductsTable.setFont(tableFont);
+        topProductsTable.setRowHeight(30);
+
+        // Set font size for table header
+        JTableHeader tableHeader = topProductsTable.getTableHeader();
+        tableHeader.setFont(new Font("Poppins", Font.BOLD, 20));
+
         JScrollPane topProductsScrollPane = new JScrollPane(topProductsTable);
         topProductsPanel.add(topProductsScrollPane, BorderLayout.CENTER);
 
@@ -759,6 +857,6 @@ public class Dashboard {
     }
 
     public static void main(String[] args) {
-        new Dashboard();
+        SwingUtilities.invokeLater(() -> new Dashboard());
     }
 }
