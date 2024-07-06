@@ -1,8 +1,6 @@
 package rupp;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -78,8 +76,59 @@ public class Dashboard {
         dashboard.repaint();
     }
 
-    private void navigation() {
+    private JPanel navigation() {
+        Font font1 = new Font("Arial", Font.BOLD, 24);
+        // Create a navigation title
+        JLabel navTitle = new JLabel("Dashboard");
+        navTitle.setFont(font1);
+        navTitle.setForeground(Color.BLUE);
+        navTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        navTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
 
+        // Simulated user data (replace with actual user data retrieval logic)
+        ImageIcon userLogo = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\p1.png");
+        // Scale the image to the desired size (e.g., 50x50 pixels)
+        Image scaledImage = userLogo.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        // Create a new ImageIcon with the scaled image
+        ImageIcon scaledUserLogo = new ImageIcon(scaledImage);
+        String userName = "CHET PANHA"; // Replace with actual user name
+
+        // User info components
+        JLabel userLogoLabel = new JLabel(scaledUserLogo);
+        userLogoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        userLogoLabel.setToolTipText("Click to view profile");
+
+        JButton userNamebtn = new JButton(userName);
+        userNamebtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        userNamebtn.setBorderPainted(false); // Remove border
+        userNamebtn.setFocusPainted(false); // Remove focus border
+        userNamebtn.setContentAreaFilled(false); // Remove background
+
+        userNamebtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Image scaledImage = userLogo.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+                // Create a new ImageIcon with the scaled image
+                ImageIcon scaledUserLogo = new ImageIcon(scaledImage);
+                showProfileDialog(userName, scaledUserLogo);
+            }
+        });
+
+        // User info panel (right side)
+        JPanel userInfoPanel = new JPanel(new BorderLayout());
+        userInfoPanel.setBackground(Color.WHITE);
+        userInfoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        userInfoPanel.add(userLogoLabel, BorderLayout.WEST);
+        userInfoPanel.add(userNamebtn, BorderLayout.CENTER);
+
+        // Header Panel (navigation title + user info panel)
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.add(navTitle, BorderLayout.WEST);
+        headerPanel.add(Box.createRigidArea(new Dimension(20, 0))); // Add space between navTitle and userInfoPanel
+        headerPanel.add(userInfoPanel, BorderLayout.EAST);
+
+        return headerPanel;
     }
 
     private void updateSummaryPanel() {
@@ -287,19 +336,6 @@ public class Dashboard {
                 "Net Total", "Purchase Date" };
         Object[][] recentData = {
                 { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
 
         };
 
@@ -332,20 +368,6 @@ public class Dashboard {
         String[] topProductsColumns = { "No.", "Product Name", "Price", "Qty.", "Total", "Total" };
         Object[][] topProductsData = {
                 { "509-GRPH", "Kaplan Melton Coat Navy", "Jackets", 50, 50, 2500 },
-                { "307-CARB", "Patch Rugger LS Shirt Taupe", "Shirts", 10, 100, 1000 },
-                { "409-CARB", "Waffle Hood Knit Olive", "Jackets", 15, 20, 300 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
-                { "489-RTLC", "Red Textured Leather Cardholder", "Card Holder", 20, 10, 200 },
         };
 
         JTable topProductsTable = new JTable(topProductsData, topProductsColumns);
@@ -366,7 +388,13 @@ public class Dashboard {
     }
 
     private void createNewSalePanel() {
-        newsalePanel = new JPanel(null);
+        newsalePanel = new JPanel(new BorderLayout()); // Use BorderLayout for proper alignment
+        // Get navigation header panel
+        JPanel headerPanel = navigation();
+
+        // Other components setup
+        JPanel centerPanel = new JPanel(null);
+        centerPanel.setBackground(Color.CYAN);
 
         JLabel lblPayment = new JLabel("Payment");
         JPanel navPaymentPanel = new JPanel();
@@ -378,7 +406,6 @@ public class Dashboard {
         JButton btnExit = new JButton("Exit");
         JButton btnInvoice = new JButton("Invoice");
         JTextArea txtDisplay = new JTextArea();
-        JButton btnBack = new JButton("Back");
 
         Font labelFont1 = new Font("Arial", Font.PLAIN, 40);
         Font labelFont2 = new Font("Arial", Font.PLAIN, 30);
@@ -408,18 +435,36 @@ public class Dashboard {
         txtDisplay.setBorder(padding);
 
         // Buttons
-        btnBack.setBounds(10, 900, 150, 40);
-        btnBack.setFont(labelFont2);
-        btnBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnClear.setBounds(220, 900, 150, 40);
+        btnClear.setBounds(13, 850, 150, 40);
         btnClear.setFont(labelFont2);
         btnClear.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnInvoice.setBounds(440, 900, 150, 40);
+        btnInvoice.setBounds(330, 850, 150, 40);
         btnInvoice.setFont(labelFont2);
         btnInvoice.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnExit.setBounds(650, 900, 150, 40);
+        btnExit.setBounds(655, 850, 150, 40);
         btnExit.setFont(labelFont2);
         btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnClear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                paymentTableModel.setRowCount(0);
+            }
+        });
+
+        btnExit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        btnInvoice.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateInvoice();
+            }
+        });
 
         // Product side
         lblProduct.setBounds(1200, 30, 500, 50);
@@ -445,47 +490,20 @@ public class Dashboard {
         // Add products
         updateProductList();
 
-        // Adding components to dashboard panel
-        newsalePanel.add(lblPayment);
-        newsalePanel.add(navPaymentPanel);
-        newsalePanel.add(paymentScrollPane);
-        newsalePanel.add(btnBack);
-        newsalePanel.add(btnClear);
-        newsalePanel.add(btnExit);
-        newsalePanel.add(btnInvoice);
-        newsalePanel.add(lblProduct);
-        newsalePanel.add(navListProductPanel);
-        newsalePanel.add(scrollPane);
-        newsalePanel.setBackground(Color.cyan);
+        // Adding components to center panel
+        centerPanel.add(lblPayment);
+        centerPanel.add(navPaymentPanel);
+        centerPanel.add(paymentScrollPane);
+        centerPanel.add(btnClear);
+        centerPanel.add(btnExit);
+        centerPanel.add(btnInvoice);
+        centerPanel.add(lblProduct);
+        centerPanel.add(navListProductPanel);
+        centerPanel.add(scrollPane);
 
-        // Button actions
-        btnBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                new PhoneShopManagementSystem();
-            }
-        });
-        btnClear.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                paymentTableModel.setRowCount(0);
-            }
-        });
-
-        btnExit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-
-        btnInvoice.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                generateInvoice();
-            }
-        });
+        // Adding header panel and center panel to newsalePanel
+        newsalePanel.add(headerPanel, BorderLayout.NORTH);
+        newsalePanel.add(centerPanel, BorderLayout.CENTER);
     }
 
     private void createSidebar() {
@@ -694,6 +712,7 @@ public class Dashboard {
     // InventoryPanel
     private JPanel createInventoryPanel() {
         JPanel inventoryPanel = new JPanel(new BorderLayout());
+        JPanel headerPanel = navigation();
 
         String[] columnNames = { "Name", "Price", "Quantity" };
         DefaultTableModel inventoryTableModel = new DefaultTableModel(columnNames, 0);
@@ -723,6 +742,7 @@ public class Dashboard {
         JPanel bottomPanel = new JPanel();
         bottomPanel.add(btnBack);
 
+        inventoryPanel.add(headerPanel, BorderLayout.NORTH);
         inventoryPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         return inventoryPanel;
@@ -730,6 +750,7 @@ public class Dashboard {
 
     private void showAddProductDialog() {
         JDialog dialog = new JDialog(frame, "Add Product", true);
+
         dialog.setSize(500, 300);
         dialog.setLocationRelativeTo(frame);
         dialog.setLayout(null);
