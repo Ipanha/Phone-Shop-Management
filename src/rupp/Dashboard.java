@@ -10,8 +10,10 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 
 public class Dashboard {
     private final JFrame frame;
@@ -160,7 +162,7 @@ public class Dashboard {
     private void createSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS)); // Vertical layout for sidebar
-        sidebar.setBackground(Color.LIGHT_GRAY);
+        sidebar.setBackground(Color.DARK_GRAY);
         sidebar.setPreferredSize(new Dimension(200, frame.getHeight()));
 
         // Top bar setup
@@ -206,11 +208,14 @@ public class Dashboard {
 
         // Bottom panel setup
         JLabel expireDateLabel = new JLabel("Expire Date: ");
+        expireDateLabel.setForeground(Color.WHITE);
         JLabel dateLabel = new JLabel("2024-07-31");
+        dateLabel.setForeground(Color.WHITE);
 
         // Create a panel to hold the labels
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        labelPanel.setBackground(null);
 
         // Add labels to the panel
         labelPanel.add(expireDateLabel);
@@ -219,7 +224,7 @@ public class Dashboard {
         // Create the bottom panel
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
-        bottomPanel.setBackground(Color.LIGHT_GRAY);
+        bottomPanel.setBackground(Color.DARK_GRAY);
 
         // Add label panel to the bottom of the bottom panel
         bottomPanel.add(labelPanel, BorderLayout.SOUTH);
@@ -248,7 +253,14 @@ public class Dashboard {
     // Create Dashbord Pannel
     private void createDashboardPanel() {
         dashboard = new JPanel(new BorderLayout());
-        updateDashboardPanels();
+
+        // Create a footer panel
+        JPanel footerPanel = Footer(); // Replace Footer() with your actual method to create the footer
+
+        // Add the footer panel to the bottom of the dashboard
+        dashboard.add(footerPanel, BorderLayout.SOUTH);
+
+        updateDashboardPanels(); // Initial update of dashboard panels
     }
 
     // Update Dashboard Panel When have something change in product stock
@@ -257,6 +269,7 @@ public class Dashboard {
         updateSummaryPanel();
         updateRecentPurchasesPanel();
         updateTopProductsPanel();
+
         dashboard.revalidate();
         dashboard.repaint();
     }
@@ -404,8 +417,6 @@ public class Dashboard {
     private void updateRecentPurchasesPanel() {
         JPanel recentPurchasePanel = new JPanel(new BorderLayout());
 
-        // Create a custom font for the title
-
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Recent Purchase Invoice");
         titledBorder.setTitleFont(font20);
         recentPurchasePanel.setBorder(titledBorder);
@@ -415,7 +426,6 @@ public class Dashboard {
                 "Net Total", "Purchase Date" };
         Object[][] recentData = {
                 { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-
         };
 
         JTable recentTable = new JTable(recentData, recentColumns);
@@ -433,7 +443,6 @@ public class Dashboard {
         dashboard.add(recentPurchasePanel, BorderLayout.CENTER);
     }
 
-    // Update Top Products Purchases
     private void updateTopProductsPanel() {
         JPanel topProductsPanel = new JPanel(new BorderLayout());
 
@@ -449,7 +458,6 @@ public class Dashboard {
         JTable topProductsTable = new JTable(topProductsData, topProductsColumns);
 
         // Set font size for table cells
-
         topProductsTable.setFont(font18);
         topProductsTable.setRowHeight(30);
 
@@ -459,6 +467,10 @@ public class Dashboard {
 
         JScrollPane topProductsScrollPane = new JScrollPane(topProductsTable);
         topProductsPanel.add(topProductsScrollPane, BorderLayout.CENTER);
+
+        // Add footer panel
+        JPanel footerPanel = Footer(); // Replace with actual method to create footer
+        topProductsPanel.add(footerPanel, BorderLayout.SOUTH);
 
         dashboard.add(topProductsPanel, BorderLayout.SOUTH);
     }
@@ -668,6 +680,19 @@ public class Dashboard {
                 double total = (double) paymentTableModel.getValueAt(i, 4);
 
                 writer.printf("%s - $%.2f x %d = $%.2f%n", name, price, quantity, total);
+
+                // Update inventory
+                for (int j = 0; j < inventoryTableModel.getRowCount(); j++) {
+                    String inventoryName = (String) inventoryTableModel.getValueAt(j, 0);
+                    if (inventoryName.equals(name)) {
+                        int currentQty = (int) inventoryTableModel.getValueAt(j, 2);
+                        int newQty = currentQty - quantity;
+                        Phone updatedPhone = new Phone(inventoryName, price, newQty,
+                                ((ImageIcon) inventoryTableModel.getValueAt(j, 3)).getDescription());
+                        updateProductInInventory(j, updatedPhone);
+                        break;
+                    }
+                }
             }
             writer.println("===========================================");
             writer.println("Thank you for your purchase!");
@@ -687,34 +712,221 @@ public class Dashboard {
     private JPanel createViewSale() {
         viewSale = new JPanel(new BorderLayout());
         JPanel headerPanel = navigation("View Sale");
+        JPanel footerPanel = Footer();
 
         viewSale.add(headerPanel, BorderLayout.NORTH);
+        viewSale.add(footerPanel, BorderLayout.SOUTH);
         return viewSale;
 
     }
 
+    class InventoryTableModel extends DefaultTableModel {
+        private final Class<?>[] columnTypes = new Class<?>[] { Integer.class, ImageIcon.class, String.class,
+                Double.class, Integer.class, JButton.class, JButton.class };
+
+        public InventoryTableModel(Object[] columnNames, int rowCount) {
+            super(columnNames, rowCount);
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return columnTypes[columnIndex];
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            // Allow editing for edit and delete button columns
+            return column == 5 || column == 6;
+        }
+
+        public void addProduct(int rowNum, Phone phone) {
+            Object[] rowData = new Object[7];
+            rowData[0] = rowNum;
+            rowData[1] = new ImageIcon(phone.getImagePath()); // Assuming phone has a method getImagePath()
+            rowData[2] = phone.getName();
+            rowData[3] = phone.getPrice();
+            rowData[4] = phone.getQty();
+            rowData[5] = "Edit";
+            rowData[6] = "Delete";
+            addRow(rowData);
+        }
+
+        public void updateProduct(int row, Phone phone) {
+            setValueAt(new ImageIcon(phone.getImagePath()), row, 2); // Assuming phone has a method getImagePath()
+            setValueAt(phone.getName(), row, 1);
+            setValueAt(phone.getPrice(), row, 3);
+            setValueAt(phone.getQty(), row, 4);
+        }
+
+        public void removeProduct(int row) {
+            removeRow(row);
+            updateRowNumbers(); // Update row numbers after removing a row
+        }
+
+        // Method to update the "No." column after removing a row
+        private void updateRowNumbers() {
+            for (int i = 0; i < getRowCount(); i++) {
+                setValueAt(i + 1, i, 0); // Update the "No." column
+            }
+        }
+    }
+
+    class ImageRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            if (value instanceof ImageIcon) {
+                ImageIcon imageIcon = (ImageIcon) value;
+                Image img = imageIcon.getImage().getScaledInstance(90, 90, Image.SCALE_SMOOTH);
+                setIcon(new ImageIcon(img));
+                setText("");
+            } else {
+                setIcon(null);
+                setText(value != null ? value.toString() : "");
+            }
+            return this;
+        }
+    }
+
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            setText((value == null) ? "" : value.toString());
+            return this;
+        }
+    }
+
+    class ButtonEditor extends DefaultCellEditor {
+        private final JButton button;
+        private String label;
+        private boolean isPushed;
+        private final JTable table;
+
+        public ButtonEditor(JCheckBox checkBox, JTable table) {
+            super(checkBox);
+            this.table = table;
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener((ActionEvent e) -> fireEditingStopped());
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
+                int column) {
+            label = (value == null) ? "" : value.toString();
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                if ("Edit".equals(label)) {
+                    // Handle edit action
+                    int row = table.getSelectedRow();
+                    // Logic for editing the product
+                } else if ("Delete".equals(label)) {
+                    // Handle delete action
+                    int row = table.getSelectedRow();
+                    // Logic for deleting the product
+                }
+            }
+            isPushed = false;
+            return label;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+
+        @Override
+        protected void fireEditingStopped() {
+            super.fireEditingStopped();
+        }
+    }
+
+    public void addProductToInventory(Phone phone) {
+        inventoryTableModel.addProduct(0, phone);
+    }
+
+    public void updateProductInInventory(int row, Phone phone) {
+        inventoryTableModel.updateProduct(row, phone);
+    }
+
+    public void removeProductFromInventory(int row) {
+        inventoryTableModel.removeProduct(row);
+    }
+
     // Inventory Panel
+    private InventoryTableModel inventoryTableModel;
+    private JTable inventoryTable;
+
+    class PaddedCellRenderer extends DefaultTableCellRenderer {
+        private final int padding;
+
+        public PaddedCellRenderer(int padding) {
+            this.padding = padding;
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+                int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (component instanceof JComponent) {
+                ((JComponent) component).setBorder(new EmptyBorder(padding, padding, padding, padding));
+            }
+            return component;
+        }
+    }
+
     private JPanel createInventoryPanel() {
         inventoryPanel = new JPanel(new BorderLayout());
         JPanel headerPanel = navigation("Inventory");
         JPanel footerPanel = Footer();
 
-        String[] columnNames = { "Name", "Price", "Quantity" };
-        DefaultTableModel inventoryTableModel = new DefaultTableModel(columnNames, 0);
+        String[] columnNames = { "No.", "Image", "Name", "Price", "Quantity", "Edit", "Delete" };
+        inventoryTableModel = new InventoryTableModel(columnNames, 0);
 
-        JTable inventoryTable = new JTable(inventoryTableModel);
-        JScrollPane inventoryScrollPane = new JScrollPane(inventoryTable);
-
-        // Populate the table with phone data
-        for (Phone phone : phonesList) {
-            Object[] rowData = new Object[3];
-            rowData[0] = phone.getName();
-            rowData[1] = phone.getPrice();
-            rowData[2] = phone.getQty();
-            inventoryTableModel.addRow(rowData);
+        inventoryTable = new JTable(inventoryTableModel);
+        inventoryTable.setFont(font18);
+        inventoryTable.setRowHeight(90); // Set the row height to accommodate the image
+        int padding = 10; // Adjust padding as needed
+        PaddedCellRenderer paddedCellRenderer = new PaddedCellRenderer(padding);
+        for (int i = 0; i < inventoryTable.getColumnCount(); i++) {
+            inventoryTable.getColumnModel().getColumn(i).setCellRenderer(paddedCellRenderer);
         }
 
-        inventoryPanel.add(inventoryScrollPane, BorderLayout.CENTER);
+        inventoryTable.getColumn("No.").setPreferredWidth(30); // Adjust preferred width for the "No." column
+        inventoryTable.getColumn("No.").setCellRenderer(new PaddedCellRenderer(padding)); // Apply padding to the "No."
+                                                                                          // column
+        inventoryTable.getColumn("Image").setCellRenderer(new ImageRenderer());
+        inventoryTable.getColumn("Edit").setCellRenderer(new ButtonRenderer());
+        inventoryTable.getColumn("Edit").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable));
+        inventoryTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
+        inventoryTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable));
+
+        // Set font for table headers
+        JTableHeader header = inventoryTable.getTableHeader();
+        header.setFont(font20); // Set desired font and size for headers
+
+        JScrollPane inventoryScrollPane = new JScrollPane(inventoryTable);
+
+        // Add padding around the scroll pane
+        inventoryScrollPane.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
+
+        // Populate the table with initial phone data
+        int rowNum = 1; // Initialize row number counter
+        for (Phone phone : phonesList) {
+            inventoryTableModel.addProduct(rowNum++, phone); // Increment row number after adding each product
+        }
 
         JButton btnBack = new JButton("Back");
         btnBack.addActionListener((ActionEvent e) -> {
@@ -725,7 +937,7 @@ public class Dashboard {
         bottomPanel.add(btnBack);
 
         inventoryPanel.add(headerPanel, BorderLayout.NORTH);
-        inventoryPanel.add(bottomPanel, BorderLayout.CENTER);
+        inventoryPanel.add(inventoryScrollPane, BorderLayout.CENTER);
         inventoryPanel.add(footerPanel, BorderLayout.SOUTH);
 
         return inventoryPanel;
@@ -801,12 +1013,18 @@ public class Dashboard {
                 // Add the new phone to the list
                 phonesList.add(newPhone);
 
+                // Update the inventory
+                addProductToInventory(newPhone);
+
                 // Update the product list display
                 updateProductList();
+
                 // Write the updated product list to file
                 writeProductsToFile();
-                // Update the dashboard panels after generating the invoice
+
+                // Update the dashboard panels
                 updateDashboardPanels();
+
                 // Close the dialog
                 dialog.dispose();
             } catch (NumberFormatException ex) {
@@ -826,8 +1044,10 @@ public class Dashboard {
         report = new JPanel(new BorderLayout()); // Use BorderLayout for proper alignment
         // Get navigation header panel
         JPanel headerPanel = navigation("Report");
+        JPanel footerPanel = Footer();
 
         report.add(headerPanel, BorderLayout.NORTH);
+        report.add(footerPanel, BorderLayout.SOUTH);
 
     }
 
@@ -836,8 +1056,10 @@ public class Dashboard {
         setting = new JPanel(new BorderLayout()); // Use BorderLayout for proper alignment
         // Get navigation header panel
         JPanel headerPanel = navigation("Settings");
+        JPanel footerPanel = Footer();
 
         setting.add(headerPanel, BorderLayout.NORTH);
+        setting.add(footerPanel, BorderLayout.SOUTH);
 
     }
 
