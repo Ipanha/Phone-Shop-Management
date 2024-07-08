@@ -31,9 +31,14 @@ public class Dashboard {
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
     private JScrollPane scrollPane;
-    Font font24 = new Font("Arial", Font.BOLD, 24);
-    Font font20 = new Font("Poppins", Font.BOLD, 20);
+    Font font24B = new Font("Arial", Font.BOLD, 24);
+    Font font20B = new Font("Poppins", Font.BOLD, 20);
+    Font font20 = new Font("Poppins", Font.PLAIN, 20);
     Font font18 = new Font("Poppins", Font.PLAIN, 18);
+    Font font40 = new Font("Arial", Font.PLAIN, 40);
+    Font font30 = new Font("Arial", Font.PLAIN, 30);
+    Font font17 = new Font("Arial", Font.PLAIN, 17);
+    Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
     public Dashboard() {
         frame = new JFrame("Phone Shop Management System");
@@ -78,7 +83,7 @@ public class Dashboard {
     private JPanel navigation(String nameHeader) {
         // Create a navigation title
         JLabel navTitle = new JLabel(nameHeader);
-        navTitle.setFont(font24);
+        navTitle.setFont(font24B);
         navTitle.setForeground(Color.BLUE);
         navTitle.setHorizontalAlignment(SwingConstants.CENTER);
         navTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -93,11 +98,11 @@ public class Dashboard {
 
         // User info components
         JLabel userLogoLabel = new JLabel(scaledUserLogo);
-        userLogoLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        userLogoLabel.setCursor(pointer);
         userLogoLabel.setToolTipText("Click to view profile");
 
         JButton userNamebtn = new JButton(userName);
-        userNamebtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        userNamebtn.setCursor(pointer);
         userNamebtn.setBorderPainted(false); // Remove border
         userNamebtn.setFocusPainted(false); // Remove focus border
         userNamebtn.setContentAreaFilled(false); // Remove background
@@ -131,16 +136,19 @@ public class Dashboard {
         JLabel nameTeam = new JLabel("E1-G1");
         nameTeam.setFont(font18);
         nameTeam.setForeground(Color.BLUE);
+        nameTeam.setCursor(pointer);
         JLabel poweredBy = new JLabel("Powered By:");
         poweredBy.setFont(font18);
         JLabel feedback = new JLabel("Feedback");
         feedback.setFont(font18);
         feedback.setForeground(Color.BLUE);
+        feedback.setCursor(pointer);
         JLabel Slas = new JLabel("|");
         Slas.setFont(font18);
         JLabel systemGuidle = new JLabel("System Guidline");
         systemGuidle.setFont(font18);
         systemGuidle.setForeground(Color.BLUE);
+        systemGuidle.setCursor(pointer);
 
         JPanel footerPanel = new JPanel(new BorderLayout());
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -195,12 +203,11 @@ public class Dashboard {
         // Array of buttons
         JButton[] buttons = { btnDashboard, btnAddProduct, btnViewInventory, btnNewSale, btnViewSales, btnReport,
                 btnSettings };
-        Cursor cursor = new Cursor(Cursor.HAND_CURSOR);
 
         for (JButton button : buttons) {
             button.setMaximumSize(new Dimension(160, 40));
-            button.setFont(font20);
-            button.setCursor(cursor);
+            button.setFont(font20B);
+            button.setCursor(pointer);
             button.setAlignmentX(Component.CENTER_ALIGNMENT);
             topBar.add(button);
             topBar.add(Box.createRigidArea(new Dimension(0, 15))); // Space between buttons
@@ -303,16 +310,16 @@ public class Dashboard {
                 .max((p1, p2) -> Integer.compare(p1.getQty(), p2.getQty())).orElse(null);
 
         JLabel totalProducts = createSummaryLabel("Total Products", String.valueOf(totalProductsCount), Color.ORANGE);
-        totalProducts.setFont(font20);
+        totalProducts.setFont(font20B);
         JLabel lowStockProducts = createSummaryLabel("Low Stock Products", String.valueOf(lowStockCount),
                 Color.MAGENTA);
-        lowStockProducts.setFont(font20);
+        lowStockProducts.setFont(font20B);
         JLabel outOfStockProducts = createSummaryLabel("Out of Stock Products", String.valueOf(outOfStockCount),
                 Color.RED);
-        outOfStockProducts.setFont(font20);
+        outOfStockProducts.setFont(font20B);
         JLabel mostStockProductLabel = createSummaryLabel("Most Stock Product",
                 mostStockProduct != null ? mostStockProduct.getName() : "N/A", Color.GREEN);
-        mostStockProductLabel.setFont(font20);
+        mostStockProductLabel.setFont(font20B);
 
         summaryPanel.add(totalProducts);
         summaryPanel.add(lowStockProducts);
@@ -381,7 +388,7 @@ public class Dashboard {
 
         // Add profile button
         JButton profileButton = new JButton("Profile");
-        profileButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        profileButton.setCursor(pointer);
         Font buttonFont = new Font(profileButton.getFont().getName(), Font.BOLD, 18);
         profileButton.setFont(buttonFont); // Set the font for profileButton
         profileButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
@@ -395,7 +402,7 @@ public class Dashboard {
 
         // Add sign out button
         JButton signOutButton = new JButton("Sign Out");
-        signOutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        signOutButton.setCursor(pointer);
         signOutButton.setFont(buttonFont);
         signOutButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         signOutButton.addActionListener((ActionEvent e) -> {
@@ -418,7 +425,7 @@ public class Dashboard {
         JPanel recentPurchasePanel = new JPanel(new BorderLayout());
 
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Recent Purchase Invoice");
-        titledBorder.setTitleFont(font20);
+        titledBorder.setTitleFont(font20B);
         recentPurchasePanel.setBorder(titledBorder);
 
         // Updated columns
@@ -435,7 +442,7 @@ public class Dashboard {
 
         // Set font size for table header
         JTableHeader tableHeader = recentTable.getTableHeader();
-        tableHeader.setFont(font20);
+        tableHeader.setFont(font20B);
 
         JScrollPane recentScrollPane = new JScrollPane(recentTable);
         recentPurchasePanel.add(recentScrollPane, BorderLayout.CENTER);
@@ -447,7 +454,7 @@ public class Dashboard {
         JPanel topProductsPanel = new JPanel(new BorderLayout());
 
         TitledBorder titledBorder = BorderFactory.createTitledBorder("Top Purchase Product");
-        titledBorder.setTitleFont(font20);
+        titledBorder.setTitleFont(font20B);
         topProductsPanel.setBorder(titledBorder);
 
         String[] topProductsColumns = { "No.", "Product Name", "Price", "Qty.", "Total", "Total" };
@@ -463,7 +470,7 @@ public class Dashboard {
 
         // Set font size for table header
         JTableHeader tableHeader = topProductsTable.getTableHeader();
-        tableHeader.setFont(font20);
+        tableHeader.setFont(font20B);
 
         JScrollPane topProductsScrollPane = new JScrollPane(topProductsTable);
         topProductsPanel.add(topProductsScrollPane, BorderLayout.CENTER);
@@ -498,13 +505,9 @@ public class Dashboard {
         JButton btnInvoice = new JButton("Invoice");
         JTextArea txtDisplay = new JTextArea();
 
-        Font labelFont1 = new Font("Arial", Font.PLAIN, 40);
-        Font labelFont2 = new Font("Arial", Font.PLAIN, 30);
-        Font labelFont4 = new Font("Arial", Font.PLAIN, 17);
-
         // Product side
         lblPayment.setBounds(350, 30, 800, 50);
-        lblPayment.setFont(labelFont1);
+        lblPayment.setFont(font40);
         lblPayment.setForeground(Color.BLUE);
         navPaymentPanel.setBounds(10, 10, 800, 100);
         navPaymentPanel.setBackground(Color.white);
@@ -516,8 +519,8 @@ public class Dashboard {
         JScrollPane paymentScrollPane = new JScrollPane(paymentTable);
         paymentScrollPane.setBounds(10, 120, 800, 700);
         JTableHeader header = paymentTable.getTableHeader();
-        header.setFont(labelFont4);
-        paymentTable.setFont(labelFont4);
+        header.setFont(font17);
+        paymentTable.setFont(font17);
         paymentTable.setRowHeight(30);
 
         // Create padding for text display
@@ -527,14 +530,14 @@ public class Dashboard {
 
         // Buttons
         btnClear.setBounds(13, 850, 150, 40);
-        btnClear.setFont(labelFont2);
-        btnClear.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnClear.setFont(font30);
+        btnClear.setCursor(pointer);
         btnInvoice.setBounds(330, 850, 150, 40);
-        btnInvoice.setFont(labelFont2);
-        btnInvoice.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnInvoice.setFont(font30);
+        btnInvoice.setCursor(pointer);
         btnExit.setBounds(655, 850, 150, 40);
-        btnExit.setFont(labelFont2);
-        btnExit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnExit.setFont(font30);
+        btnExit.setCursor(pointer);
 
         btnClear.addActionListener((ActionEvent e) -> {
             paymentTableModel.setRowCount(0);
@@ -546,11 +549,15 @@ public class Dashboard {
 
         btnInvoice.addActionListener((ActionEvent e) -> {
             generateInvoice();
+
+            // Write the updated product list to file
+            writeProductsToFile();
+            updateProductList();
         });
 
         // Product side
         lblProduct.setBounds(1200, 30, 500, 50);
-        lblProduct.setFont(labelFont1);
+        lblProduct.setFont(font40);
         lblProduct.setForeground(Color.BLUE);
         scrollPane.setBounds(840, 120, 850, 700);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -607,10 +614,10 @@ public class Dashboard {
             JLabel priceLabel = new JLabel("$" + phone.getPrice());
             JLabel qtyLabel = new JLabel("In stock : " + String.valueOf(phone.getQty()));
             JButton addToCartButton = new JButton("Add To Cart");
-            addToCartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            addToCartButton.setCursor(pointer);
 
-            priceLabel.setFont(new Font("Arial", Font.PLAIN, 18));
-            nameLabel.setFont(new Font("Arial", Font.BOLD, 20));
+            priceLabel.setFont(font18);
+            nameLabel.setFont(font20);
 
             gbc.gridx = 0;
             gbc.gridy = 0;
@@ -632,7 +639,7 @@ public class Dashboard {
 
             productPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             productPanel.setBackground(Color.WHITE);
-            productPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            productPanel.setCursor(pointer);
 
             addToCartButton.addActionListener((ActionEvent e) -> {
                 // Ask for quantity
@@ -659,6 +666,7 @@ public class Dashboard {
 
                 // Update product list display
                 updateProductList();
+                updateInventoryTable();
             });
 
             navProductPanel.add(productPanel);
@@ -676,36 +684,21 @@ public class Dashboard {
             for (int i = 0; i < paymentTableModel.getRowCount(); i++) {
                 String name = (String) paymentTableModel.getValueAt(i, 1);
                 double price = (double) paymentTableModel.getValueAt(i, 2);
-                int quantity = (int) paymentTableModel.getValueAt(i, 3);
+                int qty = (int) paymentTableModel.getValueAt(i, 3);
                 double total = (double) paymentTableModel.getValueAt(i, 4);
-
-                writer.printf("%s - $%.2f x %d = $%.2f%n", name, price, quantity, total);
-
-                // Update inventory
-                for (int j = 0; j < inventoryTableModel.getRowCount(); j++) {
-                    String inventoryName = (String) inventoryTableModel.getValueAt(j, 0);
-                    if (inventoryName.equals(name)) {
-                        int currentQty = (int) inventoryTableModel.getValueAt(j, 2);
-                        int newQty = currentQty - quantity;
-                        Phone updatedPhone = new Phone(inventoryName, price, newQty,
-                                ((ImageIcon) inventoryTableModel.getValueAt(j, 3)).getDescription());
-                        updateProductInInventory(j, updatedPhone);
-                        break;
-                    }
-                }
+                writer.printf("%s - $%.2f x %d = $%.2f%n", name, price, qty, total);
             }
             writer.println("===========================================");
             writer.println("Thank you for your purchase!");
             JOptionPane.showMessageDialog(frame, "Invoice generated successfully!", "Invoice",
                     JOptionPane.INFORMATION_MESSAGE);
-
-            writeProductsToFile();
-
-            // Update the dashboard panels after generating the invoice
-            updateDashboardPanels();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        // Update the inventory list
+        updateProductList();
+        updateInventoryTable();
     }
 
     // ViewSale Panel
@@ -720,9 +713,20 @@ public class Dashboard {
 
     }
 
+    private void updateInventoryTable() {
+        inventoryTableModel.setRowCount(0); // Clear the table
+
+        // Re-populate the table with updated phone data
+        for (Phone phone : phonesList) {
+            inventoryTableModel.addProduct(phone); // Use the updated addProduct method
+        }
+    }
+
     class InventoryTableModel extends DefaultTableModel {
-        private final Class<?>[] columnTypes = new Class<?>[] { Integer.class, ImageIcon.class, String.class,
-                Double.class, Integer.class, JButton.class, JButton.class };
+        private final Class<?>[] columnTypes = new Class<?>[] {
+                Integer.class, ImageIcon.class, String.class,
+                Double.class, Integer.class, JButton.class, JButton.class
+        };
 
         public InventoryTableModel(Object[] columnNames, int rowCount) {
             super(columnNames, rowCount);
@@ -739,7 +743,8 @@ public class Dashboard {
             return column == 5 || column == 6;
         }
 
-        public void addProduct(int rowNum, Phone phone) {
+        public void addProduct(Phone phone) {
+            int rowNum = getRowCount() + 1; // Get the next row number
             Object[] rowData = new Object[7];
             rowData[0] = rowNum;
             rowData[1] = new ImageIcon(phone.getImagePath()); // Assuming phone has a method getImagePath()
@@ -752,16 +757,20 @@ public class Dashboard {
         }
 
         public void updateProduct(int row, Phone phone) {
-            setValueAt(new ImageIcon(phone.getImagePath()), row, 2); // Assuming phone has a method getImagePath()
-            setValueAt(phone.getName(), row, 1);
+            setValueAt(new ImageIcon(phone.getImagePath()), row, 1); // Assuming phone has a method getImagePath()
+            setValueAt(phone.getName(), row, 2);
             setValueAt(phone.getPrice(), row, 3);
             setValueAt(phone.getQty(), row, 4);
+
+            writeProductsToFile();
+            updateProductList();
         }
 
         public void removeProduct(int row) {
             removeRow(row);
             updateRowNumbers(); // Update row numbers after removing a row
         }
+        
 
         // Method to update the "No." column after removing a row
         private void updateRowNumbers() {
@@ -791,13 +800,116 @@ public class Dashboard {
     class ButtonRenderer extends JButton implements TableCellRenderer {
         public ButtonRenderer() {
             setOpaque(true);
+            setFont(font18); // Set your desired font
+            setCursor(pointer);
         }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             setText((value == null) ? "" : value.toString());
+            setPreferredSize(new Dimension(70, 30)); // Adjust size as needed
             return this;
+        }
+    }
+
+    class EditProductDialog extends JDialog {
+        private final JTextField priceField;
+        private final JTextField nameField;
+        private final JTextField qtyField;
+        private final JLabel imageLabel;
+        private final JButton chooseImageButton;
+        private final JButton saveButton;
+        private final JButton cancelButton;
+        private String imagePath;
+
+        public EditProductDialog(JFrame parent, Phone phone) {
+            super(parent, "Edit Product", true);
+            setLayout(null);
+            setSize(400, 440);
+
+            // Set up components
+            JLabel nameLabel = new JLabel("Name:");
+            nameLabel.setFont(font18);
+            JLabel priceLabel = new JLabel("Price:");
+            priceLabel.setFont(font18);
+            JLabel qtyLabel = new JLabel("Quantity:");
+            qtyLabel.setFont(font18);
+            nameField = new JTextField(phone.getName());
+            nameField.setFont(font18);
+            priceField = new JTextField(String.valueOf(phone.getPrice()));
+            priceField.setFont(font18);
+            qtyField = new JTextField(String.valueOf(phone.getQty()));
+            qtyField.setFont(font18);
+            imageLabel = new JLabel(new ImageIcon(
+                    new ImageIcon(phone.getImagePath()).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+            imagePath = phone.getImagePath();
+            chooseImageButton = new JButton("Choose Image");
+            chooseImageButton.setFont(font18);
+            chooseImageButton.setCursor(pointer);
+            saveButton = new JButton("Save");
+            saveButton.setFont(font18);
+            saveButton.setCursor(pointer);
+            cancelButton = new JButton("Cancel");
+            cancelButton.setFont(font18);
+            cancelButton.setCursor(pointer);
+            // Set bounds for components
+            nameLabel.setBounds(30, 30, 100, 30);
+            nameField.setBounds(140, 30, 200, 30);
+            priceLabel.setBounds(30, 80, 100, 30);
+            priceField.setBounds(140, 80, 200, 30);
+            qtyLabel.setBounds(30, 130, 100, 30);
+            qtyField.setBounds(140, 130, 200, 30);
+            imageLabel.setBounds(30, 180, 90, 90);
+            chooseImageButton.setBounds(140, 210, 150, 30);
+            saveButton.setBounds(30, 350, 120, 30);
+            cancelButton.setBounds(220, 350, 120, 30);
+
+            // Add components to the dialog
+            add(nameLabel);
+            add(nameField);
+            add(priceLabel);
+            add(priceField);
+            add(qtyLabel);
+            add(qtyField);
+            add(imageLabel);
+            add(chooseImageButton);
+            add(saveButton);
+            add(cancelButton);
+
+            // Set up action listeners
+            chooseImageButton.addActionListener(e -> {
+                JFileChooser fileChooser = new JFileChooser();
+                int result = fileChooser.showOpenDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    imagePath = selectedFile.getAbsolutePath();
+                    imageLabel.setIcon(new ImageIcon(
+                            new ImageIcon(imagePath).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                }
+            });
+
+            saveButton.addActionListener(e -> {
+                // Validation logic (if needed)
+                writeProductsToFile();
+                JOptionPane.showMessageDialog(frame, "Edit successfully!", "Edit",
+                        JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            });
+
+            cancelButton.addActionListener(e -> {
+                dispose();
+            });
+
+            setLocationRelativeTo(parent);
+        }
+
+        public Phone getUpdatedPhone(Phone phone) {
+            phone.setName(nameField.getText());
+            phone.setPrice(Double.parseDouble(priceField.getText()));
+            phone.setQty(Integer.parseInt(qtyField.getText()));
+            phone.setImagePath(imagePath);
+            return phone;
         }
     }
 
@@ -806,13 +918,18 @@ public class Dashboard {
         private String label;
         private boolean isPushed;
         private final JTable table;
+        private final JFrame parentFrame;
 
-        public ButtonEditor(JCheckBox checkBox, JTable table) {
+        public ButtonEditor(JCheckBox checkBox, JTable table, JFrame parentFrame) {
             super(checkBox);
             this.table = table;
+            this.parentFrame = parentFrame;
             button = new JButton();
             button.setOpaque(true);
+            button.setCursor(pointer);
+            button.setFont(font18);
             button.addActionListener((ActionEvent e) -> fireEditingStopped());
+
         }
 
         @Override
@@ -827,14 +944,23 @@ public class Dashboard {
         @Override
         public Object getCellEditorValue() {
             if (isPushed) {
+                int row = table.getSelectedRow();
                 if ("Edit".equals(label)) {
-                    // Handle edit action
-                    int row = table.getSelectedRow();
-                    // Logic for editing the product
+                    Phone phone = phonesList.get(row);
+                    EditProductDialog dialog = new EditProductDialog(parentFrame, phone);
+                    dialog.setVisible(true);
+                    Phone updatedPhone = dialog.getUpdatedPhone(phone);
+                    inventoryTableModel.updateProduct(row, updatedPhone);
                 } else if ("Delete".equals(label)) {
-                    // Handle delete action
-                    int row = table.getSelectedRow();
-                    // Logic for deleting the product
+                    int response = JOptionPane.showConfirmDialog(
+                            parentFrame,
+                            "Are you sure you want to delete?",
+                            "Confirm Deletion",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE);
+                    if (response == JOptionPane.YES_OPTION) {
+                        inventoryTableModel.removeProduct(row);
+                    }
                 }
             }
             isPushed = false;
@@ -854,7 +980,7 @@ public class Dashboard {
     }
 
     public void addProductToInventory(Phone phone) {
-        inventoryTableModel.addProduct(0, phone);
+        inventoryTableModel.addProduct(phone);
     }
 
     public void updateProductInInventory(int row, Phone phone) {
@@ -909,13 +1035,15 @@ public class Dashboard {
                                                                                           // column
         inventoryTable.getColumn("Image").setCellRenderer(new ImageRenderer());
         inventoryTable.getColumn("Edit").setCellRenderer(new ButtonRenderer());
-        inventoryTable.getColumn("Edit").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable));
+        inventoryTable.getColumn("Edit").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable,
+                (JFrame) SwingUtilities.getWindowAncestor(inventoryPanel)));
         inventoryTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
-        inventoryTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable));
+        inventoryTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable,
+                (JFrame) SwingUtilities.getWindowAncestor(inventoryPanel)));
 
         // Set font for table headers
         JTableHeader header = inventoryTable.getTableHeader();
-        header.setFont(font20); // Set desired font and size for headers
+        header.setFont(font20B); // Set desired font and size for headers
 
         JScrollPane inventoryScrollPane = new JScrollPane(inventoryTable);
 
@@ -923,18 +1051,9 @@ public class Dashboard {
         inventoryScrollPane.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
 
         // Populate the table with initial phone data
-        int rowNum = 1; // Initialize row number counter
         for (Phone phone : phonesList) {
-            inventoryTableModel.addProduct(rowNum++, phone); // Increment row number after adding each product
+            inventoryTableModel.addProduct(phone); // Use the updated addProduct method
         }
-
-        JButton btnBack = new JButton("Back");
-        btnBack.addActionListener((ActionEvent e) -> {
-            cardLayout.show(mainPanel, "Dashboard");
-        });
-
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.add(btnBack);
 
         inventoryPanel.add(headerPanel, BorderLayout.NORTH);
         inventoryPanel.add(inventoryScrollPane, BorderLayout.CENTER);
@@ -973,11 +1092,11 @@ public class Dashboard {
         lblImagePath.setBounds(30, 150, 100, 30);
         txtImagePath.setBounds(150, 150, 200, 30);
         btnBrowse.setBounds(360, 150, 80, 30);
-        btnBrowse.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnBrowse.setCursor(pointer);
         btnAdd.setBounds(150, 210, 80, 30);
-        btnAdd.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnAdd.setCursor(pointer);
         btnCancel.setBounds(240, 210, 80, 30);
-        btnCancel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnCancel.setCursor(pointer);
 
         dialog.add(lblName);
         dialog.add(txtName);

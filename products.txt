@@ -1,8 +1,2 @@
-iPhone 12,1200.000000,0,D:\ImageIphone\iPhone-12.png
-iPhone 12 Pro,1300.000000,0,D:\ImageIphone\iPhone-12-Pro.png
-iPhone 12 pro max,1400.000000,0,D:\ImageIphone\iPhone-12-Pro_Max.png
-iPhone 13,1000.000000,6,D:\ImageIphone\iPhone-13.png
-IPhone 13 Pro,1499.000000,10,D:\ImageIphone\iPhone-13-Pro.png
-IPhone 13 Pro Max,1500.000000,10,D:\ImageIphone\iPhone-13-Pro-Max.png
-Iphone 14,1200.000000,4,D:\ImageIphone\iPhone-14.png
-IPhone 14 Pro,1900.000000,10,D:\ImageIphone\iPhone-14-Pro.png
+IPhone 12,1999.000000,50,D:\ImageIphone\iPhone-12.png
+IPhone 12 Por,999.000000,100,D:\ImageIphone\iPhone-12-Pro.png
