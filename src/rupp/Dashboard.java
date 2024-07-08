@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -553,6 +554,8 @@ public class Dashboard {
             // Write the updated product list to file
             writeProductsToFile();
             updateProductList();
+            updateDashboardPanels();
+
         });
 
         // Product side
@@ -722,7 +725,7 @@ public class Dashboard {
         }
     }
 
-    class InventoryTableModel extends DefaultTableModel {
+    public class InventoryTableModel extends DefaultTableModel {
         private final Class<?>[] columnTypes = new Class<?>[] {
                 Integer.class, ImageIcon.class, String.class,
                 Double.class, Integer.class, JButton.class, JButton.class
@@ -739,8 +742,7 @@ public class Dashboard {
 
         @Override
         public boolean isCellEditable(int row, int column) {
-            // Allow editing for edit and delete button columns
-            return column == 5 || column == 6;
+            return column == 5 || column == 6; // Allow editing for edit and delete button columns
         }
 
         public void addProduct(Phone phone) {
@@ -770,9 +772,7 @@ public class Dashboard {
             removeRow(row);
             updateRowNumbers(); // Update row numbers after removing a row
         }
-        
 
-        // Method to update the "No." column after removing a row
         private void updateRowNumbers() {
             for (int i = 0; i < getRowCount(); i++) {
                 setValueAt(i + 1, i, 0); // Update the "No." column
@@ -913,6 +913,23 @@ public class Dashboard {
         }
     }
 
+    private void deleteProductFromFile(Phone phone) {
+        // Read the current list of products from the file
+        List<Phone> phones = new ArrayList<>(phonesList);
+
+        // Remove the phone from the list
+        phones.removeIf(p -> p.getName().equals(phone.getName()) && p.getPrice() == phone.getPrice());
+
+        // Write the updated list back to the file
+        try (PrintWriter writer = new PrintWriter("products.txt")) {
+            for (Phone p : phones) {
+                writer.println(p.getName() + "," + p.getPrice() + "," + p.getQty() + "," + p.getImagePath());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     class ButtonEditor extends DefaultCellEditor {
         private final JButton button;
         private String label;
@@ -929,7 +946,6 @@ public class Dashboard {
             button.setCursor(pointer);
             button.setFont(font18);
             button.addActionListener((ActionEvent e) -> fireEditingStopped());
-
         }
 
         @Override
@@ -945,12 +961,13 @@ public class Dashboard {
         public Object getCellEditorValue() {
             if (isPushed) {
                 int row = table.getSelectedRow();
+                Phone phone = phonesList.get(row);
                 if ("Edit".equals(label)) {
-                    Phone phone = phonesList.get(row);
                     EditProductDialog dialog = new EditProductDialog(parentFrame, phone);
                     dialog.setVisible(true);
                     Phone updatedPhone = dialog.getUpdatedPhone(phone);
                     inventoryTableModel.updateProduct(row, updatedPhone);
+                    updateDashboardPanels();
                 } else if ("Delete".equals(label)) {
                     int response = JOptionPane.showConfirmDialog(
                             parentFrame,
@@ -959,7 +976,10 @@ public class Dashboard {
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE);
                     if (response == JOptionPane.YES_OPTION) {
+                        deleteProductFromFile(phone);
+                        phonesList.remove(row);
                         inventoryTableModel.removeProduct(row);
+                        updateDashboardPanels();
                     }
                 }
             }

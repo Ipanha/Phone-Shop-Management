@@ -1,2 +1,1 @@
-IPhone 12,1999.000000,50,D:\ImageIphone\iPhone-12.png
-IPhone 12 Por,999.000000,100,D:\ImageIphone\iPhone-12-Pro.png
+IPhone 15 Pro Max,1299.000000,110,D:\ImageIphone\iPhone-15-Pro.png
