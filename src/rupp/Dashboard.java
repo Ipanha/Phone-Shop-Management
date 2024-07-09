@@ -15,6 +15,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 public class Dashboard {
     private final JFrame frame;
@@ -36,6 +37,7 @@ public class Dashboard {
     Font font20B = new Font("Poppins", Font.BOLD, 20);
     Font font20 = new Font("Poppins", Font.PLAIN, 20);
     Font font18 = new Font("Poppins", Font.PLAIN, 18);
+    Font font18B = new Font("Poppins", Font.BOLD, 18);
     Font font40 = new Font("Arial", Font.PLAIN, 40);
     Font font30 = new Font("Arial", Font.PLAIN, 30);
     Font font17 = new Font("Arial", Font.PLAIN, 17);
@@ -390,8 +392,7 @@ public class Dashboard {
         // Add profile button
         JButton profileButton = new JButton("Profile");
         profileButton.setCursor(pointer);
-        Font buttonFont = new Font(profileButton.getFont().getName(), Font.BOLD, 18);
-        profileButton.setFont(buttonFont); // Set the font for profileButton
+        profileButton.setFont(font18); // Set the font for profileButton
         profileButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         profileButton.addActionListener((ActionEvent e) -> {
             // Handle profile button action (if needed)
@@ -404,7 +405,7 @@ public class Dashboard {
         // Add sign out button
         JButton signOutButton = new JButton("Sign Out");
         signOutButton.setCursor(pointer);
-        signOutButton.setFont(buttonFont);
+        signOutButton.setFont(font18);
         signOutButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         signOutButton.addActionListener((ActionEvent e) -> {
             profileDialog.dispose();
@@ -514,7 +515,7 @@ public class Dashboard {
         navPaymentPanel.setBackground(Color.white);
 
         // Payment side
-        String[] columnNames = { "No.", "Name", "Price", "Qty", "Total" };
+        String[] columnNames = { "No.", "Name", "Price", "Qty", "Discount", "Total" };
         paymentTableModel = new DefaultTableModel(columnNames, 0);
         paymentTable = new JTable(paymentTableModel);
         JScrollPane paymentScrollPane = new JScrollPane(paymentTable);
@@ -523,11 +524,19 @@ public class Dashboard {
         header.setFont(font17);
         paymentTable.setFont(font17);
         paymentTable.setRowHeight(30);
-
         // Create padding for text display
         int top = 10, left = 10, bottom = 10, right = 10;
         EmptyBorder padding = new EmptyBorder(top, left, bottom, right);
         txtDisplay.setBorder(padding);
+        // Retrieve the TableColumn for the "No." column (index 0)
+        TableColumn colNo = paymentTable.getColumnModel().getColumn(0);
+        TableColumn colPrice = paymentTable.getColumnModel().getColumn(2);
+        TableColumn colQty = paymentTable.getColumnModel().getColumn(3);
+
+        // Set the preferred width to 10 pixels
+        colNo.setPreferredWidth(5);
+        colPrice.setPreferredWidth(10);
+        colQty.setPreferredWidth(5);
 
         // Buttons
         btnClear.setBounds(13, 850, 150, 40);
@@ -616,8 +625,8 @@ public class Dashboard {
             JLabel nameLabel = new JLabel(phone.getName());
             JLabel priceLabel = new JLabel("$" + phone.getPrice());
             JLabel qtyLabel = new JLabel("In stock : " + String.valueOf(phone.getQty()));
-            JButton addToCartButton = new JButton("Add To Cart");
-            addToCartButton.setCursor(pointer);
+            JButton btnBuy = new JButton("Buy Now");
+            btnBuy.setCursor(pointer);
 
             priceLabel.setFont(font18);
             nameLabel.setFont(font20);
@@ -638,38 +647,80 @@ public class Dashboard {
             productPanel.add(qtyLabel, gbc);
 
             gbc.gridy = 4;
-            productPanel.add(addToCartButton, gbc);
+            productPanel.add(btnBuy, gbc);
 
             productPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             productPanel.setBackground(Color.WHITE);
             productPanel.setCursor(pointer);
 
-            addToCartButton.addActionListener((ActionEvent e) -> {
-                // Ask for quantity
-                int quantity = Integer.parseInt(JOptionPane.showInputDialog("Enter Quantity:"));
-                if (quantity <= 0) {
-                    JOptionPane.showMessageDialog(frame, "Quantity must be greater than zero.");
-                    return;
+            btnBuy.addActionListener((ActionEvent e) -> {
+                // Create a custom dialog for quantity and discount input
+                JPanel dialogPanel = new JPanel(new GridLayout(0, 1));
+                JTextField quantityField = new JTextField();
+                quantityField.setFont(font20);
+                JTextField discountField = new JTextField();
+                discountField.setFont(font20);
+                JLabel Qty = new JLabel("Quantity:");
+                JLabel Dis = new JLabel("Discount (%):");
+                Qty.setFont(font20);
+                Dis.setFont(font20);
+
+                dialogPanel.add(Qty);
+                dialogPanel.add(quantityField);
+                dialogPanel.add(Dis);
+                dialogPanel.add(discountField);
+
+                JOptionPane optionPane = new JOptionPane(dialogPanel, JOptionPane.PLAIN_MESSAGE,
+                        JOptionPane.OK_CANCEL_OPTION);
+                JDialog dialog = optionPane.createDialog(frame, "Enter Quantity and Discount");
+
+                // Set the size of the dialog
+                dialog.setSize(400, 250);
+                dialog.setResizable(false); // Optional: make the dialog non-resizable
+                dialog.setVisible(true);
+
+                int option = (Integer) optionPane.getValue();
+                if (option == JOptionPane.OK_OPTION) {
+                    // User clicked OK, process the input
+                    try {
+                        int quantity = Integer.parseInt(quantityField.getText().trim());
+                        String discountText = discountField.getText().trim();
+                        float discount = discountText.isEmpty() ? 0 : Float.parseFloat(discountText);
+
+                        if (quantity <= 0) {
+                            JOptionPane.showMessageDialog(frame, "Quantity must be greater than zero.");
+                            return;
+                        }
+                        if (quantity > phone.getQty()) {
+                            JOptionPane.showMessageDialog(frame, "Not enough stock available.");
+                            return;
+                        }
+
+                        // Calculate total with discount
+                        double priceOfOne = phone.getPrice();
+                        double discountedPrice = priceOfOne * (1 - discount / 100); // Apply discount
+                        double totalPrice = discountedPrice * quantity;
+
+                        String total = String.format("$%.2f", totalPrice);
+                        String price = String.format("$%.2f", priceOfOne);
+                        String discountFormat = String.format("%.2f%%", discount);
+
+                        // Add to payment table
+                        Object[] rowData = { paymentTableModel.getRowCount() + 1, phone.getName(), price, quantity,
+                                discountFormat, total };
+                        paymentTableModel.addRow(rowData);
+
+                        // Update phone quantity
+                        phone.setQty(phone.getQty() - quantity);
+
+                        // Update product list display
+                        updateProductList();
+                        updateInventoryTable();
+
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Invalid input. Please enter valid numbers.");
+                    }
                 }
-                if (quantity > phone.getQty()) {
-                    JOptionPane.showMessageDialog(frame, "Not enough stock available.");
-                    return;
-                }
-
-                // Calculate total
-                double price = phone.getPrice();
-                double total = price * quantity;
-
-                // Add to payment table
-                Object[] rowData = { paymentTableModel.getRowCount() + 1, phone.getName(), price, quantity, total };
-                paymentTableModel.addRow(rowData);
-
-                // Update phone quantity
-                phone.setQty(phone.getQty() - quantity);
-
-                // Update product list display
-                updateProductList();
-                updateInventoryTable();
             });
 
             navProductPanel.add(productPanel);
@@ -681,27 +732,91 @@ public class Dashboard {
 
     // Generate Invoice When Click Invoice
     private void generateInvoice() {
+        double totalAmount = 0;
+
         try (PrintWriter writer = new PrintWriter("invoice.txt")) {
             writer.println("Invoice:");
             writer.println("===========================================");
             for (int i = 0; i < paymentTableModel.getRowCount(); i++) {
                 String name = (String) paymentTableModel.getValueAt(i, 1);
-                double price = (double) paymentTableModel.getValueAt(i, 2);
+                double price = Double.parseDouble(paymentTableModel.getValueAt(i, 2).toString().substring(1)); // Removethedollarsignandconverttodouble
                 int qty = (int) paymentTableModel.getValueAt(i, 3);
-                double total = (double) paymentTableModel.getValueAt(i, 4);
-                writer.printf("%s - $%.2f x %d = $%.2f%n", name, price, qty, total);
+                String discountText = (String) paymentTableModel.getValueAt(i, 4);
+                double discount = Double.parseDouble(discountText.substring(0, discountText.length() - 1)); // Removethepercentagesign andconvertto double
+                double total = Double.parseDouble(paymentTableModel.getValueAt(i, 5).toString().substring(1)); // Removethedollarsignandconverttodouble
+
+                writer.printf("%s - $%.2f x %d, Discount: %.2f%%, Total: $%.2f%n", name, price, qty, discount, total);
+                totalAmount += total;
             }
             writer.println("===========================================");
+            writer.printf("Total Amount: $%.2f%n", totalAmount);
             writer.println("Thank you for your purchase!");
-            JOptionPane.showMessageDialog(frame, "Invoice generated successfully!", "Invoice",
-                    JOptionPane.INFORMATION_MESSAGE);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
+        // Load the QR Code image from the PNG file
+        BufferedImage qrCodeImage = null;
+        try {
+            qrCodeImage = ImageIO.read(new File("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\qr_code.png"));
+            // Scale the image to 500x500
+            if (qrCodeImage != null) {
+                qrCodeImage = getScaledImage(qrCodeImage, 500, 500);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Create a custom dialog to show the success message, QR code, and total amount
+        JDialog dialog = new JDialog(frame, "Invoice", true);
+        dialog.setLayout(new BorderLayout());
+        dialog.setBackground(Color.WHITE);
+
+        JPanel dialogPanel = new JPanel(new BorderLayout());
+        dialogPanel.setBackground(Color.WHITE);
+        // Center the success message label
+        JLabel successLabel = new JLabel("Invoice generated successfully!", SwingConstants.CENTER);
+        JPanel successPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        successPanel.add(successLabel);
+        dialog.add(successPanel, BorderLayout.NORTH);
+
+        if (qrCodeImage != null) {
+            JLabel qrLabel = new JLabel(new ImageIcon(qrCodeImage));
+            dialogPanel.add(qrLabel, BorderLayout.CENTER);
+        }
+
+        JLabel totalLabel = new JLabel("Total to pay: $" + String.format("%.2f", totalAmount));
+        totalLabel.setFont(font20B);
+        totalLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        dialogPanel.add(totalLabel, BorderLayout.SOUTH);
+
+        JButton okButton = new JButton("OK");
+        okButton.setPreferredSize(new Dimension(100, 30)); // Set button size
+        okButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)); // Set cursor
+        okButton.addActionListener(e -> dialog.dispose());
+        okButton.setFont(font18B);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(okButton);
+        dialog.add(dialogPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(frame);
+        dialog.setVisible(true);
+
         // Update the inventory list
         updateProductList();
         updateInventoryTable();
+    }
+
+    private BufferedImage getScaledImage(BufferedImage src, int width, int height) {
+        BufferedImage resizedImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = resizedImg.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(src, 0, 0, width, height, null);
+        g2.dispose();
+        return resizedImg;
     }
 
     // ViewSale Panel
