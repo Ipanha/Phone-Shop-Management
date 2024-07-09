@@ -1,1 +1,4 @@
-IPhone 15 Pro Max,1299.000000,12,D:\ImageIphone\iPhone-15-Pro.png
+IPhone 15 Pro Max,1299.000000,40,D:\ImageIphone\iPhone-15-Pro.png
+IPhone 12,1299.000000,1,D:\ImageIphone\iPhone-12.png
+IPhone 12 Pro,1399.000000,87,D:\ImageIphone\iPhone-12-Pro.png
+IPhone 12 Pro Max,1099.000000,40,D:\ImageIphone\iPhone-12-Pro_Max.png

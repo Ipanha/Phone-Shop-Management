@@ -1,6 +1,10 @@
 Invoice:
 ===========================================
-IPhone 15 Pro Max - $1299.00 x 30, Discount: 50.00%, Total: $19485.00
+IPhone 15 Pro Max - $1299.00 x 10, Discount: 50.00%, Total: $6495.00
+IPhone 12 - $1299.00 x 1, Discount: 0.00%, Total: $1299.00
+IPhone 12 - $1299.00 x 1, Discount: 0.00%, Total: $1299.00
+IPhone 12 Pro - $1399.00 x 12, Discount: 30.00%, Total: $11751.60
+IPhone 12 Pro Max - $1099.00 x 50, Discount: 50.00%, Total: $27475.00
 ===========================================
-Total Amount: $19485.00
+Total Amount: $48319.60
 Thank you for your purchase!

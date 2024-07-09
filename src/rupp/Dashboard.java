@@ -4,7 +4,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
@@ -16,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 public class Dashboard {
     private final JFrame frame;
@@ -423,6 +429,7 @@ public class Dashboard {
     }
 
     // Update Recently Purchase Pannel
+
     private void updateRecentPurchasesPanel() {
         JPanel recentPurchasePanel = new JPanel(new BorderLayout());
 
@@ -433,12 +440,62 @@ public class Dashboard {
         // Updated columns
         String[] recentColumns = { "No.", "Products Name", "Vendor Name", "Price", "Qty.", "Total", "Discount",
                 "Net Total", "Purchase Date" };
-        Object[][] recentData = {
-                { "1", "P00019S", "Mike", 1500, 10, 1510, 100, 1410, "2024/07/01" },
-        };
+        List<Object[]> recentDataList = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("recentlyBuy.txt"))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                Object[] row = {
+                        values[0],
+                        values[1],
+                        values[2],
+                        "$" + String.format("%.2f", Double.parseDouble(values[3])),
+                        Integer.parseInt(values[4]),
+                        "$" + String.format("%.2f", Double.parseDouble(values[5])),
+                        values[6] + "%",
+                        "$" + String.format("%.2f", Double.parseDouble(values[7])),
+                        values[8]
+                };
+                recentDataList.add(row);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Sort the data by purchase date in descending order
+        recentDataList.sort(new Comparator<Object[]>() {
+            @Override
+            public int compare(Object[] o1, Object[] o2) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+                try {
+                    Date date1 = sdf.parse((String) o1[8]);
+                    Date date2 = sdf.parse((String) o2[8]);
+                    return date2.compareTo(date1); // Newer dates first
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+
+        // Update "No." column and format purchase date
+        for (int i = 0; i < recentDataList.size(); i++) {
+            recentDataList.get(i)[0] = i + 1;
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
+            try {
+                Date date = inputFormat.parse((String) recentDataList.get(i)[8]);
+                recentDataList.get(i)[8] = outputFormat.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Object[][] recentData = recentDataList.toArray(new Object[0][]);
 
         JTable recentTable = new JTable(recentData, recentColumns);
-
         recentTable.setFont(font18);
         recentTable.setRowHeight(30);
 
@@ -446,33 +503,90 @@ public class Dashboard {
         JTableHeader tableHeader = recentTable.getTableHeader();
         tableHeader.setFont(font20B);
 
+        // Set width for No. and Qty for 5px
+        TableColumnModel columnNo = recentTable.getColumnModel();
+        columnNo.getColumn(0).setPreferredWidth(5);
+        TableColumnModel columnQty = recentTable.getColumnModel();
+        columnQty.getColumn(4).setPreferredWidth(5);
+
         JScrollPane recentScrollPane = new JScrollPane(recentTable);
         recentPurchasePanel.add(recentScrollPane, BorderLayout.CENTER);
 
         dashboard.add(recentPurchasePanel, BorderLayout.CENTER);
+        dashboard.revalidate(); // Ensure the panel is updated
+        dashboard.repaint(); // Ensure the panel is updated
     }
 
     private void updateTopProductsPanel() {
         JPanel topProductsPanel = new JPanel(new BorderLayout());
 
-        TitledBorder titledBorder = BorderFactory.createTitledBorder("Top Purchase Product");
+        TitledBorder titledBorder = BorderFactory.createTitledBorder("Top Sale");
         titledBorder.setTitleFont(font20B);
         topProductsPanel.setBorder(titledBorder);
 
-        String[] topProductsColumns = { "No.", "Product Name", "Price", "Qty.", "Total", "Total" };
-        Object[][] topProductsData = {
-                { "509-GRPH", "Kaplan Melton Coat Navy", "Jackets", 50, 50, 2500 },
-        };
+        String[] topProductsColumns = { "No.", "Products Name", "Vendor Name", "Price", "Qty.", "Total", "Discount",
+                "Net Total", "Purchase Date" };
+        List<Object[]> topProductsDataList = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader("recentlyBuy.txt"))) {
+            String line;
+            br.readLine(); // Skip header
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                Object[] row = {
+                        0, // Placeholder for "No." column
+                        values[1],
+                        values[2],
+                        "$" + String.format("%.2f", Double.parseDouble(values[3])),
+                        Integer.parseInt(values[4]),
+                        "$" + String.format("%.2f", Double.parseDouble(values[5])),
+                        values[6] + "%",
+                        "$" + String.format("%.2f", Double.parseDouble(values[7])),
+                        values[8]
+                };
+                topProductsDataList.add(row);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Sort the data by quantity in descending order
+        topProductsDataList.sort(new Comparator<Object[]>() {
+            @Override
+            public int compare(Object[] o1, Object[] o2) {
+                return Integer.compare((int) o2[4], (int) o1[4]); // Compare quantities
+            }
+        });
+
+        // Update "No." column and format the date
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd h:mm a");
+
+        for (int i = 0; i < topProductsDataList.size(); i++) {
+            topProductsDataList.get(i)[0] = i + 1;
+            try {
+                Date date = inputFormat.parse((String) topProductsDataList.get(i)[8]);
+                topProductsDataList.get(i)[8] = outputFormat.format(date); // Format the date
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Object[][] topProductsData = topProductsDataList.toArray(new Object[0][]);
 
         JTable topProductsTable = new JTable(topProductsData, topProductsColumns);
-
-        // Set font size for table cells
         topProductsTable.setFont(font18);
         topProductsTable.setRowHeight(30);
 
         // Set font size for table header
         JTableHeader tableHeader = topProductsTable.getTableHeader();
         tableHeader.setFont(font20B);
+
+        // Set width for No. and Qty for 5px
+        TableColumnModel columnNo = topProductsTable.getColumnModel();
+        columnNo.getColumn(0).setPreferredWidth(5);
+        TableColumnModel columnQty = topProductsTable.getColumnModel();
+        columnQty.getColumn(4).setPreferredWidth(5);
 
         JScrollPane topProductsScrollPane = new JScrollPane(topProductsTable);
         topProductsPanel.add(topProductsScrollPane, BorderLayout.CENTER);
@@ -482,6 +596,8 @@ public class Dashboard {
         topProductsPanel.add(footerPanel, BorderLayout.SOUTH);
 
         dashboard.add(topProductsPanel, BorderLayout.SOUTH);
+        dashboard.revalidate(); // Ensure the panel is updated
+        dashboard.repaint(); // Ensure the panel is updated
     }
 
     // New Sale Panel
@@ -564,6 +680,7 @@ public class Dashboard {
             writeProductsToFile();
             updateProductList();
             updateDashboardPanels();
+            paymentTableModel.setRowCount(0);
 
         });
 
@@ -734,24 +851,57 @@ public class Dashboard {
     private void generateInvoice() {
         double totalAmount = 0;
 
-        try (PrintWriter writer = new PrintWriter("invoice.txt")) {
+        try (PrintWriter writer = new PrintWriter("invoice.txt");
+                FileWriter fileWriter = new FileWriter("recentlyBuy.txt", true);
+                PrintWriter recentWriter = new PrintWriter(fileWriter)) {
+
             writer.println("Invoice:");
             writer.println("===========================================");
+
+            // Check if the file is new and needs a header
+            File recentlyBuyFile = new File("recentlyBuy.txt");
+            if (recentlyBuyFile.length() == 0) {
+                recentWriter.println("No.,Products Name,Vendor Name,Price,Qty.,Total,Discount,Net Total,Purchase Date");
+            }
+
             for (int i = 0; i < paymentTableModel.getRowCount(); i++) {
                 String name = (String) paymentTableModel.getValueAt(i, 1);
-                double price = Double.parseDouble(paymentTableModel.getValueAt(i, 2).toString().substring(1)); // Removethedollarsignandconverttodouble
+                double price = Double.parseDouble(paymentTableModel.getValueAt(i, 2).toString().substring(1)); // Remove
+                                                                                                               // the
+                                                                                                               // dollar
+                                                                                                               // sign
+                                                                                                               // and
+                                                                                                               // convert
+                                                                                                               // to
+                                                                                                               // double
                 int qty = (int) paymentTableModel.getValueAt(i, 3);
                 String discountText = (String) paymentTableModel.getValueAt(i, 4);
-                double discount = Double.parseDouble(discountText.substring(0, discountText.length() - 1)); // Removethepercentagesign andconvertto double
-                double total = Double.parseDouble(paymentTableModel.getValueAt(i, 5).toString().substring(1)); // Removethedollarsignandconverttodouble
+                double discount = Double.parseDouble(discountText.substring(0, discountText.length() - 1)); // Remove
+                                                                                                            // the
+                                                                                                            // percentage
+                                                                                                            // sign and
+                                                                                                            // convert
+                                                                                                            // to double
+                double total = Double.parseDouble(paymentTableModel.getValueAt(i, 5).toString().substring(1)); // Remove
+                                                                                                               // the
+                                                                                                               // dollar
+                                                                                                               // sign
+                                                                                                               // and
+                                                                                                               // convert
+                                                                                                               // to
+                                                                                                               // double
+                double netTotal = total - (total * discount / 100);
+                String purchaseDate = new SimpleDateFormat("yyyy-MM-dd-H-m-s").format(new Date());
 
                 writer.printf("%s - $%.2f x %d, Discount: %.2f%%, Total: $%.2f%n", name, price, qty, discount, total);
+                recentWriter.printf("%d,%s,%s,%.2f,%d,%.2f,%.2f,%.2f,%s%n", i + 1, name, "Vendor Name", price, qty,
+                        total, discount, netTotal, purchaseDate);
                 totalAmount += total;
             }
             writer.println("===========================================");
             writer.printf("Total Amount: $%.2f%n", totalAmount);
             writer.println("Thank you for your purchase!");
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -808,6 +958,9 @@ public class Dashboard {
         // Update the inventory list
         updateProductList();
         updateInventoryTable();
+
+        // Update the recent purchases panel
+        updateRecentPurchasesPanel();
     }
 
     private BufferedImage getScaledImage(BufferedImage src, int width, int height) {
