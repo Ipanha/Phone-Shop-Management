@@ -142,7 +142,6 @@ public class PhoneShopManagementSystem {
             }
         });
 
-
         btnRegister.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -150,8 +149,6 @@ public class PhoneShopManagementSystem {
             }
         });
     }
-    
-
 
     private void createRegisterPanel() {
         registerPanel = new JPanel(null);

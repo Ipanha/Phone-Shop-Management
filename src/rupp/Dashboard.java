@@ -7,8 +7,6 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -46,6 +44,7 @@ public class Dashboard {
     Font font18B = new Font("Poppins", Font.BOLD, 18);
     Font font40 = new Font("Arial", Font.PLAIN, 40);
     Font font30 = new Font("Arial", Font.PLAIN, 30);
+    Font font30B = new Font("Arial", Font.BOLD, 30);
     Font font17 = new Font("Arial", Font.PLAIN, 17);
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
@@ -451,11 +450,11 @@ public class Dashboard {
                         values[0],
                         values[1],
                         values[2],
-                        "$" + String.format("%.2f", Double.parseDouble(values[3])),
-                        Integer.parseInt(values[4]),
-                        "$" + String.format("%.2f", Double.parseDouble(values[5])),
+                        "$" + String.format("%.2f", Double.valueOf(values[3])),
+                        Integer.valueOf(values[4]),
+                        "$" + String.format("%.2f", Double.valueOf(values[5])),
                         values[6] + "%",
-                        "$" + String.format("%.2f", Double.parseDouble(values[7])),
+                        "$" + String.format("%.2f", Double.valueOf(values[7])),
                         values[8]
                 };
                 recentDataList.add(row);
@@ -465,18 +464,15 @@ public class Dashboard {
         }
 
         // Sort the data by purchase date in descending order
-        recentDataList.sort(new Comparator<Object[]>() {
-            @Override
-            public int compare(Object[] o1, Object[] o2) {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
-                try {
-                    Date date1 = sdf.parse((String) o1[8]);
-                    Date date2 = sdf.parse((String) o2[8]);
-                    return date2.compareTo(date1); // Newer dates first
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    return 0;
-                }
+        recentDataList.sort((Object[] o1, Object[] o2) -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+            try {
+                Date date1 = sdf.parse((String) o1[8]);
+                Date date2 = sdf.parse((String) o2[8]);
+                return date2.compareTo(date1); // Newer dates first
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return 0;
             }
         });
 
@@ -493,7 +489,7 @@ public class Dashboard {
             }
         }
 
-        Object[][] recentData = recentDataList.toArray(new Object[0][]);
+        Object[][] recentData = recentDataList.toArray(Object[][]::new);
 
         JTable recentTable = new JTable(recentData, recentColumns);
         recentTable.setFont(font18);
@@ -537,11 +533,11 @@ public class Dashboard {
                         0, // Placeholder for "No." column
                         values[1],
                         values[2],
-                        "$" + String.format("%.2f", Double.parseDouble(values[3])),
-                        Integer.parseInt(values[4]),
-                        "$" + String.format("%.2f", Double.parseDouble(values[5])),
+                        "$" + String.format("%.2f", Double.valueOf(values[3])),
+                        Integer.valueOf(values[4]),
+                        "$" + String.format("%.2f", Double.valueOf(values[5])),
                         values[6] + "%",
-                        "$" + String.format("%.2f", Double.parseDouble(values[7])),
+                        "$" + String.format("%.2f", Double.valueOf(values[7])),
                         values[8]
                 };
                 topProductsDataList.add(row);
@@ -551,12 +547,9 @@ public class Dashboard {
         }
 
         // Sort the data by quantity in descending order
-        topProductsDataList.sort(new Comparator<Object[]>() {
-            @Override
-            public int compare(Object[] o1, Object[] o2) {
-                return Integer.compare((int) o2[4], (int) o1[4]); // Compare quantities
-            }
-        });
+        topProductsDataList.sort((Object[] o1, Object[] o2) -> Integer.compare((int) o2[4], (int) o1[4]) // Compare
+                                                                                                         // quantities
+        );
 
         // Update "No." column and format the date
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
@@ -572,7 +565,7 @@ public class Dashboard {
             }
         }
 
-        Object[][] topProductsData = topProductsDataList.toArray(new Object[0][]);
+        Object[][] topProductsData = topProductsDataList.toArray(Object[][]::new);
 
         JTable topProductsTable = new JTable(topProductsData, topProductsColumns);
         topProductsTable.setFont(font18);
@@ -609,7 +602,7 @@ public class Dashboard {
         JPanel footerPanel = Footer(); // Call the Footer method
 
         // Other components setup
-        JPanel centerPanel = new JPanel(null);
+        JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setBackground(Color.CYAN);
 
         JLabel lblPayment = new JLabel("Payment");
@@ -621,13 +614,10 @@ public class Dashboard {
         JButton btnClear = new JButton("Clear all");
         JButton btnExit = new JButton("Exit");
         JButton btnInvoice = new JButton("Invoice");
-        JTextArea txtDisplay = new JTextArea();
 
         // Product side
-        lblPayment.setBounds(350, 30, 800, 50);
         lblPayment.setFont(font40);
         lblPayment.setForeground(Color.BLUE);
-        navPaymentPanel.setBounds(10, 10, 800, 100);
         navPaymentPanel.setBackground(Color.white);
 
         // Payment side
@@ -635,35 +625,34 @@ public class Dashboard {
         paymentTableModel = new DefaultTableModel(columnNames, 0);
         paymentTable = new JTable(paymentTableModel);
         JScrollPane paymentScrollPane = new JScrollPane(paymentTable);
-        paymentScrollPane.setBounds(10, 120, 800, 700);
         JTableHeader header = paymentTable.getTableHeader();
         header.setFont(font17);
         paymentTable.setFont(font17);
         paymentTable.setRowHeight(30);
-        // Create padding for text display
-        int top = 10, left = 10, bottom = 10, right = 10;
-        EmptyBorder padding = new EmptyBorder(top, left, bottom, right);
-        txtDisplay.setBorder(padding);
-        // Retrieve the TableColumn for the "No." column (index 0)
+
         TableColumn colNo = paymentTable.getColumnModel().getColumn(0);
         TableColumn colPrice = paymentTable.getColumnModel().getColumn(2);
         TableColumn colQty = paymentTable.getColumnModel().getColumn(3);
 
-        // Set the preferred width to 10 pixels
         colNo.setPreferredWidth(5);
         colPrice.setPreferredWidth(10);
         colQty.setPreferredWidth(5);
 
         // Buttons
-        btnClear.setBounds(13, 850, 150, 40);
-        btnClear.setFont(font30);
+        btnClear.setFont(font30B);
         btnClear.setCursor(pointer);
-        btnInvoice.setBounds(330, 850, 150, 40);
-        btnInvoice.setFont(font30);
+        btnClear.setBackground(Color.MAGENTA);
+        btnClear.setForeground(Color.white);
+
+        btnInvoice.setFont(font30B);
         btnInvoice.setCursor(pointer);
-        btnExit.setBounds(655, 850, 150, 40);
-        btnExit.setFont(font30);
+        btnInvoice.setBackground(Color.green);
+        btnInvoice.setForeground(Color.white);
+
+        btnExit.setFont(font30B);
         btnExit.setCursor(pointer);
+        btnExit.setBackground(Color.RED);
+        btnExit.setForeground(Color.white);
 
         btnClear.addActionListener((ActionEvent e) -> {
             paymentTableModel.setRowCount(0);
@@ -675,25 +664,18 @@ public class Dashboard {
 
         btnInvoice.addActionListener((ActionEvent e) -> {
             generateInvoice();
-
-            // Write the updated product list to file
             writeProductsToFile();
             updateProductList();
             updateDashboardPanels();
             paymentTableModel.setRowCount(0);
-
         });
 
         // Product side
-        lblProduct.setBounds(1200, 30, 500, 50);
         lblProduct.setFont(font40);
         lblProduct.setForeground(Color.BLUE);
-        scrollPane.setBounds(840, 120, 850, 700);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        navListProductPanel.setBounds(840, 10, 850, 100);
         navListProductPanel.setBackground(Color.white);
 
-        // Set the unit increment to a higher value for faster scrolling
         JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
         JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
         verticalScrollBar.setUnitIncrement(16);
@@ -701,21 +683,48 @@ public class Dashboard {
         verticalScrollBar.setBlockIncrement(100);
         horizontalScrollBar.setBlockIncrement(100);
 
-        // Add products
         updateProductList();
 
-        // Adding components to center panel
-        centerPanel.add(lblPayment);
-        centerPanel.add(navPaymentPanel);
-        centerPanel.add(paymentScrollPane);
-        centerPanel.add(btnClear);
-        centerPanel.add(btnExit);
-        centerPanel.add(btnInvoice);
-        centerPanel.add(lblProduct);
-        centerPanel.add(navListProductPanel);
-        centerPanel.add(scrollPane);
+        // Layout setup using GridBagLayout for responsiveness
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.BOTH;
 
-        // Adding header panel and center panel to newsalePanel
+        // Payment section
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        centerPanel.add(lblPayment, gbc);
+
+        gbc.gridy = 1;
+        gbc.weighty = 1.0;
+        centerPanel.add(paymentScrollPane, gbc);
+
+        gbc.gridy = 2;
+        gbc.weighty = 0;
+        JPanel paymentButtonPanel = new JPanel();
+        paymentButtonPanel.setBackground(Color.CYAN); // Match centerPanel background
+        paymentButtonPanel.setLayout(new BoxLayout(paymentButtonPanel, BoxLayout.X_AXIS));
+        paymentButtonPanel.add(btnClear);
+        paymentButtonPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+        paymentButtonPanel.add(btnInvoice);
+        paymentButtonPanel.add(Box.createRigidArea(new Dimension(20, 0)));
+        paymentButtonPanel.add(btnExit);
+        centerPanel.add(paymentButtonPanel, gbc);
+
+        // Product section
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        centerPanel.add(lblProduct, gbc);
+
+        gbc.gridy = 1;
+        gbc.weighty = 1.0;
+        centerPanel.add(scrollPane, gbc);
+
+        // Adding header panel, center panel, and footer panel to newsalePanel
         newsalePanel.add(headerPanel, BorderLayout.NORTH);
         newsalePanel.add(centerPanel, BorderLayout.CENTER);
         newsalePanel.add(footerPanel, BorderLayout.SOUTH);
