@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -22,10 +23,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 public class Dashboard {
+
     private final JFrame frame;
     private final JPanel mainPanel;
     private final CardLayout cardLayout;
-
     private JPanel dashboard;
     private JPanel newsalePanel;
     private JPanel viewSale;
@@ -36,6 +37,7 @@ public class Dashboard {
     private DefaultTableModel paymentTableModel;
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
+    private final String username;
     private JScrollPane scrollPane;
     Font font24B = new Font("Arial", Font.BOLD, 24);
     Font font20B = new Font("Poppins", Font.BOLD, 20);
@@ -48,7 +50,8 @@ public class Dashboard {
     Font font17 = new Font("Arial", Font.PLAIN, 17);
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
-    public Dashboard() {
+    public Dashboard(String username) {
+        this.username = username;
         frame = new JFrame("Phone Shop Management System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1920, 1080);
@@ -102,7 +105,7 @@ public class Dashboard {
         Image scaledImage = userLogo.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         // Create a new ImageIcon with the scaled image
         ImageIcon scaledUserLogo = new ImageIcon(scaledImage);
-        String userName = "CHET PANHA"; // Replace with actual user name
+        String userName = username; // Replace with actual user name
 
         // User info components
         JLabel userLogoLabel = new JLabel(scaledUserLogo);
@@ -306,7 +309,7 @@ public class Dashboard {
         // Ensure the products are loaded into phonesList
         readProductsFromFile();
         // Create a navigation title
-        JPanel headerPanel = navigation("Dashboard");
+        JPanel headerPanel = navងិត​gation("Dashboard");
         // Summary Panel
         JPanel summaryPanel = new JPanel(new GridLayout(1, 5, 10, 10));
         summaryPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -875,30 +878,11 @@ public class Dashboard {
 
             for (int i = 0; i < paymentTableModel.getRowCount(); i++) {
                 String name = (String) paymentTableModel.getValueAt(i, 1);
-                double price = Double.parseDouble(paymentTableModel.getValueAt(i, 2).toString().substring(1)); // Remove
-                                                                                                               // the
-                                                                                                               // dollar
-                                                                                                               // sign
-                                                                                                               // and
-                                                                                                               // convert
-                                                                                                               // to
-                                                                                                               // double
+                double price = Double.parseDouble(paymentTableModel.getValueAt(i, 2).toString().substring(1));
                 int qty = (int) paymentTableModel.getValueAt(i, 3);
                 String discountText = (String) paymentTableModel.getValueAt(i, 4);
-                double discount = Double.parseDouble(discountText.substring(0, discountText.length() - 1)); // Remove
-                                                                                                            // the
-                                                                                                            // percentage
-                                                                                                            // sign and
-                                                                                                            // convert
-                                                                                                            // to double
-                double total = Double.parseDouble(paymentTableModel.getValueAt(i, 5).toString().substring(1)); // Remove
-                                                                                                               // the
-                                                                                                               // dollar
-                                                                                                               // sign
-                                                                                                               // and
-                                                                                                               // convert
-                                                                                                               // to
-                                                                                                               // double
+                double discount = Double.parseDouble(discountText.substring(0, discountText.length() - 1));
+                double total = Double.parseDouble(paymentTableModel.getValueAt(i, 5).toString().substring(1));
                 double netTotal = total - (total * discount / 100);
                 String purchaseDate = new SimpleDateFormat("yyyy-MM-dd-H-m-s").format(new Date());
 
@@ -1186,6 +1170,7 @@ public class Dashboard {
             phone.setPrice(Double.parseDouble(priceField.getText()));
             phone.setQty(Integer.parseInt(qtyField.getText()));
             phone.setImagePath(imagePath);
+
             return phone;
         }
     }
@@ -1310,6 +1295,24 @@ public class Dashboard {
         }
     }
 
+    // Custom renderer for the price column
+    class PriceRenderer extends DefaultTableCellRenderer {
+        private final NumberFormat currencyFormat;
+
+        public PriceRenderer() {
+            super();
+            currencyFormat = NumberFormat.getCurrencyInstance();
+        }
+
+        @Override
+        protected void setValue(Object value) {
+            if (value != null) {
+                value = currencyFormat.format(value);
+            }
+            super.setValue(value);
+        }
+    }
+
     private JPanel createInventoryPanel() {
         inventoryPanel = new JPanel(new BorderLayout());
         JPanel headerPanel = navigation("Inventory");
@@ -1338,6 +1341,7 @@ public class Dashboard {
         inventoryTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable,
                 (JFrame) SwingUtilities.getWindowAncestor(inventoryPanel)));
 
+        inventoryTable.getColumn("Price").setCellRenderer(new PriceRenderer());
         // Set font for table headers
         JTableHeader header = inventoryTable.getTableHeader();
         header.setFont(font20B); // Set desired font and size for headers
@@ -1513,6 +1517,7 @@ public class Dashboard {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Dashboard());
+        SwingUtilities.invokeLater(() -> new Dashboard("DefaultUser"));
     }
+
 }

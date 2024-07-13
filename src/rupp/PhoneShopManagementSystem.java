@@ -134,7 +134,7 @@ public class PhoneShopManagementSystem {
                 String password = new String(txtPassword.getPassword());
                 if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
                     frame.dispose(); // Close the login window
-                    SwingUtilities.invokeLater(() -> new Dashboard());
+                    SwingUtilities.invokeLater(() -> new Dashboard(usernameLogin));
                 } else {
                     JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
                             JOptionPane.ERROR_MESSAGE);
@@ -237,16 +237,13 @@ public class PhoneShopManagementSystem {
         btnToggleConfirmPassword.setBorderPainted(false);
         btnToggleConfirmPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnToggleConfirmPassword.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (txtConfirmPassword.getEchoChar() != '\u0000') {
-                    txtConfirmPassword.setEchoChar((char) 0);
-                    btnToggleConfirmPassword.setIcon(resizedHideIcon); // Switch to hide icon
-                } else {
-                    txtConfirmPassword.setEchoChar('•');
-                    btnToggleConfirmPassword.setIcon(resizedViewIcon); // Switch to view icon
-                }
+        btnToggleConfirmPassword.addActionListener((ActionEvent e) -> {
+            if (txtConfirmPassword.getEchoChar() != '\u0000') {
+                txtConfirmPassword.setEchoChar((char) 0);
+                btnToggleConfirmPassword.setIcon(resizedHideIcon); // Switch to hide icon
+            } else {
+                txtConfirmPassword.setEchoChar('•');
+                btnToggleConfirmPassword.setIcon(resizedViewIcon); // Switch to view icon
             }
         });
 
@@ -301,7 +298,7 @@ public class PhoneShopManagementSystem {
     private void saveUserToFile(String username, String password) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE, true))) {
             writer.write(username + ":" + password);
-            writer.newLine();
+            writer.newLine(); // This ensures that each user's data is written on a new line.
             System.out.println("User data saved to: " + USERS_FILE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, "Error saving user data", "Error", JOptionPane.ERROR_MESSAGE);
