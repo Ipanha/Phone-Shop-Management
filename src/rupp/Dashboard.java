@@ -309,7 +309,7 @@ public class Dashboard {
         // Ensure the products are loaded into phonesList
         readProductsFromFile();
         // Create a navigation title
-        JPanel headerPanel = navងិត​gation("Dashboard");
+        JPanel headerPanel = navigation("Dashboard");
         // Summary Panel
         JPanel summaryPanel = new JPanel(new GridLayout(1, 5, 10, 10));
         summaryPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
