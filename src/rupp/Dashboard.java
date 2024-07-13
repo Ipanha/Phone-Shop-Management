@@ -887,7 +887,7 @@ public class Dashboard {
                 String purchaseDate = new SimpleDateFormat("yyyy-MM-dd-H-m-s").format(new Date());
 
                 writer.printf("%s - $%.2f x %d, Discount: %.2f%%, Total: $%.2f%n", name, price, qty, discount, total);
-                recentWriter.printf("%d,%s,%s,%.2f,%d,%.2f,%.2f,%.2f,%s%n", i + 1, name, "Vendor Name", price, qty,
+                recentWriter.printf("%d,%s,%s,%.2f,%d,%.2f,%.2f,%.2f,%s%n", i + 1, name, username, price, qty,
                         total, discount, netTotal, purchaseDate);
                 totalAmount += total;
             }

@@ -1,13 +1,12 @@
 package rupp;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import javax.swing.*;
 
 public class PhoneShopManagementSystem {
     private final JFrame frame;
@@ -22,8 +21,8 @@ public class PhoneShopManagementSystem {
     public PhoneShopManagementSystem() {
         frame = new JFrame("Phone Shop Management System");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1920, 1080);
         frame.setLocationRelativeTo(null); // Center the frame on the screen
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         frame.add(mainPanel);
@@ -72,16 +71,13 @@ public class PhoneShopManagementSystem {
         btnTogglePassword.setBorderPainted(false);
         btnTogglePassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnTogglePassword.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (txtPassword.getEchoChar() != '\u0000') {
-                    txtPassword.setEchoChar((char) 0);
-                    btnTogglePassword.setIcon(resizedHideIcon); // Switch to hide icon
-                } else {
-                    txtPassword.setEchoChar('•');
-                    btnTogglePassword.setIcon(resizedViewIcon); // Switch to view icon
-                }
+        btnTogglePassword.addActionListener((ActionEvent e) -> {
+            if (txtPassword.getEchoChar() != '\u0000') {
+                txtPassword.setEchoChar((char) 0);
+                btnTogglePassword.setIcon(resizedHideIcon); // Switch to hide icon
+            } else {
+                txtPassword.setEchoChar('•');
+                btnTogglePassword.setIcon(resizedViewIcon); // Switch to view icon
             }
         });
 
@@ -109,10 +105,26 @@ public class PhoneShopManagementSystem {
         lblPassword.setFont(labelFont2);
         txtPassword.setBounds(900, 400, 300, 45);
         txtPassword.setFont(labelFont2);
+
         btnLogin.setBounds(750, 500, 150, 40);
         btnLogin.setFont(labelFont2);
-        btnRegister.setBounds(1050, 500, 150, 40);
+        btnLogin.setForeground(Color.WHITE);
+        btnLogin.setBackground(new Color(0, 122, 255));
+        btnLogin.setOpaque(true);
+        btnLogin.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
+                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
+        ));
+
+        btnRegister.setBounds(1000, 500, 200, 40);
         btnRegister.setFont(labelFont2);
+        btnRegister.setForeground(Color.WHITE);
+        btnRegister.setBackground(Color.GREEN);
+        btnRegister.setOpaque(true);
+        btnRegister.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
+                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
+        ));
 
         loginPanel.add(nameStor);
         loginPanel.add(imageLabel);
@@ -125,28 +137,22 @@ public class PhoneShopManagementSystem {
         loginPanel.add(btnTogglePassword);
         loginPanel.add(btnLogin);
         loginPanel.add(btnRegister);
-        loginPanel.setBackground(Color.cyan);
+        loginPanel.setBackground(Color.white);
 
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                usernameLogin = txtUsername.getText();
-                String password = new String(txtPassword.getPassword());
-                if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
-                    frame.dispose(); // Close the login window
-                    SwingUtilities.invokeLater(() -> new Dashboard(usernameLogin));
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                }
+        btnLogin.addActionListener((ActionEvent e) -> {
+            usernameLogin = txtUsername.getText();
+            String password = new String(txtPassword.getPassword());
+            if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
+                frame.dispose(); // Close the login window
+                SwingUtilities.invokeLater(() -> new Dashboard(usernameLogin));
+            } else {
+                JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        btnRegister.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(mainPanel, "Register");
-            }
+        btnRegister.addActionListener((ActionEvent e) -> {
+            cardLayout.show(mainPanel, "Register");
         });
     }
 
@@ -216,16 +222,13 @@ public class PhoneShopManagementSystem {
         btnToggleNewPassword.setBorderPainted(false);
         btnToggleNewPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnToggleNewPassword.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (txtNewPassword.getEchoChar() != '\u0000') {
-                    txtNewPassword.setEchoChar((char) 0);
-                    btnToggleNewPassword.setIcon(resizedHideIcon); // Switch to hide icon
-                } else {
-                    txtNewPassword.setEchoChar('•');
-                    btnToggleNewPassword.setIcon(resizedViewIcon); // Switch to view icon
-                }
+        btnToggleNewPassword.addActionListener((ActionEvent e) -> {
+            if (txtNewPassword.getEchoChar() != '\u0000') {
+                txtNewPassword.setEchoChar((char) 0);
+                btnToggleNewPassword.setIcon(resizedHideIcon); // Switch to hide icon
+            } else {
+                txtNewPassword.setEchoChar('•');
+                btnToggleNewPassword.setIcon(resizedViewIcon); // Switch to view icon
             }
         });
 
@@ -267,31 +270,25 @@ public class PhoneShopManagementSystem {
         registerPanel.add(btnToggleConfirmPassword);
         registerPanel.setBackground(Color.cyan);
 
-        btnRegister.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String newUsername = txtNewUsername.getText();
-                String newPassword = new String(txtNewPassword.getPassword());
-                String confirmPassword = new String(txtConfirmPassword.getPassword());
-                if (!newPassword.equals(confirmPassword)) {
-                    JOptionPane.showMessageDialog(frame, "Passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
-                } else if (users.containsKey(newUsername)) {
-                    JOptionPane.showMessageDialog(frame, "Username already exists", "Error", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    users.put(newUsername, newPassword);
-                    saveUserToFile(newUsername, newPassword);
-                    JOptionPane.showMessageDialog(frame, "Registration successful", "Success",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    cardLayout.show(mainPanel, "Login");
-                }
+        btnRegister.addActionListener((ActionEvent e) -> {
+            String newUsername = txtNewUsername.getText();
+            String newPassword = new String(txtNewPassword.getPassword());
+            String confirmPassword = new String(txtConfirmPassword.getPassword());
+            if (!newPassword.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(frame, "Passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (users.containsKey(newUsername)) {
+                JOptionPane.showMessageDialog(frame, "Username already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                users.put(newUsername, newPassword);
+                saveUserToFile(newUsername, newPassword);
+                JOptionPane.showMessageDialog(frame, "Registration successful", "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+                cardLayout.show(mainPanel, "Login");
             }
         });
 
-        btnBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardLayout.show(mainPanel, "Login");
-            }
+        btnBack.addActionListener((ActionEvent e) -> {
+            cardLayout.show(mainPanel, "Login");
         });
     }
 

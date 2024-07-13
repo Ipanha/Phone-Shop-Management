@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "DiprellaLogin",
+      "request": "launch",
+      "mainClass": "rupp.DiprellaLogin",
+      "projectName": "RUPP_5e5c80e4"
+    },
+    {
+      "type": "java",
       "name": "PhoneShopManagementSystem",
       "request": "launch",
       "mainClass": "PhoneShopManagementSystem",
