@@ -199,10 +199,27 @@ public class PhoneShopManagementSystem {
         lblConfirmPassword.setFont(labelFont2);
         txtConfirmPassword.setBounds(1000, 480, 300, 45);
         txtConfirmPassword.setFont(labelFont2);
-        btnRegister.setBounds(700, 600, 150, 40);
+        btnRegister.setBounds(700, 600, 200, 40);
         btnRegister.setFont(labelFont2);
         btnBack.setBounds(1150, 600, 150, 40);
         btnBack.setFont(labelFont2);
+        btnRegister.setFont(labelFont2);
+        btnRegister.setForeground(Color.WHITE);
+        btnRegister.setBackground(Color.GREEN);
+        btnRegister.setOpaque(true);
+        btnRegister.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
+                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
+        ));
+
+        btnBack.setFont(labelFont2);
+        btnBack.setForeground(Color.WHITE);
+        btnBack.setBackground(new Color(0, 122, 255));
+        btnBack.setOpaque(true);
+        btnBack.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
+                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
+        ));
 
         // Load and resize the eye icons
         ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png"); // icon
