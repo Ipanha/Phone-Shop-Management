@@ -23,6 +23,7 @@ public class PhoneShopManagementSystem {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null); // Center the frame on the screen
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(1920, 1080);
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         frame.add(mainPanel);
