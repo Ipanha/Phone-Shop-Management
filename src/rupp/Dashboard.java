@@ -39,6 +39,7 @@ public class Dashboard {
     private JPanel navProductPanel;
     private final String username;
     private JScrollPane scrollPane;
+    private String photoPath;
     Font font24B = new Font("Arial", Font.BOLD, 24);
     Font font20B = new Font("Poppins", Font.BOLD, 20);
     Font font20 = new Font("Poppins", Font.PLAIN, 20);
@@ -99,13 +100,42 @@ public class Dashboard {
         navTitle.setHorizontalAlignment(SwingConstants.CENTER);
         navTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Simulated user data (replace with actual user data retrieval logic)
-        ImageIcon userLogo = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\p1.png");
+        String filePath = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
+        String userName = username;
+        final ImageIcon[] userLogo = { null }; // Use an array to make 'final' work
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Split the line into username, password, and photo path
+                String[] parts = line.split(",");
+                if (parts.length >= 3) {
+                    String fileUsername = parts[0];
+                    String password = parts[1];
+                    String photoPath = parts[2];
+                    this.photoPath = photoPath;
+
+                    // Compare the input username with the username from the file
+                    if (fileUsername.trim().equals(userName)) {
+                        System.out.println("Password: " + password);
+                        userLogo[0] = new ImageIcon(photoPath); // Assign to array element
+                        break; // Exit the loop once the username is found
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (userLogo[0] == null) {
+            // Handle case where userLogo is not found (e.g., set a default image)
+            userLogo[0] = new ImageIcon("default_image.png"); // Provide a default image path here
+        }
+
         // Scale the image to the desired size (e.g., 50x50 pixels)
-        Image scaledImage = userLogo.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        Image scaledImage = userLogo[0].getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
         // Create a new ImageIcon with the scaled image
         ImageIcon scaledUserLogo = new ImageIcon(scaledImage);
-        String userName = username; // Replace with actual user name
 
         // User info components
         JLabel userLogoLabel = new JLabel(scaledUserLogo);
@@ -119,7 +149,7 @@ public class Dashboard {
         userNamebtn.setContentAreaFilled(false); // Remove background
 
         userNamebtn.addActionListener((ActionEvent e) -> {
-            Image scaledImage1 = userLogo.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+            Image scaledImage1 = userLogo[0].getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
             // Create a new ImageIcon with the scaled image
             ImageIcon scaledUserLogo1 = new ImageIcon(scaledImage1);
             showProfileDialog(userName, scaledUserLogo1);
@@ -138,7 +168,6 @@ public class Dashboard {
         headerPanel.add(navTitle, BorderLayout.WEST);
         headerPanel.add(Box.createRigidArea(new Dimension(20, 0))); // Add space between navTitle and userInfoPanel
         headerPanel.add(userInfoPanel, BorderLayout.EAST);
-
         return headerPanel;
     }
 
@@ -403,7 +432,8 @@ public class Dashboard {
         profileButton.setFont(font18); // Set the font for profileButton
         profileButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         profileButton.addActionListener((ActionEvent e) -> {
-            // Handle profile button action (if needed)
+            EditProfileDialog editProfileDialog = new EditProfileDialog(frame, userName, photoPath);
+            editProfileDialog.setVisible(true);
         });
         buttonPanel.add(profileButton);
 

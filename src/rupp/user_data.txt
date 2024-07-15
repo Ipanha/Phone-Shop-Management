@@ -1,4 +1,4 @@
-Chet Panha:123
-PAPA:123
-:
-Marany:
+Panha,111,D:\girl.png
+PP,123,N/A
+KK,123,N/A
+Chet Panha,123,D:\girl.png

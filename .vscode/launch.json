@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "EditProfileDialog",
+      "request": "launch",
+      "mainClass": "rupp.EditProfileDialog",
+      "projectName": "RUPP_5e5c80e4"
+    },
+    {
+      "type": "java",
       "name": "DiprellaLogin",
       "request": "launch",
       "mainClass": "rupp.DiprellaLogin",

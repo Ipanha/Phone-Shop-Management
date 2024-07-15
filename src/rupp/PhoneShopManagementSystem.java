@@ -292,16 +292,21 @@ public class PhoneShopManagementSystem {
             String newUsername = txtNewUsername.getText();
             String newPassword = new String(txtNewPassword.getPassword());
             String confirmPassword = new String(txtConfirmPassword.getPassword());
-            if (!newPassword.equals(confirmPassword)) {
-                JOptionPane.showMessageDialog(frame, "Passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
-            } else if (users.containsKey(newUsername)) {
-                JOptionPane.showMessageDialog(frame, "Username already exists", "Error", JOptionPane.ERROR_MESSAGE);
+
+            if (newPassword.equals(confirmPassword)) {
+                if (!users.containsKey(newUsername)) {
+                    users.put(newUsername, newPassword);
+                    saveUserToFile(newUsername, newPassword, null); // Pass null for photoPath initially
+                    JOptionPane.showMessageDialog(frame, "Registration successful!", "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    cardLayout.show(mainPanel, "Login");
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Username already exists!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             } else {
-                users.put(newUsername, newPassword);
-                saveUserToFile(newUsername, newPassword);
-                JOptionPane.showMessageDialog(frame, "Registration successful", "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
-                cardLayout.show(mainPanel, "Login");
+                JOptionPane.showMessageDialog(frame, "Passwords do not match!", "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -310,13 +315,12 @@ public class PhoneShopManagementSystem {
         });
     }
 
-    private void saveUserToFile(String username, String password) {
+    private void saveUserToFile(String username, String password, String photoPath) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE, true))) {
-            writer.write(username + ":" + password);
-            writer.newLine(); // This ensures that each user's data is written on a new line.
-            System.out.println("User data saved to: " + USERS_FILE);
+            String photoPathValue = (photoPath != null && !photoPath.isEmpty()) ? photoPath : "N/A";
+            writer.write(username + "," + password + "," + photoPathValue);
+            writer.newLine();
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Error saving user data", "Error", JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
@@ -325,16 +329,17 @@ public class PhoneShopManagementSystem {
         try (Scanner scanner = new Scanner(new File(filePath))) {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                String[] parts = line.split(":");
-                if (parts.length == 2) {
+                String[] parts = line.split(",");
+                if (parts.length >= 2) {
                     String username = parts[0];
                     String password = parts[1];
+                   // String photoPath = parts.length > 2 ? parts[2] : "N/A";
                     users.put(username, password);
+                   // userPhotos.put(username, photoPath.equals("N/A") ? null : photoPath);
                 }
             }
-            System.out.println("Users loaded from file: " + filePath); // Optional log
         } catch (FileNotFoundException e) {
-            System.err.println("Users file not found: " + filePath);
+            e.printStackTrace();
         }
     }
 
