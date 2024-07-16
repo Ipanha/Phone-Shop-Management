@@ -96,7 +96,12 @@ public class Dashboard {
         this.photoPath = newPhotoPath;
 
         // Update navigation panel
-        // mainPanel.remove(dashboard);
+        mainPanel.remove(dashboard);
+        mainPanel.remove(newsalePanel);
+        mainPanel.remove(viewSale);
+        mainPanel.remove(inventoryPanel);
+        mainPanel.remove(report);
+        mainPanel.remove(setting);
         frame.add(mainPanel);
 
         createDashboardPanel();
@@ -1124,17 +1129,19 @@ public class Dashboard {
     }
 
     class ButtonRenderer extends JButton implements TableCellRenderer {
+        private final Dimension buttonSize = new Dimension(100, 40); // Adjust size as needed
+
         public ButtonRenderer() {
             setOpaque(true);
-            setFont(font18); // Set your desired font
+            setFont(font18B); // Set your desired font
             setCursor(pointer);
+            setPreferredSize(buttonSize); // Set preferred size for the button
         }
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             setText((value == null) ? "" : value.toString());
-            setPreferredSize(new Dimension(70, 30)); // Adjust size as needed
             return this;
         }
     }
@@ -1263,6 +1270,7 @@ public class Dashboard {
         private boolean isPushed;
         private final JTable table;
         private final JFrame parentFrame;
+        private final Dimension buttonSize = new Dimension(50, 20); // Adjust size as needed
 
         public ButtonEditor(JCheckBox checkBox, JTable table, JFrame parentFrame) {
             super(checkBox);
@@ -1272,6 +1280,7 @@ public class Dashboard {
             button.setOpaque(true);
             button.setCursor(pointer);
             button.setFont(font18);
+            button.setPreferredSize(buttonSize); // Set preferred size for the button
             button.addActionListener((ActionEvent e) -> fireEditingStopped());
         }
 
@@ -1383,7 +1392,7 @@ public class Dashboard {
         JPanel headerPanel = navigation("Inventory");
         JPanel footerPanel = Footer();
 
-        String[] columnNames = { "No.", "Image", "Name", "Price", "Quantity", "Edit", "Delete" };
+        String[] columnNames = { "No.", "Image", "Name", "Price", "Quantity", "", " " };
         inventoryTableModel = new InventoryTableModel(columnNames, 0);
 
         inventoryTable = new JTable(inventoryTableModel);
@@ -1395,15 +1404,15 @@ public class Dashboard {
             inventoryTable.getColumnModel().getColumn(i).setCellRenderer(paddedCellRenderer);
         }
 
-        inventoryTable.getColumn("No.").setPreferredWidth(30); // Adjust preferred width for the "No." column
+        inventoryTable.getColumn("No.").setPreferredWidth(20); // Adjust preferred width for the "No." column
         inventoryTable.getColumn("No.").setCellRenderer(new PaddedCellRenderer(padding)); // Apply padding to the "No."
                                                                                           // column
         inventoryTable.getColumn("Image").setCellRenderer(new ImageRenderer());
-        inventoryTable.getColumn("Edit").setCellRenderer(new ButtonRenderer());
-        inventoryTable.getColumn("Edit").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable,
+        inventoryTable.getColumn("").setCellRenderer(new ButtonRenderer());
+        inventoryTable.getColumn("").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable,
                 (JFrame) SwingUtilities.getWindowAncestor(inventoryPanel)));
-        inventoryTable.getColumn("Delete").setCellRenderer(new ButtonRenderer());
-        inventoryTable.getColumn("Delete").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable,
+        inventoryTable.getColumn(" ").setCellRenderer(new ButtonRenderer());
+        inventoryTable.getColumn(" ").setCellEditor(new ButtonEditor(new JCheckBox(), inventoryTable,
                 (JFrame) SwingUtilities.getWindowAncestor(inventoryPanel)));
 
         inventoryTable.getColumn("Price").setCellRenderer(new PriceRenderer());
@@ -1583,11 +1592,6 @@ public class Dashboard {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new Dashboard("DefaultUser"));
-    }
-
-    public void dispose() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'dispose'");
     }
 
 }
