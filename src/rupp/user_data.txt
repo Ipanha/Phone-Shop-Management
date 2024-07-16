@@ -1,4 +1,1 @@
-Panha,111,D:\girl.png
-PP,123,N/A
-KK,123,N/A
-Chet Panha,123,D:\girl.png
+Chet Panha,111,D:\Panha.jpg

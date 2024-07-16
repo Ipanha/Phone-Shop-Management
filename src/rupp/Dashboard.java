@@ -37,7 +37,7 @@ public class Dashboard {
     private DefaultTableModel paymentTableModel;
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
-    private final String username;
+    private String username;
     private JScrollPane scrollPane;
     private String photoPath;
     Font font24B = new Font("Arial", Font.BOLD, 24);
@@ -86,6 +86,41 @@ public class Dashboard {
 
         createSidebar();
 
+        frame.setVisible(true);
+        updateProductList();
+
+    }
+
+    public void refreshUserProfile(String newUsername, String newPhotoPath) {
+        this.username = newUsername;
+        this.photoPath = newPhotoPath;
+
+        // Update navigation panel
+        // mainPanel.remove(dashboard);
+        frame.add(mainPanel);
+
+        createDashboardPanel();
+        mainPanel.add(dashboard, "Dashboard");
+
+        createNewSalePanel();
+        mainPanel.add(newsalePanel, "newSale");
+
+        createViewSale();
+        mainPanel.add(viewSale, "viewSale");
+
+        createInventoryPanel();
+        mainPanel.add(inventoryPanel, "inventoryPanel");
+
+        creatReportPanel();
+        mainPanel.add(report, "report");
+
+        createSettingPanel();
+        mainPanel.add(setting, "setting");
+        // createSidebar();
+        // updateProductList();
+        // Ensure the changes are reflected immediately
+        frame.revalidate();
+        frame.repaint();
         frame.setVisible(true);
         updateProductList();
 
@@ -432,7 +467,7 @@ public class Dashboard {
         profileButton.setFont(font18); // Set the font for profileButton
         profileButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         profileButton.addActionListener((ActionEvent e) -> {
-            EditProfileDialog editProfileDialog = new EditProfileDialog(frame, userName, photoPath);
+            EditProfileDialog editProfileDialog = new EditProfileDialog(frame, userName, photoPath, this);
             editProfileDialog.setVisible(true);
         });
         buttonPanel.add(profileButton);
@@ -1548,6 +1583,11 @@ public class Dashboard {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new Dashboard("DefaultUser"));
+    }
+
+    public void dispose() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'dispose'");
     }
 
 }

@@ -12,9 +12,12 @@ public class EditProfileDialog extends JDialog {
     private final JPasswordField confirmNewPasswordField;
     private final JLabel photoLabel;
     private String photoPath;
+    private final Dashboard dashboard;
 
-    public EditProfileDialog(JFrame parent, String username, String photoPath) {
+    public EditProfileDialog(JFrame parent, String username, String photoPath, Dashboard dashboard) {
         super(parent, "Edit Profile", true);
+        this.dashboard = dashboard;
+
         setLayout(null);
         setSize(550, 550);
 
@@ -23,13 +26,13 @@ public class EditProfileDialog extends JDialog {
         Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
         // Set up components
-        JLabel oldPasswordLabel = new JLabel("Old Password                :");
+        JLabel oldPasswordLabel = new JLabel("Old Password:");
         oldPasswordLabel.setFont(font18);
-        JLabel newUsernameLabel = new JLabel("New Username              :");
+        JLabel newUsernameLabel = new JLabel("New Username:");
         newUsernameLabel.setFont(font18);
-        JLabel newPasswordLabel = new JLabel("New Password              :");
+        JLabel newPasswordLabel = new JLabel("New Password:");
         newPasswordLabel.setFont(font18);
-        JLabel confirmNewPasswordLabel = new JLabel("Confirm New Password :");
+        JLabel confirmNewPasswordLabel = new JLabel("Confirm New Password:");
         confirmNewPasswordLabel.setFont(font18);
 
         oldPasswordField = new JPasswordField();
@@ -69,17 +72,19 @@ public class EditProfileDialog extends JDialog {
         saveButton.setBounds(30, 450, 120, 30);
         cancelButton.setBounds(330, 450, 120, 30);
 
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png"); // icon
+        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
+
         ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
         Image hideImg = hideIcon.getImage();
         Image resizedHideImg = hideImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedHideIcon = new ImageIcon(resizedHideImg);
-        // Eye icon button for New Password field
-        JButton btnToggleoldPasswordField = new JButton(resizedViewIcon); // Start with the view icon
-        btnToggleoldPasswordField.setBounds(460, 20, 45, 45); // Adjust position as needed
+
+        // Eye icon button for Old Password field
+        JButton btnToggleoldPasswordField = new JButton(resizedViewIcon);
+        btnToggleoldPasswordField.setBounds(460, 20, 45, 45);
         btnToggleoldPasswordField.setOpaque(false);
         btnToggleoldPasswordField.setContentAreaFilled(false);
         btnToggleoldPasswordField.setBorderPainted(false);
@@ -88,16 +93,16 @@ public class EditProfileDialog extends JDialog {
         btnToggleoldPasswordField.addActionListener((ActionEvent e) -> {
             if (oldPasswordField.getEchoChar() != '\u0000') {
                 oldPasswordField.setEchoChar((char) 0);
-                btnToggleoldPasswordField.setIcon(resizedHideIcon); // Switch to hide icon
+                btnToggleoldPasswordField.setIcon(resizedHideIcon);
             } else {
                 oldPasswordField.setEchoChar('•');
-                btnToggleoldPasswordField.setIcon(resizedViewIcon); // Switch to view icon
+                btnToggleoldPasswordField.setIcon(resizedViewIcon);
             }
         });
 
-        // Eye icon button for Confirm Password field
-        JButton btnTogglenewPasswordField = new JButton(resizedViewIcon); // Start with the view icon
-        btnTogglenewPasswordField.setBounds(460, 120, 45, 45); // Adjust position as needed
+        // Eye icon button for New Password field
+        JButton btnTogglenewPasswordField = new JButton(resizedViewIcon);
+        btnTogglenewPasswordField.setBounds(460, 120, 45, 45);
         btnTogglenewPasswordField.setOpaque(false);
         btnTogglenewPasswordField.setContentAreaFilled(false);
         btnTogglenewPasswordField.setBorderPainted(false);
@@ -106,14 +111,16 @@ public class EditProfileDialog extends JDialog {
         btnTogglenewPasswordField.addActionListener((ActionEvent e) -> {
             if (newPasswordField.getEchoChar() != '\u0000') {
                 newPasswordField.setEchoChar((char) 0);
-                btnTogglenewPasswordField.setIcon(resizedHideIcon); // Switch to hide icon
+                btnTogglenewPasswordField.setIcon(resizedHideIcon);
             } else {
                 newPasswordField.setEchoChar('•');
-                btnTogglenewPasswordField.setIcon(resizedViewIcon); // Switch to view icon
+                btnTogglenewPasswordField.setIcon(resizedViewIcon);
             }
         });
-        JButton btnToggleconfirmNewPasswordField = new JButton(resizedViewIcon); // Start with the view icon
-        btnToggleconfirmNewPasswordField.setBounds(460, 175, 45, 45); // Adjust position as needed
+
+        // Eye icon button for Confirm New Password field
+        JButton btnToggleconfirmNewPasswordField = new JButton(resizedViewIcon);
+        btnToggleconfirmNewPasswordField.setBounds(460, 175, 45, 45);
         btnToggleconfirmNewPasswordField.setOpaque(false);
         btnToggleconfirmNewPasswordField.setContentAreaFilled(false);
         btnToggleconfirmNewPasswordField.setBorderPainted(false);
@@ -122,10 +129,10 @@ public class EditProfileDialog extends JDialog {
         btnToggleconfirmNewPasswordField.addActionListener((ActionEvent e) -> {
             if (confirmNewPasswordField.getEchoChar() != '\u0000') {
                 confirmNewPasswordField.setEchoChar((char) 0);
-                btnToggleconfirmNewPasswordField.setIcon(resizedHideIcon); // Switch to hide icon
+                btnToggleconfirmNewPasswordField.setIcon(resizedHideIcon);
             } else {
                 confirmNewPasswordField.setEchoChar('•');
-                btnToggleconfirmNewPasswordField.setIcon(resizedViewIcon); // Switch to view icon
+                btnToggleconfirmNewPasswordField.setIcon(resizedViewIcon);
             }
         });
 
@@ -138,9 +145,9 @@ public class EditProfileDialog extends JDialog {
         add(newPasswordField);
         add(confirmNewPasswordLabel);
         add(confirmNewPasswordField);
-        add(btnTogglenewPasswordField);
         add(photoLabel);
         add(btnToggleoldPasswordField);
+        add(btnTogglenewPasswordField);
         add(btnToggleconfirmNewPasswordField);
         add(choosePhotoButton);
         add(saveButton);
@@ -220,14 +227,17 @@ public class EditProfileDialog extends JDialog {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+
             JOptionPane.showMessageDialog(parent, "Profile updated successfully!", "Edit Profile",
                     JOptionPane.INFORMATION_MESSAGE);
+
+            // Call method in Dashboard to refresh profile data
+            dashboard.refreshUserProfile(newUsernameField.getText(), this.photoPath);
+
             dispose();
         });
 
-        cancelButton.addActionListener(e -> {
-            dispose();
-        });
+        cancelButton.addActionListener(e -> dispose());
 
         setLocationRelativeTo(parent);
     }
@@ -237,8 +247,9 @@ public class EditProfileDialog extends JDialog {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
         frame.setVisible(true);
+        Dashboard dashboard = new Dashboard("testUser");
         EditProfileDialog editProfileDialog = new EditProfileDialog(frame, "testUser",
-                "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
+                "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png", dashboard);
         editProfileDialog.setVisible(true);
     }
 }
