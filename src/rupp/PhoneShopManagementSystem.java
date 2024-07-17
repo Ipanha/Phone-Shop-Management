@@ -13,14 +13,15 @@ public class PhoneShopManagementSystem {
     private final JPanel mainPanel;
     private final CardLayout cardLayout;
     private JPanel loginPanel, registerPanel;
-    private String usernameLogin;
+    // private String usernameLogin;
     // In-memory user storage
     private final String USERS_FILE = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
     private final Map<String, String> users = new HashMap<>();
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
-    Font font40 = new Font("Arial", Font.PLAIN, 40);
+    // Font font40 = new Font("Arial", Font.PLAIN, 40);
     Font font30 = new Font("Arial", Font.PLAIN, 30);
     Font font35 = new Font("Arial", Font.PLAIN, 35);
+    Font font35B = new Font("Arial", Font.BOLD, 35);
     Font font20 = new Font("Arial", Font.PLAIN, 20);
     Font font40B = new Font("Arial", Font.BOLD, 40);
 
@@ -57,6 +58,7 @@ public class PhoneShopManagementSystem {
         westGbc.anchor = GridBagConstraints.CENTER;
 
         JLabel lblTitle = new JLabel("LOGIN");
+        lblTitle.setForeground(Color.BLUE);
         lblTitle.setFont(font40B);
         westGbc.gridx = 0;
         westGbc.gridy = 0;
@@ -125,7 +127,7 @@ public class PhoneShopManagementSystem {
         btnTogglePassword.setOpaque(false);
         btnTogglePassword.setContentAreaFilled(false);
         btnTogglePassword.setBorderPainted(false);
-        btnTogglePassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTogglePassword.setCursor(pointer);
 
         btnTogglePassword.addActionListener((ActionEvent e) -> {
             if (txtPassword.getEchoChar() != '\u0000') {
@@ -199,7 +201,7 @@ public class PhoneShopManagementSystem {
 
         JLabel lblWelcome = new JLabel(
                 "<html><div style='text-align: center;'>Welcome back!<br>We are so happy to have you here.<br>It's great to see you again.<br> We hope you had a safe and enjoyable time away.</div></html>");
-        lblWelcome.setFont(font35);
+        lblWelcome.setFont(font35B);
         lblWelcome.setForeground(Color.WHITE);
         eastGbc.gridx = 0;
         eastGbc.gridy = 0;
@@ -257,6 +259,7 @@ public class PhoneShopManagementSystem {
         westGbc.anchor = GridBagConstraints.CENTER;
 
         JLabel lblTitle = new JLabel("REGISTER");
+        lblTitle.setForeground(new Color(21, 201, 0));
         lblTitle.setFont(font40B);
         westGbc.gridx = 0;
         westGbc.gridy = 0;
@@ -271,6 +274,7 @@ public class PhoneShopManagementSystem {
         txtNewUsername.setText("Username");
         txtNewUsername.setForeground(Color.GRAY);
         txtNewUsername.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (txtNewUsername.getText().equals("Username")) {
                     txtNewUsername.setText("");
@@ -278,6 +282,7 @@ public class PhoneShopManagementSystem {
                 }
             }
 
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (txtNewUsername.getText().isEmpty()) {
                     txtNewUsername.setForeground(Color.GRAY);
@@ -293,6 +298,7 @@ public class PhoneShopManagementSystem {
         txtNewPassword.setText("Password");
         txtNewPassword.setForeground(Color.GRAY);
         txtNewPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (new String(txtNewPassword.getPassword()).equals("Password")) {
                     txtNewPassword.setText("");
@@ -300,6 +306,7 @@ public class PhoneShopManagementSystem {
                 }
             }
 
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (new String(txtNewPassword.getPassword()).isEmpty()) {
                     txtNewPassword.setForeground(Color.GRAY);
@@ -392,20 +399,20 @@ public class PhoneShopManagementSystem {
         westGbc.gridwidth = 2;
         westPanel.add(confirmPasswordPanel, westGbc);
 
-        JButton btnSignup = new JButton("REGISTER");
-        btnSignup.setFont(font30);
-        btnSignup.setForeground(Color.WHITE);
-        btnSignup.setBackground(new Color(0, 122, 255));
-        btnSignup.setOpaque(true);
-        btnSignup.setBorder(BorderFactory.createCompoundBorder(
+        JButton btnRegister = new JButton("REGISTER");
+        btnRegister.setFont(font30);
+        btnRegister.setForeground(Color.WHITE);
+        btnRegister.setBackground(new Color(21, 201, 0));
+        btnRegister.setOpaque(true);
+        btnRegister.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.BLACK, 1),
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)));
-        btnSignup.setCursor(pointer);
+        btnRegister.setCursor(pointer);
 
         westGbc.gridx = 0;
         westGbc.gridy++;
         westGbc.gridwidth = 2;
-        westPanel.add(btnSignup, westGbc);
+        westPanel.add(btnRegister, westGbc);
 
         JLabel lblOr = new JLabel("or register with");
         lblOr.setFont(font20);
@@ -451,7 +458,7 @@ public class PhoneShopManagementSystem {
 
         JLabel lblWelcome = new JLabel(
                 "<html><div style='text-align: center;'>Welcome back!<br>We are so happy to have you here.<br>It's great to see you again. <br>We hope you had a safe and enjoyable time away.</div></html>");
-        lblWelcome.setFont(new Font("Arial", Font.BOLD, 35));
+        lblWelcome.setFont(font35B);
         lblWelcome.setForeground(Color.WHITE);
         eastGbc.gridx = 0;
         eastGbc.gridy = 0;
@@ -477,7 +484,7 @@ public class PhoneShopManagementSystem {
         // Adding center container to login panel
         registerPanel.add(centerContainer, BorderLayout.CENTER);
 
-        btnSignup.addActionListener((ActionEvent e) -> {
+        btnRegister.addActionListener((ActionEvent e) -> {
             String newUsername = txtNewUsername.getText();
             String newPassword = new String(txtNewPassword.getPassword());
             String confirmPassword = new String(txtConPassword.getPassword());

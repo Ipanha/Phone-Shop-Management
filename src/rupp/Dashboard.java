@@ -38,7 +38,7 @@ public class Dashboard {
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
     private String username;
-    private JScrollPane scrollPane;
+    //private JScrollPane scrollPane;
     private String photoPath;
     Font font24B = new Font("Arial", Font.BOLD, 24);
     Font font20B = new Font("Poppins", Font.BOLD, 20);
@@ -46,7 +46,7 @@ public class Dashboard {
     Font font18 = new Font("Poppins", Font.PLAIN, 18);
     Font font18B = new Font("Poppins", Font.BOLD, 18);
     Font font40 = new Font("Arial", Font.PLAIN, 40);
-    Font font30 = new Font("Arial", Font.PLAIN, 30);
+    //Font font30 = new Font("Arial", Font.PLAIN, 30);
     Font font30B = new Font("Arial", Font.BOLD, 30);
     Font font17 = new Font("Arial", Font.PLAIN, 17);
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
@@ -169,7 +169,7 @@ public class Dashboard {
 
         if (userLogo[0] == null) {
             // Handle case where userLogo is not found (e.g., set a default image)
-            userLogo[0] = new ImageIcon("default_image.png"); // Provide a default image path here
+            userLogo[0] = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\default-user.png"); // Provide a default image path here
         }
 
         // Scale the image to the desired size (e.g., 50x50 pixels)
@@ -1591,7 +1591,7 @@ public class Dashboard {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Dashboard("DefaultUser"));
+        SwingUtilities.invokeLater(() -> new Dashboard("Admin"));
     }
 
 }
