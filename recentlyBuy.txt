@@ -5,3 +5,5 @@ No.,Products Name,Vendor Name,Price,Qty.,Total,Discount,Net Total,Purchase Date
 1,IPhone 15 Pro Max,Chet Panha,1299.00,100,129900.00,0.00,129900.00,2024-07-14-0-19-3
 1,IPhone 12 Pro Max,Thany,1099.00,20,10990.00,50.00,5495.00,2024-07-16-13-12-9
 1,IPhone 15,Boty,1999.00,150,149925.00,50.00,74962.50,2024-07-16-18-49-45
+1,IPhone 15 Pro Max,Chet Panha,1299.00,2,2338.20,10.00,2104.38,2024-07-17-14-1-10
+1,IPhone 15 Pro Max,Chet Panha,1299.00,2,2598.00,0.00,2598.00,2024-07-17-14-3-54

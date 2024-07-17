@@ -17,6 +17,12 @@ public class PhoneShopManagementSystem {
     // In-memory user storage
     private final String USERS_FILE = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
     private final Map<String, String> users = new HashMap<>();
+    Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
+    Font font40 = new Font("Arial", Font.PLAIN, 40);
+    Font font30 = new Font("Arial", Font.PLAIN, 30);
+    Font font35 = new Font("Arial", Font.PLAIN, 35);
+    Font font20 = new Font("Arial", Font.PLAIN, 20);
+    Font font40B = new Font("Arial", Font.BOLD, 40);
 
     public PhoneShopManagementSystem() {
         frame = new JFrame("Phone Shop Management System");
@@ -37,36 +43,85 @@ public class PhoneShopManagementSystem {
     }
 
     private void createLoginPanel() {
-        loginPanel = new JPanel(null);
+        loginPanel = new JPanel(new BorderLayout());
 
-        ImageIcon originalImg = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\logo.png");
-        Image img = originalImg.getImage();
-        Image resizedImg = img.getScaledInstance(150, 150, Image.SCALE_SMOOTH); // Resize to 200x200 pixels
-        ImageIcon resizedIcon = new ImageIcon(resizedImg);
-        JLabel imageLabel = new JLabel(resizedIcon);
-        imageLabel.setBounds(500, 0, resizedIcon.getIconWidth(), resizedIcon.getIconHeight());
+        // Center container to hold both panels
+        JPanel centerContainer = new JPanel(new GridLayout(1, 2));
+        centerContainer.setBackground(Color.WHITE);
 
-        JLabel nameStor = new JLabel("Space Phone Technology");
-        JPanel navigationPanel = new JPanel();
-        JLabel lblTitle = new JLabel("Welcome to the store.");
-        JLabel lblUsername = new JLabel("Username:");
-        JTextField txtUsername = new JTextField();
-        JLabel lblPassword = new JLabel("Password:");
-        JPasswordField txtPassword = new JPasswordField();
+        // West Panel (Login Form)
+        JPanel westPanel = new JPanel(new GridBagLayout());
+        westPanel.setBackground(Color.WHITE);
+        GridBagConstraints westGbc = new GridBagConstraints();
+        westGbc.insets = new Insets(10, 10, 10, 10);
+        westGbc.anchor = GridBagConstraints.CENTER;
 
-        // Load and resize the eye icons
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png"); // // here
+        JLabel lblTitle = new JLabel("LOGIN");
+        lblTitle.setFont(font40B);
+        westGbc.gridx = 0;
+        westGbc.gridy = 0;
+        westGbc.gridwidth = 2;
+        westPanel.add(lblTitle, westGbc);
+
+        westGbc.gridwidth = 1;
+        westGbc.anchor = GridBagConstraints.WEST;
+
+        JTextField txtUsername = new JTextField(15);
+        txtUsername.setFont(font30);
+        txtUsername.setText("Username");
+        txtUsername.setForeground(Color.GRAY);
+        txtUsername.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (txtUsername.getText().equals("Username")) {
+                    txtUsername.setText("");
+                    txtUsername.setForeground(Color.BLACK);
+                }
+            }
+
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (txtUsername.getText().isEmpty()) {
+                    txtUsername.setForeground(Color.GRAY);
+                    txtUsername.setText("Username");
+                }
+            }
+        });
+        westGbc.gridy++;
+        westPanel.add(txtUsername, westGbc);
+
+        JPasswordField txtPassword = new JPasswordField(15);
+        txtPassword.setFont(font30);
+        txtPassword.setText("Password");
+        txtPassword.setForeground(Color.GRAY);
+        txtPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (new String(txtPassword.getPassword()).equals("Password")) {
+                    txtPassword.setText("");
+                    txtPassword.setForeground(Color.BLACK);
+                }
+            }
+
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (new String(txtPassword.getPassword()).isEmpty()) {
+                    txtPassword.setForeground(Color.GRAY);
+                    txtPassword.setText("Password");
+                }
+            }
+        });
+        westGbc.gridy++;
+        westPanel.add(txtPassword, westGbc);
+
+        // Eye icon button to toggle password visibility
+        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
+
         ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
         Image hideImg = hideIcon.getImage();
         Image resizedHideImg = hideImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedHideIcon = new ImageIcon(resizedHideImg);
 
-        // Eye icon button to toggle password visibility
-        JButton btnTogglePassword = new JButton(resizedViewIcon); // Start with the view icon
-        btnTogglePassword.setBounds(1210, 400, 45, 45); // Adjust position as needed
+        JButton btnTogglePassword = new JButton(resizedViewIcon);
         btnTogglePassword.setOpaque(false);
         btnTogglePassword.setContentAreaFilled(false);
         btnTogglePassword.setBorderPainted(false);
@@ -75,76 +130,106 @@ public class PhoneShopManagementSystem {
         btnTogglePassword.addActionListener((ActionEvent e) -> {
             if (txtPassword.getEchoChar() != '\u0000') {
                 txtPassword.setEchoChar((char) 0);
-                btnTogglePassword.setIcon(resizedHideIcon); // Switch to hide icon
+                btnTogglePassword.setIcon(resizedHideIcon);
             } else {
                 txtPassword.setEchoChar('•');
-                btnTogglePassword.setIcon(resizedViewIcon); // Switch to view icon
+                btnTogglePassword.setIcon(resizedViewIcon);
             }
         });
 
-        JButton btnLogin = new JButton("Login");
-        JButton btnRegister = new JButton("Register");
-        // Set cursor to hand pointer when hovering over the button
-        btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        westGbc.gridx++;
+        westPanel.add(btnTogglePassword, westGbc);
 
-        Font labelFont1 = new Font("Arial", Font.PLAIN, 40);
-        Font labelFont2 = new Font("Arial", Font.PLAIN, 30);
-
-        nameStor.setBounds(750, 50, 500, 50);
-        nameStor.setFont(labelFont1);
-        nameStor.setForeground(Color.BLUE);
-        navigationPanel.setBounds(0, 0, 1920, 150);
-        navigationPanel.setBackground(Color.white);
-        lblTitle.setBounds(800, 200, 400, 50);
-        lblTitle.setFont(labelFont1);
-        lblUsername.setBounds(750, 320, 300, 45);
-        lblUsername.setFont(labelFont2);
-        txtUsername.setBounds(900, 320, 300, 45);
-        txtUsername.setFont(labelFont2);
-        lblPassword.setBounds(750, 400, 300, 45);
-        lblPassword.setFont(labelFont2);
-        txtPassword.setBounds(900, 400, 300, 45);
-        txtPassword.setFont(labelFont2);
-
-        btnLogin.setBounds(750, 500, 150, 40);
-        btnLogin.setFont(labelFont2);
+        JButton btnLogin = new JButton("LOGIN");
+        btnLogin.setFont(font30);
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setBackground(new Color(0, 122, 255));
         btnLogin.setOpaque(true);
         btnLogin.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
-                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
-        ));
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+        btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnRegister.setBounds(1000, 500, 200, 40);
-        btnRegister.setFont(labelFont2);
-        btnRegister.setForeground(Color.WHITE);
-        btnRegister.setBackground(Color.GREEN);
-        btnRegister.setOpaque(true);
-        btnRegister.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
-                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
-        ));
+        westGbc.gridx = 0;
+        westGbc.gridy++;
+        westGbc.gridwidth = 2;
+        westPanel.add(btnLogin, westGbc);
 
-        loginPanel.add(nameStor);
-        loginPanel.add(imageLabel);
-        loginPanel.add(navigationPanel);
-        loginPanel.add(lblTitle);
-        loginPanel.add(lblUsername);
-        loginPanel.add(txtUsername);
-        loginPanel.add(lblPassword);
-        loginPanel.add(txtPassword);
-        loginPanel.add(btnTogglePassword);
-        loginPanel.add(btnLogin);
-        loginPanel.add(btnRegister);
-        loginPanel.setBackground(Color.white);
+        JLabel lblOr = new JLabel("or login with");
+        lblOr.setFont(font20);
+        westGbc.gridy++;
+        westPanel.add(lblOr, westGbc);
+
+        JPanel socialPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        socialPanel.setBackground(Color.WHITE);
+
+        JButton btnFacebook = new JButton(
+                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\facebook.png")
+                        .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        btnFacebook.setBackground(null);
+        btnFacebook.setBorder(null);
+        btnFacebook.setCursor(pointer);
+        JButton btnGoogle = new JButton(
+                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\google.png").getImage()
+                        .getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        btnGoogle.setBackground(null);
+        btnGoogle.setBorder(null);
+        btnGoogle.setCursor(pointer);
+        JButton btnLinkedIn = new JButton(
+                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\linkedin.png")
+                        .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        btnLinkedIn.setBackground(null);
+        btnLinkedIn.setBorder(null);
+        btnLinkedIn.setCursor(pointer);
+
+        socialPanel.add(btnFacebook);
+        socialPanel.add(btnGoogle);
+        socialPanel.add(btnLinkedIn);
+
+        westGbc.gridy++;
+        westGbc.gridwidth = 2;
+        westPanel.add(socialPanel, westGbc);
+
+        // East Panel (Welcome Message)
+        JPanel eastPanel = new JPanel(new GridBagLayout());
+        eastPanel.setBackground(new Color(0, 150, 136));
+        GridBagConstraints eastGbc = new GridBagConstraints();
+        eastGbc.insets = new Insets(10, 10, 10, 10);
+        eastGbc.anchor = GridBagConstraints.CENTER;
+
+        JLabel lblWelcome = new JLabel(
+                "<html><div style='text-align: center;'>Welcome back!<br>We are so happy to have you here.<br>It's great to see you again.<br> We hope you had a safe and enjoyable time away.</div></html>");
+        lblWelcome.setFont(font35);
+        lblWelcome.setForeground(Color.WHITE);
+        eastGbc.gridx = 0;
+        eastGbc.gridy = 0;
+        eastPanel.add(lblWelcome, eastGbc);
+
+        JButton btnSignup = new JButton("No account yet? Register.");
+        btnSignup.setFont(font20);
+        btnSignup.setForeground(Color.WHITE);
+        btnSignup.setBackground(new Color(0, 122, 255));
+        btnSignup.setOpaque(true);
+        btnSignup.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+        btnSignup.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        eastGbc.gridy++;
+        eastPanel.add(btnSignup, eastGbc);
+
+        // Adding panels to center container
+        centerContainer.add(westPanel);
+        centerContainer.add(eastPanel);
+
+        // Adding center container to login panel
+        loginPanel.add(centerContainer, BorderLayout.CENTER);
 
         btnLogin.addActionListener((ActionEvent e) -> {
-            usernameLogin = txtUsername.getText();
+            String usernameLogin = txtUsername.getText();
             String password = new String(txtPassword.getPassword());
             if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
-                frame.dispose(); // Close the login window
+                frame.dispose();
                 SwingUtilities.invokeLater(() -> new Dashboard(usernameLogin));
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
@@ -152,146 +237,250 @@ public class PhoneShopManagementSystem {
             }
         });
 
-        btnRegister.addActionListener((ActionEvent e) -> {
+        btnSignup.addActionListener((ActionEvent e) -> {
             cardLayout.show(mainPanel, "Register");
         });
     }
 
     private void createRegisterPanel() {
-        registerPanel = new JPanel(null);
+        registerPanel = new JPanel(new BorderLayout());
 
-        ImageIcon originalImg = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\logo.png");
-        Image img = originalImg.getImage();
-        Image resizedImg = img.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
-        ImageIcon resizedIcon = new ImageIcon(resizedImg);
-        JLabel imageLabel = new JLabel(resizedIcon);
-        imageLabel.setBounds(500, 0, resizedIcon.getIconWidth(), resizedIcon.getIconHeight());
-        JLabel nameStor = new JLabel("Space Phone Technology");
-        JPanel navigationPanel = new JPanel();
-        JLabel lblTitle = new JLabel("Welcome to the store.");
-        JLabel lblNewUsername = new JLabel("New Username:");
-        JTextField txtNewUsername = new JTextField();
-        JLabel lblNewPassword = new JLabel("New Password:");
-        JPasswordField txtNewPassword = new JPasswordField();
-        JLabel lblConfirmPassword = new JLabel("Confirm Password:");
-        JPasswordField txtConfirmPassword = new JPasswordField();
-        JButton btnRegister = new JButton("Register");
-        JButton btnBack = new JButton("Back");
+        // Center container to hold both panels
+        JPanel centerContainer = new JPanel(new GridLayout(1, 2));
+        centerContainer.setBackground(Color.WHITE);
 
-        Font labelFont1 = new Font("Arial", Font.PLAIN, 40);
-        Font labelFont2 = new Font("Arial", Font.PLAIN, 30);
+        // West Panel (Login Form)
+        JPanel westPanel = new JPanel(new GridBagLayout());
+        westPanel.setBackground(Color.WHITE);
+        GridBagConstraints westGbc = new GridBagConstraints();
+        westGbc.insets = new Insets(10, 10, 10, 10);
+        westGbc.anchor = GridBagConstraints.CENTER;
 
-        nameStor.setBounds(750, 50, 500, 50);
-        nameStor.setFont(labelFont1);
-        nameStor.setForeground(Color.BLUE);
-        navigationPanel.setBounds(0, 0, 1920, 150);
-        navigationPanel.setBackground(Color.white);
-        lblTitle.setBounds(800, 200, 400, 50);
-        lblTitle.setFont(labelFont1);
-        lblNewUsername.setBounds(700, 320, 300, 45);
-        lblNewUsername.setFont(labelFont2);
-        txtNewUsername.setBounds(1000, 320, 300, 45);
-        txtNewUsername.setFont(labelFont2);
-        lblNewPassword.setBounds(700, 400, 300, 45);
-        lblNewPassword.setFont(labelFont2);
-        txtNewPassword.setBounds(1000, 400, 300, 45);
-        txtNewPassword.setFont(labelFont2);
-        lblConfirmPassword.setBounds(700, 480, 300, 45);
-        lblConfirmPassword.setFont(labelFont2);
-        txtConfirmPassword.setBounds(1000, 480, 300, 45);
-        txtConfirmPassword.setFont(labelFont2);
-        btnRegister.setBounds(700, 600, 200, 40);
-        btnRegister.setFont(labelFont2);
-        btnBack.setBounds(1150, 600, 150, 40);
-        btnBack.setFont(labelFont2);
-        btnRegister.setFont(labelFont2);
-        btnRegister.setForeground(Color.WHITE);
-        btnRegister.setBackground(Color.GREEN);
-        btnRegister.setOpaque(true);
-        btnRegister.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
-                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
-        ));
+        JLabel lblTitle = new JLabel("REGISTER");
+        lblTitle.setFont(font40B);
+        westGbc.gridx = 0;
+        westGbc.gridy = 0;
+        westGbc.gridwidth = 2;
+        westPanel.add(lblTitle, westGbc);
 
-        btnBack.setFont(labelFont2);
-        btnBack.setForeground(Color.WHITE);
-        btnBack.setBackground(new Color(0, 122, 255));
-        btnBack.setOpaque(true);
-        btnBack.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.BLACK, 1), // Black border
-                BorderFactory.createEmptyBorder(10, 20, 10, 20) // Padding
-        ));
+        westGbc.gridwidth = 1;
+        westGbc.anchor = GridBagConstraints.WEST;
 
-        // Load and resize the eye icons
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png"); // icon
+        JTextField txtNewUsername = new JTextField(15);
+        txtNewUsername.setFont(font30);
+        txtNewUsername.setText("Username");
+        txtNewUsername.setForeground(Color.GRAY);
+        txtNewUsername.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (txtNewUsername.getText().equals("Username")) {
+                    txtNewUsername.setText("");
+                    txtNewUsername.setForeground(Color.BLACK);
+                }
+            }
+
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (txtNewUsername.getText().isEmpty()) {
+                    txtNewUsername.setForeground(Color.GRAY);
+                    txtNewUsername.setText("Username");
+                }
+            }
+        });
+        westGbc.gridy++;
+        westPanel.add(txtNewUsername, westGbc);
+
+        JPasswordField txtNewPassword = new JPasswordField(15);
+        txtNewPassword.setFont(font30);
+        txtNewPassword.setText("Password");
+        txtNewPassword.setForeground(Color.GRAY);
+        txtNewPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (new String(txtNewPassword.getPassword()).equals("Password")) {
+                    txtNewPassword.setText("");
+                    txtNewPassword.setForeground(Color.BLACK);
+                }
+            }
+
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (new String(txtNewPassword.getPassword()).isEmpty()) {
+                    txtNewPassword.setForeground(Color.GRAY);
+                    txtNewPassword.setText("Password");
+                }
+            }
+        });
+
+        // Eye icon button to toggle password visibility
+        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
+
         ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
         Image hideImg = hideIcon.getImage();
         Image resizedHideImg = hideImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedHideIcon = new ImageIcon(resizedHideImg);
 
-        // Eye icon button for New Password field
-        JButton btnToggleNewPassword = new JButton(resizedViewIcon); // Start with the view icon
-        btnToggleNewPassword.setBounds(1310, 400, 45, 45); // Adjust position as needed
-        btnToggleNewPassword.setOpaque(false);
-        btnToggleNewPassword.setContentAreaFilled(false);
-        btnToggleNewPassword.setBorderPainted(false);
-        btnToggleNewPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JButton btnTogglePassword = new JButton(resizedViewIcon);
+        btnTogglePassword.setOpaque(false);
+        btnTogglePassword.setContentAreaFilled(false);
+        btnTogglePassword.setBorderPainted(false);
+        btnTogglePassword.setCursor(pointer);
 
-        btnToggleNewPassword.addActionListener((ActionEvent e) -> {
+        btnTogglePassword.addActionListener((ActionEvent e) -> {
             if (txtNewPassword.getEchoChar() != '\u0000') {
                 txtNewPassword.setEchoChar((char) 0);
-                btnToggleNewPassword.setIcon(resizedHideIcon); // Switch to hide icon
+                btnTogglePassword.setIcon(resizedHideIcon);
             } else {
                 txtNewPassword.setEchoChar('•');
-                btnToggleNewPassword.setIcon(resizedViewIcon); // Switch to view icon
+                btnTogglePassword.setIcon(resizedViewIcon);
             }
         });
 
-        // Eye icon button for Confirm Password field
-        JButton btnToggleConfirmPassword = new JButton(resizedViewIcon); // Start with the view icon
-        btnToggleConfirmPassword.setBounds(1310, 480, 45, 45); // Adjust position as needed
-        btnToggleConfirmPassword.setOpaque(false);
-        btnToggleConfirmPassword.setContentAreaFilled(false);
-        btnToggleConfirmPassword.setBorderPainted(false);
-        btnToggleConfirmPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        // Panel to hold password field and toggle button
+        JPanel passwordPanel = new JPanel(new BorderLayout());
+        passwordPanel.setBackground(null);
+        passwordPanel.add(txtNewPassword, BorderLayout.CENTER);
+        passwordPanel.add(btnTogglePassword, BorderLayout.EAST);
 
-        btnToggleConfirmPassword.addActionListener((ActionEvent e) -> {
-            if (txtConfirmPassword.getEchoChar() != '\u0000') {
-                txtConfirmPassword.setEchoChar((char) 0);
-                btnToggleConfirmPassword.setIcon(resizedHideIcon); // Switch to hide icon
+        westGbc.gridy++;
+        westGbc.gridx = 0;
+        westGbc.gridwidth = 2;
+        westPanel.add(passwordPanel, westGbc);
+
+        JPasswordField txtConPassword = new JPasswordField(15);
+        txtConPassword.setFont(font30);
+        txtConPassword.setText("Password");
+        txtConPassword.setForeground(Color.GRAY);
+        txtConPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                if (new String(txtConPassword.getPassword()).equals("Password")) {
+                    txtConPassword.setText("");
+                    txtConPassword.setForeground(Color.BLACK);
+                }
+            }
+
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                if (new String(txtConPassword.getPassword()).isEmpty()) {
+                    txtConPassword.setForeground(Color.GRAY);
+                    txtConPassword.setText("Password");
+                }
+            }
+        });
+
+        JButton btnToggleConPassword = new JButton(resizedViewIcon);
+        btnToggleConPassword.setOpaque(false);
+        btnToggleConPassword.setContentAreaFilled(false);
+        btnToggleConPassword.setBorderPainted(false);
+        btnToggleConPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        btnToggleConPassword.addActionListener((ActionEvent e) -> {
+            if (txtConPassword.getEchoChar() != '\u0000') {
+                txtConPassword.setEchoChar((char) 0);
+                btnToggleConPassword.setIcon(resizedHideIcon);
             } else {
-                txtConfirmPassword.setEchoChar('•');
-                btnToggleConfirmPassword.setIcon(resizedViewIcon); // Switch to view icon
+                txtConPassword.setEchoChar('•');
+                btnToggleConPassword.setIcon(resizedViewIcon);
             }
         });
 
-        // Set cursor to hand pointer when hovering over the button
-        btnBack.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JPanel confirmPasswordPanel = new JPanel(new BorderLayout());
+        confirmPasswordPanel.setBackground(null);
+        confirmPasswordPanel.add(txtConPassword, BorderLayout.CENTER);
+        confirmPasswordPanel.add(btnToggleConPassword, BorderLayout.EAST);
 
-        registerPanel.add(nameStor);
-        registerPanel.add(imageLabel);
-        registerPanel.add(navigationPanel);
-        registerPanel.add(lblTitle);
-        registerPanel.add(lblNewUsername);
-        registerPanel.add(txtNewUsername);
-        registerPanel.add(lblNewPassword);
-        registerPanel.add(txtNewPassword);
-        registerPanel.add(lblConfirmPassword);
-        registerPanel.add(txtConfirmPassword);
-        registerPanel.add(btnRegister);
-        registerPanel.add(btnBack);
-        registerPanel.add(btnToggleNewPassword);
-        registerPanel.add(btnToggleConfirmPassword);
-        registerPanel.setBackground(Color.cyan);
+        westGbc.gridy++;
+        westGbc.gridx = 0;
+        westGbc.gridwidth = 2;
+        westPanel.add(confirmPasswordPanel, westGbc);
 
-        btnRegister.addActionListener((ActionEvent e) -> {
+        JButton btnSignup = new JButton("REGISTER");
+        btnSignup.setFont(font30);
+        btnSignup.setForeground(Color.WHITE);
+        btnSignup.setBackground(new Color(0, 122, 255));
+        btnSignup.setOpaque(true);
+        btnSignup.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+        btnSignup.setCursor(pointer);
+
+        westGbc.gridx = 0;
+        westGbc.gridy++;
+        westGbc.gridwidth = 2;
+        westPanel.add(btnSignup, westGbc);
+
+        JLabel lblOr = new JLabel("or register with");
+        lblOr.setFont(font20);
+        westGbc.gridy++;
+        westPanel.add(lblOr, westGbc);
+
+        JPanel socialPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        socialPanel.setBackground(Color.WHITE);
+
+        JButton btnFacebook = new JButton(
+                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\facebook.png")
+                        .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        btnFacebook.setBackground(null);
+        btnFacebook.setBorder(null);
+        btnFacebook.setCursor(pointer);
+        JButton btnGoogle = new JButton(
+                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\google.png").getImage()
+                        .getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        btnGoogle.setBackground(null);
+        btnGoogle.setBorder(null);
+        btnGoogle.setCursor(pointer);
+        JButton btnLinkedIn = new JButton(
+                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\linkedin.png")
+                        .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
+        btnLinkedIn.setBackground(null);
+        btnLinkedIn.setBorder(null);
+        btnLinkedIn.setCursor(pointer);
+
+        socialPanel.add(btnFacebook);
+        socialPanel.add(btnGoogle);
+        socialPanel.add(btnLinkedIn);
+
+        westGbc.gridy++;
+        westGbc.gridwidth = 2;
+        westPanel.add(socialPanel, westGbc);
+
+        // East Panel (Welcome Message)
+        JPanel eastPanel = new JPanel(new GridBagLayout());
+        eastPanel.setBackground(new Color(0, 150, 136));
+        GridBagConstraints eastGbc = new GridBagConstraints();
+        eastGbc.insets = new Insets(10, 10, 10, 10);
+        eastGbc.anchor = GridBagConstraints.CENTER;
+
+        JLabel lblWelcome = new JLabel(
+                "<html><div style='text-align: center;'>Welcome back!<br>We are so happy to have you here.<br>It's great to see you again. <br>We hope you had a safe and enjoyable time away.</div></html>");
+        lblWelcome.setFont(new Font("Arial", Font.BOLD, 35));
+        lblWelcome.setForeground(Color.WHITE);
+        eastGbc.gridx = 0;
+        eastGbc.gridy = 0;
+        eastPanel.add(lblWelcome, eastGbc);
+
+        JButton btnLogin = new JButton("Have Account? Login.");
+        btnLogin.setFont(new Font("Arial", Font.PLAIN, 20));
+        btnLogin.setForeground(Color.WHITE);
+        btnLogin.setBackground(new Color(0, 122, 255));
+        btnLogin.setOpaque(true);
+        btnLogin.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+        btnLogin.setCursor(pointer);
+
+        eastGbc.gridy++;
+        eastPanel.add(btnLogin, eastGbc);
+
+        // Adding panels to center container
+        centerContainer.add(eastPanel);
+        centerContainer.add(westPanel);
+
+        // Adding center container to login panel
+        registerPanel.add(centerContainer, BorderLayout.CENTER);
+
+        btnSignup.addActionListener((ActionEvent e) -> {
             String newUsername = txtNewUsername.getText();
             String newPassword = new String(txtNewPassword.getPassword());
-            String confirmPassword = new String(txtConfirmPassword.getPassword());
+            String confirmPassword = new String(txtConPassword.getPassword());
 
             if (newPassword.equals(confirmPassword)) {
                 if (!users.containsKey(newUsername)) {
@@ -310,7 +499,7 @@ public class PhoneShopManagementSystem {
             }
         });
 
-        btnBack.addActionListener((ActionEvent e) -> {
+        btnLogin.addActionListener((ActionEvent e) -> {
             cardLayout.show(mainPanel, "Login");
         });
     }
@@ -333,9 +522,9 @@ public class PhoneShopManagementSystem {
                 if (parts.length >= 2) {
                     String username = parts[0];
                     String password = parts[1];
-                   // String photoPath = parts.length > 2 ? parts[2] : "N/A";
+                    // String photoPath = parts.length > 2 ? parts[2] : "N/A";
                     users.put(username, password);
-                   // userPhotos.put(username, photoPath.equals("N/A") ? null : photoPath);
+                    // userPhotos.put(username, photoPath.equals("N/A") ? null : photoPath);
                 }
             }
         } catch (FileNotFoundException e) {
