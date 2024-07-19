@@ -169,15 +169,18 @@ public class EditProfileDialog extends JDialog {
             // Check if photo has changed
             boolean photoChanged = !photoPath.equals(this.photoPath);
 
+            // Determine if old password validation is needed
+            boolean isPasswordChange = newPasswordField.getPassword().length > 0;
+            boolean isNameChange = !newUsernameField.getText().equals(username);
+
             // Read and validate old password only if username or password is being changed
             String inputOldPassword = null;
             boolean passwordMatched = false;
 
-            if (!photoChanged
-                    && (newPasswordField.getPassword().length > 0 || !newUsernameField.getText().equals(username))) {
+            if (isPasswordChange) {
                 inputOldPassword = new String(oldPasswordField.getPassword());
             } else {
-                passwordMatched = true; // Skip password validation if only photo is being changed
+                passwordMatched = true; // Skip password validation if only photo or username is being changed
             }
 
             String filePath = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
@@ -193,15 +196,21 @@ public class EditProfileDialog extends JDialog {
                         String filePassword = parts[1];
                         String filePhotoPath = parts[2];
 
-                        if (fileUsername.trim().equals(username.trim())
-                                && (passwordMatched || filePassword.trim().equals(inputOldPassword.trim()))) {
+                        if (fileUsername.trim().equals(username.trim())) {
+                            // Validate old password if needed
+                            if (isPasswordChange && !filePassword.trim().equals(inputOldPassword.trim())) {
+                                JOptionPane.showMessageDialog(parent, "Old password is incorrect!", "Edit Profile",
+                                        JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
                             // Update new username, password, and photo path
                             String newUsername = newUsernameField.getText();
                             String newPassword = new String(newPasswordField.getPassword());
                             String newPhotoPath = this.photoPath;
 
                             // Use existing password if new password fields are empty
-                            if (newPassword.isEmpty()) {
+                            if (!isPasswordChange) {
                                 newPassword = filePassword.trim();
                             }
 

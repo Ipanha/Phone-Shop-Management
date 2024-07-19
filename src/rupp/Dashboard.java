@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -38,15 +39,15 @@ public class Dashboard {
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
     private String username;
-    //private JScrollPane scrollPane;
+    // private JScrollPane scrollPane;
     private String photoPath;
     Font font24B = new Font("Arial", Font.BOLD, 24);
     Font font20B = new Font("Poppins", Font.BOLD, 20);
     Font font20 = new Font("Poppins", Font.PLAIN, 20);
     Font font18 = new Font("Poppins", Font.PLAIN, 18);
     Font font18B = new Font("Poppins", Font.BOLD, 18);
-    Font font40 = new Font("Arial", Font.PLAIN, 40);
-    //Font font30 = new Font("Arial", Font.PLAIN, 30);
+    // Font font40 = new Font("Arial", Font.PLAIN, 40);
+    Font font40B = new Font("Poppins", Font.BOLD, 40);
     Font font30B = new Font("Arial", Font.BOLD, 30);
     Font font17 = new Font("Arial", Font.PLAIN, 17);
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
@@ -169,7 +170,7 @@ public class Dashboard {
 
         if (userLogo[0] == null) {
             // Handle case where userLogo is not found (e.g., set a default image)
-            userLogo[0] = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\default-user.png"); // Provide a default image path here
+            userLogo[0] = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\default-user.png");
         }
 
         // Scale the image to the desired size (e.g., 50x50 pixels)
@@ -676,12 +677,10 @@ public class Dashboard {
 
         // Other components setup
         JPanel centerPanel = new JPanel(new GridBagLayout());
-        centerPanel.setBackground(Color.CYAN);
+        centerPanel.setBackground(Color.LIGHT_GRAY);
 
         JLabel lblPayment = new JLabel("Payment");
-        JPanel navPaymentPanel = new JPanel();
         JLabel lblProduct = new JLabel("List Product");
-        JPanel navListProductPanel = new JPanel();
         navProductPanel = new JPanel(new GridLayout(0, 3, 10, 10));
         JScrollPane scrollPane = new JScrollPane(navProductPanel);
         JButton btnClear = new JButton("Clear all");
@@ -689,9 +688,8 @@ public class Dashboard {
         JButton btnInvoice = new JButton("Invoice");
 
         // Product side
-        lblPayment.setFont(font40);
-        lblPayment.setForeground(Color.BLUE);
-        navPaymentPanel.setBackground(Color.white);
+        lblPayment.setFont(font40B);
+        lblPayment.setForeground(Color.BLACK);
 
         // Payment side
         String[] columnNames = { "No.", "Name", "Price", "Qty", "Discount", "Total" };
@@ -729,6 +727,8 @@ public class Dashboard {
 
         btnClear.addActionListener((ActionEvent e) -> {
             paymentTableModel.setRowCount(0);
+            updateProductList();
+            updateDashboardPanels();
         });
 
         btnExit.addActionListener((ActionEvent e) -> {
@@ -744,10 +744,9 @@ public class Dashboard {
         });
 
         // Product side
-        lblProduct.setFont(font40);
-        lblProduct.setForeground(Color.BLUE);
+        lblProduct.setFont(font40B);
+        lblProduct.setForeground(Color.BLACK);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        navListProductPanel.setBackground(Color.white);
 
         JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
         JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
@@ -777,7 +776,7 @@ public class Dashboard {
         gbc.gridy = 2;
         gbc.weighty = 0;
         JPanel paymentButtonPanel = new JPanel();
-        paymentButtonPanel.setBackground(Color.CYAN); // Match centerPanel background
+        paymentButtonPanel.setBackground(Color.LIGHT_GRAY); // Match centerPanel background
         paymentButtonPanel.setLayout(new BoxLayout(paymentButtonPanel, BoxLayout.X_AXIS));
         paymentButtonPanel.add(btnClear);
         paymentButtonPanel.add(Box.createRigidArea(new Dimension(20, 0)));
@@ -1390,7 +1389,33 @@ public class Dashboard {
     private JPanel createInventoryPanel() {
         inventoryPanel = new JPanel(new BorderLayout());
         JPanel headerPanel = navigation("Inventory");
-        JPanel footerPanel = Footer();
+
+        // Create SearchPanel with inputNameSearch and btnSearch
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.setPreferredSize(new Dimension(300, 45)); // Set the width of searchPanel to 50px
+        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0));
+        // Create a container to hold the searchPanel and ensure it gets the correct
+        // width
+        JPanel searchContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        searchContainer.setPreferredSize(new Dimension(50, 45));
+        searchContainer.add(searchPanel);
+
+        JTextField inputNameSearch = new JTextField(10); // Set preferred width for inputNameSearch
+        inputNameSearch.setFont(font18B);
+        JButton btnSearch = new JButton("Search");
+        searchPanel.add(inputNameSearch, BorderLayout.CENTER);
+        searchPanel.add(btnSearch, BorderLayout.EAST);
+        btnSearch.setFont(font18B);
+        btnSearch.setCursor(pointer);
+        btnSearch.setForeground(Color.WHITE);
+        btnSearch.setBackground(new Color(0, 122, 255));
+        btnSearch.setOpaque(true);
+        btnSearch.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)));
+
+        // Create centerPanel to hold SearchPanel and inventoryScrollPane
+        JPanel centerPanel = new JPanel(new BorderLayout());
 
         String[] columnNames = { "No.", "Image", "Name", "Price", "Quantity", "", " " };
         inventoryTableModel = new InventoryTableModel(columnNames, 0);
@@ -1416,6 +1441,7 @@ public class Dashboard {
                 (JFrame) SwingUtilities.getWindowAncestor(inventoryPanel)));
 
         inventoryTable.getColumn("Price").setCellRenderer(new PriceRenderer());
+
         // Set font for table headers
         JTableHeader header = inventoryTable.getTableHeader();
         header.setFont(font20B); // Set desired font and size for headers
@@ -1430,11 +1456,60 @@ public class Dashboard {
             inventoryTableModel.addProduct(phone); // Use the updated addProduct method
         }
 
+        // Add searchContainer and inventoryScrollPane to centerPanel
+        centerPanel.add(searchContainer, BorderLayout.NORTH);
+        centerPanel.add(inventoryScrollPane, BorderLayout.CENTER);
+
+        JPanel footerPanel = Footer();
+
         inventoryPanel.add(headerPanel, BorderLayout.NORTH);
-        inventoryPanel.add(inventoryScrollPane, BorderLayout.CENTER);
+        inventoryPanel.add(centerPanel, BorderLayout.CENTER);
         inventoryPanel.add(footerPanel, BorderLayout.SOUTH);
 
+        // Define the search action
+        ActionListener searchAction = (ActionEvent e) -> {
+            String searchQuery = inputNameSearch.getText().trim().toLowerCase();
+            if (!searchQuery.isEmpty()) {
+                filterProductsByName(searchQuery);
+            } else {
+                resetProductTable();
+            }
+        };
+
+        // Add action listener to search button
+        btnSearch.addActionListener(searchAction);
+
+        // Add key listener to inputNameSearch to trigger search on Enter key
+        inputNameSearch.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    searchAction.actionPerformed(null); // Trigger the search action
+                }
+            }
+        });
+
         return inventoryPanel;
+    }
+
+    // Method to filter products by name
+    private void filterProductsByName(String name) {
+        List<Phone> filteredPhones = phonesList.stream()
+                .filter(phone -> phone.getName().toLowerCase().contains(name))
+                .collect(Collectors.toList());
+
+        inventoryTableModel.setRowCount(0); // Clear the table
+        for (Phone phone : filteredPhones) {
+            inventoryTableModel.addProduct(phone); // Use the updated addProduct method
+        }
+    }
+
+    // Method to reset the product table to show all products
+    private void resetProductTable() {
+        inventoryTableModel.setRowCount(0); // Clear the table
+        for (Phone phone : phonesList) {
+            inventoryTableModel.addProduct(phone); // Use the updated addProduct method
+        }
     }
 
     // Show Add Product Dialog

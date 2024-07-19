@@ -1,4 +1,4 @@
-IPhone 15 Pro Max,1299.000000,100,D:\ImageIphone\iPhone-15-Pro.png
+IPhone 15 Pro Max,1299.000000,97,D:\ImageIphone\iPhone-15-Pro.png
 IPhone 12 Pro,1399.000000,100,D:\ImageIphone\iPhone-12-Pro.png
 IPhone 12 Pro Max,1099.000000,80,D:\ImageIphone\iPhone-12-Pro_Max.png
 IPhone 12,1299.000000,100,D:\ImageIphone\iPhone-12.png
@@ -8,5 +8,5 @@ IPhone 13 Pro Max,1111.000000,100,D:\ImageIphone\iPhone-13-Pro-Max.png
 IPhone 14,1200.000000,100,D:\ImageIphone\iPhone-14.png
 IPhone 14 Pro,1299.000000,100,D:\ImageIphone\iPhone-14-Pro.png
 IPhone 14 Pro Max,1499.000000,100,D:\ImageIphone\iPhone-14-Pro-Max.png
-IPhone 15,1999.000000,850,D:\ImageIphone\iphone-15.png
+IPhone 15,1999.000000,450,D:\ImageIphone\iphone-15.png
 IPhone 15 Pro,1999.000000,2000,D:\ImageIphone\iPhone-15-Pro.png

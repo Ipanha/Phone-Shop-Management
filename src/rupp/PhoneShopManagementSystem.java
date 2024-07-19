@@ -20,7 +20,7 @@ public class PhoneShopManagementSystem {
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
     // Font font40 = new Font("Arial", Font.PLAIN, 40);
     Font font30 = new Font("Arial", Font.PLAIN, 30);
-    Font font35 = new Font("Arial", Font.PLAIN, 35);
+    // Font font35 = new Font("Arial", Font.PLAIN, 35);
     Font font35B = new Font("Arial", Font.BOLD, 35);
     Font font20 = new Font("Arial", Font.PLAIN, 20);
     Font font40B = new Font("Arial", Font.BOLD, 40);
@@ -73,6 +73,7 @@ public class PhoneShopManagementSystem {
         txtUsername.setText("Username");
         txtUsername.setForeground(Color.GRAY);
         txtUsername.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (txtUsername.getText().equals("Username")) {
                     txtUsername.setText("");
@@ -80,6 +81,7 @@ public class PhoneShopManagementSystem {
                 }
             }
 
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (txtUsername.getText().isEmpty()) {
                     txtUsername.setForeground(Color.GRAY);
@@ -95,6 +97,7 @@ public class PhoneShopManagementSystem {
         txtPassword.setText("Password");
         txtPassword.setForeground(Color.GRAY);
         txtPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (new String(txtPassword.getPassword()).equals("Password")) {
                     txtPassword.setText("");
@@ -102,6 +105,7 @@ public class PhoneShopManagementSystem {
                 }
             }
 
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (new String(txtPassword.getPassword()).isEmpty()) {
                     txtPassword.setForeground(Color.GRAY);
@@ -237,6 +241,8 @@ public class PhoneShopManagementSystem {
                 JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
+            txtUsername.setText("");
+            txtPassword.setText("");
         });
 
         btnSignup.addActionListener((ActionEvent e) -> {
@@ -358,6 +364,7 @@ public class PhoneShopManagementSystem {
         txtConPassword.setText("Password");
         txtConPassword.setForeground(Color.GRAY);
         txtConPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
                 if (new String(txtConPassword.getPassword()).equals("Password")) {
                     txtConPassword.setText("");
@@ -365,6 +372,7 @@ public class PhoneShopManagementSystem {
                 }
             }
 
+            @Override
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (new String(txtConPassword.getPassword()).isEmpty()) {
                     txtConPassword.setForeground(Color.GRAY);
