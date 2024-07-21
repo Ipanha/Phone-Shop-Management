@@ -1,0 +1,2 @@
+No.,Products Name,Vendor Name,Price,Qty.,Total,Discount,Net Total,Purchase Date
+1,IPhone 15 Pro Max,Panha,1499.00,10,7495.00,50.00,3747.50,2024-07-21-15-46-51

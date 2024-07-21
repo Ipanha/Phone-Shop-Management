@@ -15,14 +15,16 @@ public class PhoneShopManagementSystem {
     private JPanel loginPanel, registerPanel;
     // private String usernameLogin;
     // In-memory user storage
-    private final String USERS_FILE = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
+    private final String USERS_FILE = "src/rupp/File/user_data.txt";
     private final Map<String, String> users = new HashMap<>();
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
     // Font font40 = new Font("Arial", Font.PLAIN, 40);
     Font font30 = new Font("Arial", Font.PLAIN, 30);
+    Font font30B = new Font("Arial", Font.BOLD, 30);
     // Font font35 = new Font("Arial", Font.PLAIN, 35);
     Font font35B = new Font("Arial", Font.BOLD, 35);
     Font font20 = new Font("Arial", Font.PLAIN, 20);
+    Font font20B = new Font("Arial", Font.BOLD, 20);
     Font font40B = new Font("Arial", Font.BOLD, 40);
 
     public PhoneShopManagementSystem() {
@@ -117,12 +119,12 @@ public class PhoneShopManagementSystem {
         westPanel.add(txtPassword, westGbc);
 
         // Eye icon button to toggle password visibility
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");
+        ImageIcon viewIcon = new ImageIcon("src/rupp/icon/hide.png");
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
 
-        ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
+        ImageIcon hideIcon = new ImageIcon("src/rupp/icon/view.png");
         Image hideImg = hideIcon.getImage();
         Image resizedHideImg = hideImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedHideIcon = new ImageIcon(resizedHideImg);
@@ -147,7 +149,7 @@ public class PhoneShopManagementSystem {
         westPanel.add(btnTogglePassword, westGbc);
 
         JButton btnLogin = new JButton("LOGIN");
-        btnLogin.setFont(font30);
+        btnLogin.setFont(font30B);
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setBackground(new Color(0, 122, 255));
         btnLogin.setOpaque(true);
@@ -170,19 +172,19 @@ public class PhoneShopManagementSystem {
         socialPanel.setBackground(Color.WHITE);
 
         JButton btnFacebook = new JButton(
-                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\facebook.png")
+                new ImageIcon(new ImageIcon("src/rupp/icon/facebook.png")
                         .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         btnFacebook.setBackground(null);
         btnFacebook.setBorder(null);
         btnFacebook.setCursor(pointer);
         JButton btnGoogle = new JButton(
-                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\google.png").getImage()
+                new ImageIcon(new ImageIcon("src/rupp/icon/google.png").getImage()
                         .getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         btnGoogle.setBackground(null);
         btnGoogle.setBorder(null);
         btnGoogle.setCursor(pointer);
         JButton btnLinkedIn = new JButton(
-                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\linkedin.png")
+                new ImageIcon(new ImageIcon("src/rupp/icon/linkedin.png")
                         .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         btnLinkedIn.setBackground(null);
         btnLinkedIn.setBorder(null);
@@ -212,14 +214,14 @@ public class PhoneShopManagementSystem {
         eastPanel.add(lblWelcome, eastGbc);
 
         JButton btnSignup = new JButton("No account yet? Register.");
-        btnSignup.setFont(font20);
+        btnSignup.setFont(font20B);
         btnSignup.setForeground(Color.WHITE);
         btnSignup.setBackground(new Color(0, 122, 255));
         btnSignup.setOpaque(true);
         btnSignup.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(Color.BLACK, 1),
                 BorderFactory.createEmptyBorder(10, 20, 10, 20)));
-        btnSignup.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSignup.setCursor(pointer);
 
         eastGbc.gridy++;
         eastPanel.add(btnSignup, eastGbc);
@@ -322,12 +324,12 @@ public class PhoneShopManagementSystem {
         });
 
         // Eye icon button to toggle password visibility
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");
+        ImageIcon viewIcon = new ImageIcon("src/rupp/icon/hide.png");
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
 
-        ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
+        ImageIcon hideIcon = new ImageIcon("src/rupp/icon/view.png");
         Image hideImg = hideIcon.getImage();
         Image resizedHideImg = hideImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedHideIcon = new ImageIcon(resizedHideImg);
@@ -408,7 +410,7 @@ public class PhoneShopManagementSystem {
         westPanel.add(confirmPasswordPanel, westGbc);
 
         JButton btnRegister = new JButton("REGISTER");
-        btnRegister.setFont(font30);
+        btnRegister.setFont(font30B);
         btnRegister.setForeground(Color.WHITE);
         btnRegister.setBackground(new Color(21, 201, 0));
         btnRegister.setOpaque(true);
@@ -429,21 +431,21 @@ public class PhoneShopManagementSystem {
 
         JPanel socialPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         socialPanel.setBackground(Color.WHITE);
-
         JButton btnFacebook = new JButton(
-                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\facebook.png")
+
+                new ImageIcon(new ImageIcon("src/rupp/icon/facebook.png")
                         .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         btnFacebook.setBackground(null);
         btnFacebook.setBorder(null);
         btnFacebook.setCursor(pointer);
         JButton btnGoogle = new JButton(
-                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\google.png").getImage()
+                new ImageIcon(new ImageIcon("src/rupp/icon/google.png").getImage()
                         .getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         btnGoogle.setBackground(null);
         btnGoogle.setBorder(null);
         btnGoogle.setCursor(pointer);
         JButton btnLinkedIn = new JButton(
-                new ImageIcon(new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\linkedin.png")
+                new ImageIcon(new ImageIcon("src/rupp/icon/linkedin.png")
                         .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         btnLinkedIn.setBackground(null);
         btnLinkedIn.setBorder(null);
@@ -473,7 +475,7 @@ public class PhoneShopManagementSystem {
         eastPanel.add(lblWelcome, eastGbc);
 
         JButton btnLogin = new JButton("Have Account? Login.");
-        btnLogin.setFont(new Font("Arial", Font.PLAIN, 20));
+        btnLogin.setFont(font20B);
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setBackground(new Color(0, 122, 255));
         btnLogin.setOpaque(true);

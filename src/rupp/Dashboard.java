@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,6 +52,8 @@ public class Dashboard {
     Font font40B = new Font("Poppins", Font.BOLD, 40);
     Font font30B = new Font("Arial", Font.BOLD, 30);
     Font font17 = new Font("Arial", Font.PLAIN, 17);
+    Font font17B = new Font("Arial", Font.BOLD, 17);
+    Font font12 = new Font("Arial", Font.PLAIN, 12);
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
     public Dashboard(String username) {
@@ -141,7 +145,7 @@ public class Dashboard {
         navTitle.setHorizontalAlignment(SwingConstants.CENTER);
         navTitle.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        String filePath = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
+        String filePath = "src/rupp/File/user_data.txt";
         String userName = username;
         final ImageIcon[] userLogo = { null }; // Use an array to make 'final' work
 
@@ -170,7 +174,7 @@ public class Dashboard {
 
         if (userLogo[0] == null) {
             // Handle case where userLogo is not found (e.g., set a default image)
-            userLogo[0] = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\default-user.png");
+            userLogo[0] = new ImageIcon("src/rupp/images/default-user.png");
         }
 
         // Scale the image to the desired size (e.g., 50x50 pixels)
@@ -260,7 +264,7 @@ public class Dashboard {
         topBar.setLayout(new BoxLayout(topBar, BoxLayout.Y_AXIS)); // Vertical layout for top bar
 
         // Logo setup
-        ImageIcon originalImg = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\logo.png");
+        ImageIcon originalImg = new ImageIcon("src/rupp/images/logo.png");
         Image img = originalImg.getImage();
         Image resizedImg = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
         ImageIcon resizedIcon = new ImageIcon(resizedImg);
@@ -470,7 +474,11 @@ public class Dashboard {
         // Add profile button
         JButton profileButton = new JButton("Profile");
         profileButton.setCursor(pointer);
-        profileButton.setFont(font18); // Set the font for profileButton
+        profileButton.setFont(font18B); // Set the font for profileButton
+        profileButton.setForeground(Color.WHITE);
+        profileButton.setBackground(new Color(0, 62, 255));
+        profileButton.setOpaque(true);
+        profileButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         profileButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         profileButton.addActionListener((ActionEvent e) -> {
             EditProfileDialog editProfileDialog = new EditProfileDialog(frame, userName, photoPath, this);
@@ -484,7 +492,11 @@ public class Dashboard {
         // Add sign out button
         JButton signOutButton = new JButton("Sign Out");
         signOutButton.setCursor(pointer);
-        signOutButton.setFont(font18);
+        signOutButton.setFont(font18B);
+        signOutButton.setForeground(Color.WHITE);
+        signOutButton.setBackground(new Color(255, 0, 0));
+        signOutButton.setOpaque(true);
+        signOutButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         signOutButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         signOutButton.addActionListener((ActionEvent e) -> {
             profileDialog.dispose();
@@ -515,7 +527,7 @@ public class Dashboard {
                 "Net Total", "Purchase Date" };
         List<Object[]> recentDataList = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("recentlyBuy.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("src/rupp/File/recentlyBuy.txt"))) {
             String line;
             br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
@@ -598,7 +610,7 @@ public class Dashboard {
                 "Net Total", "Purchase Date" };
         List<Object[]> topProductsDataList = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("recentlyBuy.txt"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("src/rupp/File/recentlyBuy.txt"))) {
             String line;
             br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
@@ -729,6 +741,8 @@ public class Dashboard {
             paymentTableModel.setRowCount(0);
             updateProductList();
             updateDashboardPanels();
+            updateProductList();
+            updateInventoryTable();
         });
 
         btnExit.addActionListener((ActionEvent e) -> {
@@ -918,6 +932,9 @@ public class Dashboard {
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(frame, "Invalid input. Please enter valid numbers.");
                     }
+                } else {
+                    updateProductList();
+                    updateInventoryTable();
                 }
             });
 
@@ -932,15 +949,15 @@ public class Dashboard {
     private void generateInvoice() {
         double totalAmount = 0;
 
-        try (PrintWriter writer = new PrintWriter("invoice.txt");
-                FileWriter fileWriter = new FileWriter("recentlyBuy.txt", true);
+        try (PrintWriter writer = new PrintWriter("src/rupp/File/invoice.txt");
+                FileWriter fileWriter = new FileWriter("src/rupp/File/recentlyBuy.txt", true);
                 PrintWriter recentWriter = new PrintWriter(fileWriter)) {
 
             writer.println("Invoice:");
             writer.println("===========================================");
 
             // Check if the file is new and needs a header
-            File recentlyBuyFile = new File("recentlyBuy.txt");
+            File recentlyBuyFile = new File("src/rupp/File/recentlyBuy.txt");
             if (recentlyBuyFile.length() == 0) {
                 recentWriter.println("No.,Products Name,Vendor Name,Price,Qty.,Total,Discount,Net Total,Purchase Date");
             }
@@ -970,7 +987,7 @@ public class Dashboard {
         // Load the QR Code image from the PNG file
         BufferedImage qrCodeImage = null;
         try {
-            qrCodeImage = ImageIO.read(new File("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\images\\qr_code.png"));
+            qrCodeImage = ImageIO.read(new File("src/rupp/images/qr_code.png"));
             // Scale the image to 500x500
             if (qrCodeImage != null) {
                 qrCodeImage = getScaledImage(qrCodeImage, 500, 500);
@@ -1023,6 +1040,127 @@ public class Dashboard {
 
         // Update the recent purchases panel
         updateRecentPurchasesPanel();
+    }
+
+    // Show Add Product Dialog
+    private void showAddProductDialog() {
+        JDialog dialog = new JDialog(frame, "Add Product", true);
+
+        dialog.setSize(525, 400);
+        dialog.setLocationRelativeTo(frame);
+        dialog.setLayout(null);
+
+        JLabel lblName = new JLabel("Product Name:");
+        JTextField txtName = new JTextField();
+        JLabel lblPrice = new JLabel("Price               :");
+        JTextField txtPrice = new JTextField();
+        JLabel lblQty = new JLabel("Quantity         :");
+        JTextField txtQty = new JTextField();
+        JLabel lblImagePath = new JLabel("Image Path     :");
+        JTextField txtImagePath = new JTextField();
+        JButton btnBrowse = new JButton("Browse");
+        JButton btnAdd = new JButton("Add");
+        JButton btnCancel = new JButton("Cancel");
+
+        // Set bounds for components
+        lblName.setBounds(30, 30, 150, 30);
+        lblName.setFont(font17B);
+        txtName.setBounds(170, 30, 200, 30);
+        txtName.setFont(font17B);
+        lblPrice.setBounds(30, 70, 150, 30);
+        lblPrice.setFont(font17B);
+        txtPrice.setBounds(170, 70, 200, 30);
+        txtPrice.setFont(font17B);
+        lblQty.setBounds(30, 110, 200, 30);
+        lblQty.setFont(font17B);
+        txtQty.setBounds(170, 110, 200, 30);
+        txtQty.setFont(font17B);
+        lblImagePath.setBounds(30, 150, 150, 30);
+        lblImagePath.setFont(font17B);
+        txtImagePath.setBounds(170, 150, 200, 30);
+        txtImagePath.setFont(font12);
+        btnBrowse.setBounds(380, 150, 100, 30);
+        btnBrowse.setFont(font17B);
+        btnBrowse.setCursor(pointer);
+        btnAdd.setBounds(170, 210, 90, 30);
+        btnAdd.setFont(font17B);
+        btnAdd.setCursor(pointer);
+        btnCancel.setBounds(280, 210, 90, 30);
+        btnCancel.setFont(font17B);
+        btnCancel.setCursor(pointer);
+
+        dialog.add(lblName);
+        dialog.add(txtName);
+        dialog.add(lblPrice);
+        dialog.add(txtPrice);
+        dialog.add(lblQty);
+        dialog.add(txtQty);
+        dialog.add(lblImagePath);
+        dialog.add(txtImagePath);
+        dialog.add(btnBrowse);
+        dialog.add(btnAdd);
+        dialog.add(btnCancel);
+
+        btnBrowse.addActionListener((ActionEvent e) -> {
+            JFileChooser fileChooser = new JFileChooser();
+            int returnValue = fileChooser.showOpenDialog(null);
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                txtImagePath.setText(selectedFile.getAbsolutePath());
+
+                // Copy the image to the P_pic folder
+                File destinationDir = new File("src/rupp/P_pic");
+                if (!destinationDir.exists()) {
+                    destinationDir.mkdirs();
+                }
+                File destinationFile = new File(destinationDir, selectedFile.getName());
+                try {
+                    Files.copy(selectedFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    // Update the image path to the new location
+                    txtImagePath.setText(destinationFile.getAbsolutePath());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Failed to copy the image file.");
+                }
+            }
+        });
+
+        btnAdd.addActionListener((ActionEvent e) -> {
+            try {
+                String name = txtName.getText();
+                double price = Double.parseDouble(txtPrice.getText());
+                int qty = Integer.parseInt(txtQty.getText());
+                String imagePath = txtImagePath.getText();
+                String relativeImagePath = "src/rupp/P_pic/" + new File(imagePath).getName();
+                // Create a new Phone object
+                Phone newPhone = new Phone(name, price, qty, relativeImagePath);
+
+                // Add the new phone to the list
+                phonesList.add(newPhone);
+
+                // Update the inventory
+                addProductToInventory(newPhone);
+
+                // Update the product list display
+                updateProductList();
+
+                // Write the updated product list to file
+                writeProductsToFile();
+
+                // Update the dashboard panels
+                updateDashboardPanels();
+
+                // Close the dialog
+                dialog.dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Invalid input. Please check your entries.");
+            }
+        });
+
+        btnCancel.addActionListener((ActionEvent e) -> {
+            dialog.dispose();
+        });
+
+        dialog.setVisible(true);
     }
 
     private BufferedImage getScaledImage(BufferedImage src, int width, int height) {
@@ -1154,11 +1292,13 @@ public class Dashboard {
         private final JButton saveButton;
         private final JButton cancelButton;
         private String imagePath;
+        private final Phone originalPhone; // Added to keep track of the original phone
 
         public EditProductDialog(JFrame parent, Phone phone) {
             super(parent, "Edit Product", true);
             setLayout(null);
             setSize(400, 440);
+            originalPhone = phone; // Initialize originalPhone with the passed phone object
 
             // Set up components
             JLabel nameLabel = new JLabel("Name:");
@@ -1185,6 +1325,7 @@ public class Dashboard {
             cancelButton = new JButton("Cancel");
             cancelButton.setFont(font18);
             cancelButton.setCursor(pointer);
+
             // Set bounds for components
             nameLabel.setBounds(30, 30, 100, 30);
             nameField.setBounds(140, 30, 200, 30);
@@ -1215,18 +1356,56 @@ public class Dashboard {
                 int result = fileChooser.showOpenDialog(this);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
-                    imagePath = selectedFile.getAbsolutePath();
-                    imageLabel.setIcon(new ImageIcon(
-                            new ImageIcon(imagePath).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                    String newImagePath = "src/rupp/P_pic/"
+                            + selectedFile.getName();
+                    File newImageFile = new File(newImagePath);
+
+                    // Delete the old image if it exists
+                    File oldImageFile = new File(imagePath);
+                    if (oldImageFile.exists()) {
+                        oldImageFile.delete();
+                    }
+
+                    // Copy the new image to P_pic folder, replacing the old image
+                    try {
+                        Files.copy(selectedFile.toPath(), newImageFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        imagePath = newImagePath;
+                        imageLabel.setIcon(new ImageIcon(
+                                new ImageIcon(imagePath).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "Failed to copy the image file.");
+                    }
                 }
             });
 
             saveButton.addActionListener(e -> {
-                // Validation logic (if needed)
-                writeProductsToFile();
-                JOptionPane.showMessageDialog(frame, "Edit successfully!", "Edit",
-                        JOptionPane.INFORMATION_MESSAGE);
-                dispose();
+                // Validate inputs
+                try {
+                    originalPhone.setName(nameField.getText());
+                    originalPhone.setPrice(Double.parseDouble(priceField.getText()));
+                    originalPhone.setQty(Integer.parseInt(qtyField.getText()));
+                    originalPhone.setImagePath(imagePath);
+
+                    // Find the row index of the original phone
+                    int rowIndex = phonesList.indexOf(originalPhone);
+                    if (rowIndex != -1) {
+                        // Update the phone object in the list and inventory
+                        Phone updatedPhone = getUpdatedPhone(originalPhone);
+                        inventoryTableModel.updateProduct(rowIndex, updatedPhone);
+
+                        // Update the dashboard and file
+                        updateDashboardPanels();
+                        writeProductsToFile();
+
+                        JOptionPane.showMessageDialog(frame, "Edit successfully!", "Edit",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Product not found in the list.");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Invalid input. Please check your entries.");
+                }
             });
 
             cancelButton.addActionListener(e -> {
@@ -1254,13 +1433,15 @@ public class Dashboard {
         phones.removeIf(p -> p.getName().equals(phone.getName()) && p.getPrice() == phone.getPrice());
 
         // Write the updated list back to the file
-        try (PrintWriter writer = new PrintWriter("products.txt")) {
+        try (PrintWriter writer = new PrintWriter("src/rupp/File/products.txt")) {
             for (Phone p : phones) {
                 writer.println(p.getName() + "," + p.getPrice() + "," + p.getQty() + "," + p.getImagePath());
+
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
     }
 
     class ButtonEditor extends DefaultCellEditor {
@@ -1311,10 +1492,18 @@ public class Dashboard {
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE);
                     if (response == JOptionPane.YES_OPTION) {
+                        File imageFile = new File(phone.getImagePath());
+                        if (imageFile.exists() && imageFile.delete()) {
+                            System.out.println("Image deleted successfully.");
+                        } else {
+                            System.out.println("Failed to delete the image.");
+                        }
                         deleteProductFromFile(phone);
                         phonesList.remove(row);
                         inventoryTableModel.removeProduct(row);
                         updateDashboardPanels();
+                        updateProductList();
+                        updateInventoryTable();
                     }
                 }
             }
@@ -1512,102 +1701,6 @@ public class Dashboard {
         }
     }
 
-    // Show Add Product Dialog
-    private void showAddProductDialog() {
-        JDialog dialog = new JDialog(frame, "Add Product", true);
-
-        dialog.setSize(500, 300);
-        dialog.setLocationRelativeTo(frame);
-        dialog.setLayout(null);
-
-        JLabel lblName = new JLabel("Product Name:");
-        JTextField txtName = new JTextField();
-        JLabel lblPrice = new JLabel("Price:");
-        JTextField txtPrice = new JTextField();
-        JLabel lblQty = new JLabel("Quantity:");
-        JTextField txtQty = new JTextField();
-        JLabel lblImagePath = new JLabel("Image Path:");
-        JTextField txtImagePath = new JTextField();
-        JButton btnBrowse = new JButton("Browse");
-        JButton btnAdd = new JButton("Add");
-        JButton btnCancel = new JButton("Cancel");
-
-        // Set bounds for components
-        lblName.setBounds(30, 30, 100, 30);
-        txtName.setBounds(150, 30, 200, 30);
-        lblPrice.setBounds(30, 70, 100, 30);
-        txtPrice.setBounds(150, 70, 200, 30);
-        lblQty.setBounds(30, 110, 200, 30);
-        txtQty.setBounds(150, 110, 200, 30);
-        lblImagePath.setBounds(30, 150, 100, 30);
-        txtImagePath.setBounds(150, 150, 200, 30);
-        btnBrowse.setBounds(360, 150, 80, 30);
-        btnBrowse.setCursor(pointer);
-        btnAdd.setBounds(150, 210, 80, 30);
-        btnAdd.setCursor(pointer);
-        btnCancel.setBounds(240, 210, 80, 30);
-        btnCancel.setCursor(pointer);
-
-        dialog.add(lblName);
-        dialog.add(txtName);
-        dialog.add(lblPrice);
-        dialog.add(txtPrice);
-        dialog.add(lblQty);
-        dialog.add(txtQty);
-        dialog.add(lblImagePath);
-        dialog.add(txtImagePath);
-        dialog.add(btnBrowse);
-        dialog.add(btnAdd);
-        dialog.add(btnCancel);
-
-        btnBrowse.addActionListener((ActionEvent e) -> {
-            JFileChooser fileChooser = new JFileChooser();
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                txtImagePath.setText(selectedFile.getAbsolutePath());
-            }
-        });
-
-        btnAdd.addActionListener((ActionEvent e) -> {
-            try {
-                String name = txtName.getText();
-                double price = Double.parseDouble(txtPrice.getText());
-                int qty = Integer.parseInt(txtQty.getText());
-                String imagePath = txtImagePath.getText();
-
-                // Create a new Phone object
-                Phone newPhone = new Phone(name, price, qty, imagePath);
-
-                // Add the new phone to the list
-                phonesList.add(newPhone);
-
-                // Update the inventory
-                addProductToInventory(newPhone);
-
-                // Update the product list display
-                updateProductList();
-
-                // Write the updated product list to file
-                writeProductsToFile();
-
-                // Update the dashboard panels
-                updateDashboardPanels();
-
-                // Close the dialog
-                dialog.dispose();
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Invalid input. Please check your entries.");
-            }
-        });
-
-        btnCancel.addActionListener((ActionEvent e) -> {
-            dialog.dispose();
-        });
-
-        dialog.setVisible(true);
-    }
-
     // Report
     private void creatReportPanel() {
         report = new JPanel(new BorderLayout()); // Use BorderLayout for proper alignment
@@ -1635,7 +1728,7 @@ public class Dashboard {
     // Read Products From File
     private void readProductsFromFile() {
         phonesList.clear();
-        File file = new File("products.txt");
+        File file = new File("src/rupp/File/products.txt");
         if (file.exists()) {
             try (Scanner scanner = new Scanner(file)) {
                 while (scanner.hasNextLine()) {
@@ -1656,7 +1749,7 @@ public class Dashboard {
 
     // Write Products To File
     private void writeProductsToFile() {
-        try (PrintWriter writer = new PrintWriter("products.txt")) {
+        try (PrintWriter writer = new PrintWriter("src/rupp/File/products.txt")) {
             for (Phone phone : phonesList) {
                 writer.printf("%s,%f,%d,%s%n", phone.getName(), phone.getPrice(), phone.getQty(), phone.getImagePath());
             }

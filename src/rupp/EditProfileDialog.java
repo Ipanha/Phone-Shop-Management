@@ -2,7 +2,9 @@ package rupp;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
+import java.nio.file.*;
 import javax.swing.*;
 
 public class EditProfileDialog extends JDialog {
@@ -12,129 +14,120 @@ public class EditProfileDialog extends JDialog {
     private final JPasswordField confirmNewPasswordField;
     private final JLabel photoLabel;
     private String photoPath;
+    private String newPhotoPath;
     private final Dashboard dashboard;
 
     public EditProfileDialog(JFrame parent, String username, String photoPath, Dashboard dashboard) {
         super(parent, "Edit Profile", true);
         this.dashboard = dashboard;
+        this.photoPath = photoPath; // Initial photoPath
 
         setLayout(null);
-        setSize(550, 550);
+        setSize(600, 600);
 
         // Font settings
         Font font18 = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
+        Font font18B = new Font(Font.SANS_SERIF, Font.BOLD, 18);
+        Font font25B = new Font(Font.SANS_SERIF, Font.BOLD, 25);
         Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
         // Set up components
-        JLabel oldPasswordLabel = new JLabel("Old Password:");
-        oldPasswordLabel.setFont(font18);
-        JLabel newUsernameLabel = new JLabel("New Username:");
-        newUsernameLabel.setFont(font18);
-        JLabel newPasswordLabel = new JLabel("New Password:");
-        newPasswordLabel.setFont(font18);
-        JLabel confirmNewPasswordLabel = new JLabel("Confirm New Password:");
-        confirmNewPasswordLabel.setFont(font18);
+        JLabel oldPasswordLabel = new JLabel("Old Password                   :");
+        oldPasswordLabel.setFont(font18B);
+        JLabel newUsernameLabel = new JLabel("New Username                :");
+        newUsernameLabel.setFont(font18B);
+        JLabel newPasswordLabel = new JLabel("New Password                 :");
+        newPasswordLabel.setFont(font18B);
+        JLabel confirmNewPasswordLabel = new JLabel("Confirm New Password  :");
+        confirmNewPasswordLabel.setFont(font18B);
 
         oldPasswordField = new JPasswordField();
-        oldPasswordField.setFont(font18);
+        oldPasswordField.setFont(font18B);
         newUsernameField = new JTextField(username);
-        newUsernameField.setFont(font18);
+        newUsernameField.setFont(font18B);
         newPasswordField = new JPasswordField();
-        newPasswordField.setFont(font18);
+        newPasswordField.setFont(font18B);
         confirmNewPasswordField = new JPasswordField();
-        confirmNewPasswordField.setFont(font18);
+        confirmNewPasswordField.setFont(font18B);
 
         photoLabel = new JLabel(new ImageIcon(
                 new ImageIcon(photoPath).getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH)));
-        this.photoPath = photoPath;
         JButton choosePhotoButton = new JButton("Choose Photo");
-        choosePhotoButton.setFont(font18);
+        choosePhotoButton.setFont(font18B);
         choosePhotoButton.setCursor(pointer);
         JButton saveButton = new JButton("Save");
-        saveButton.setFont(font18);
+        saveButton.setFont(font25B);
         saveButton.setCursor(pointer);
+        saveButton.setForeground(Color.WHITE);
+        saveButton.setBackground(new Color(0, 62, 255));
+        saveButton.setOpaque(true);
+        saveButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
         JButton cancelButton = new JButton("Cancel");
-        cancelButton.setFont(font18);
+        cancelButton.setFont(font25B);
         cancelButton.setCursor(pointer);
+        cancelButton.setForeground(Color.WHITE);
+        cancelButton.setBackground(new Color(255, 0, 0));
+        cancelButton.setOpaque(true);
+        cancelButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         // Set bounds for components
-        oldPasswordLabel.setBounds(30, 30, 200, 30);
-        oldPasswordField.setBounds(250, 30, 200, 30);
-        newUsernameLabel.setBounds(30, 80, 200, 30);
-        newUsernameField.setBounds(250, 80, 200, 30);
-        newPasswordLabel.setBounds(30, 130, 200, 30);
-        newPasswordField.setBounds(250, 130, 200, 30);
-        confirmNewPasswordLabel.setBounds(30, 180, 200, 30);
-        confirmNewPasswordField.setBounds(250, 180, 200, 30);
+        oldPasswordLabel.setBounds(30, 30, 230, 30);
+        oldPasswordField.setBounds(270, 30, 230, 30);
+        newUsernameLabel.setBounds(30, 80, 230, 30);
+        newUsernameField.setBounds(270, 80, 230, 30);
+        newPasswordLabel.setBounds(30, 130, 230, 30);
+        newPasswordField.setBounds(270, 130, 230, 30);
+        confirmNewPasswordLabel.setBounds(30, 180, 230, 30);
+        confirmNewPasswordField.setBounds(270, 180, 230, 30);
 
         photoLabel.setBounds(30, 230, 200, 200);
-        choosePhotoButton.setBounds(300, 300, 150, 30);
-        saveButton.setBounds(30, 450, 120, 30);
-        cancelButton.setBounds(330, 450, 120, 30);
+        choosePhotoButton.setBounds(330, 330, 160, 30);
+        saveButton.setBounds(30, 490, 120, 50);
+        cancelButton.setBounds(340, 490, 140, 50);
 
-        ImageIcon viewIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\hide.png");
+        ImageIcon viewIcon = new ImageIcon("src/rupp/icon/hide.png");
         Image viewImg = viewIcon.getImage();
         Image resizedViewImg = viewImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedViewIcon = new ImageIcon(resizedViewImg);
 
-        ImageIcon hideIcon = new ImageIcon("D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png");
+        ImageIcon hideIcon = new ImageIcon("src/rupp/icon/view.png");
         Image hideImg = hideIcon.getImage();
         Image resizedHideImg = hideImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
         ImageIcon resizedHideIcon = new ImageIcon(resizedHideImg);
 
         // Eye icon button for Old Password field
         JButton btnToggleoldPasswordField = new JButton(resizedViewIcon);
-        btnToggleoldPasswordField.setBounds(460, 20, 45, 45);
+        btnToggleoldPasswordField.setBounds(510, 20, 45, 45);
         btnToggleoldPasswordField.setOpaque(false);
         btnToggleoldPasswordField.setContentAreaFilled(false);
         btnToggleoldPasswordField.setBorderPainted(false);
         btnToggleoldPasswordField.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnToggleoldPasswordField.addActionListener((ActionEvent e) -> {
-            if (oldPasswordField.getEchoChar() != '\u0000') {
-                oldPasswordField.setEchoChar((char) 0);
-                btnToggleoldPasswordField.setIcon(resizedHideIcon);
-            } else {
-                oldPasswordField.setEchoChar('•');
-                btnToggleoldPasswordField.setIcon(resizedViewIcon);
-            }
-        });
+        btnToggleoldPasswordField.addActionListener(
+                new TogglePasswordActionListener(oldPasswordField, resizedViewIcon, resizedHideIcon));
 
         // Eye icon button for New Password field
         JButton btnTogglenewPasswordField = new JButton(resizedViewIcon);
-        btnTogglenewPasswordField.setBounds(460, 120, 45, 45);
+        btnTogglenewPasswordField.setBounds(510, 120, 45, 45);
         btnTogglenewPasswordField.setOpaque(false);
         btnTogglenewPasswordField.setContentAreaFilled(false);
         btnTogglenewPasswordField.setBorderPainted(false);
         btnTogglenewPasswordField.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnTogglenewPasswordField.addActionListener((ActionEvent e) -> {
-            if (newPasswordField.getEchoChar() != '\u0000') {
-                newPasswordField.setEchoChar((char) 0);
-                btnTogglenewPasswordField.setIcon(resizedHideIcon);
-            } else {
-                newPasswordField.setEchoChar('•');
-                btnTogglenewPasswordField.setIcon(resizedViewIcon);
-            }
-        });
+        btnTogglenewPasswordField.addActionListener(
+                new TogglePasswordActionListener(newPasswordField, resizedViewIcon, resizedHideIcon));
 
         // Eye icon button for Confirm New Password field
         JButton btnToggleconfirmNewPasswordField = new JButton(resizedViewIcon);
-        btnToggleconfirmNewPasswordField.setBounds(460, 175, 45, 45);
+        btnToggleconfirmNewPasswordField.setBounds(510, 175, 45, 45);
         btnToggleconfirmNewPasswordField.setOpaque(false);
         btnToggleconfirmNewPasswordField.setContentAreaFilled(false);
         btnToggleconfirmNewPasswordField.setBorderPainted(false);
         btnToggleconfirmNewPasswordField.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        btnToggleconfirmNewPasswordField.addActionListener((ActionEvent e) -> {
-            if (confirmNewPasswordField.getEchoChar() != '\u0000') {
-                confirmNewPasswordField.setEchoChar((char) 0);
-                btnToggleconfirmNewPasswordField.setIcon(resizedHideIcon);
-            } else {
-                confirmNewPasswordField.setEchoChar('•');
-                btnToggleconfirmNewPasswordField.setIcon(resizedViewIcon);
-            }
-        });
+        btnToggleconfirmNewPasswordField.addActionListener(
+                new TogglePasswordActionListener(confirmNewPasswordField, resizedViewIcon, resizedHideIcon));
 
         // Add components to the dialog
         add(oldPasswordLabel);
@@ -154,26 +147,82 @@ public class EditProfileDialog extends JDialog {
         add(cancelButton);
 
         // Set up action listeners
-        choosePhotoButton.addActionListener(e -> {
+        choosePhotoButton.addActionListener(new ChoosePhotoActionListener());
+
+        saveButton.addActionListener(new SaveButtonActionListener(parent, username));
+
+        cancelButton.addActionListener(e -> dispose());
+
+        setLocationRelativeTo(parent);
+    }
+
+    // Inner class for toggle password visibility
+    private class TogglePasswordActionListener implements ActionListener {
+        private final JPasswordField passwordField;
+        private final ImageIcon viewIcon;
+        private final ImageIcon hideIcon;
+
+        public TogglePasswordActionListener(JPasswordField passwordField, ImageIcon viewIcon, ImageIcon hideIcon) {
+            this.passwordField = passwordField;
+            this.viewIcon = viewIcon;
+            this.hideIcon = hideIcon;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (passwordField.getEchoChar() != '\u0000') {
+                passwordField.setEchoChar((char) 0);
+                ((JButton) e.getSource()).setIcon(hideIcon);
+            } else {
+                passwordField.setEchoChar('•');
+                ((JButton) e.getSource()).setIcon(viewIcon);
+            }
+        }
+    }
+
+    // Inner class for choose photo action listener
+    private class ChoosePhotoActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser();
-            int result = fileChooser.showOpenDialog(this);
+            int result = fileChooser.showOpenDialog(EditProfileDialog.this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
-                this.photoPath = selectedFile.getAbsolutePath();
-                photoLabel.setIcon(new ImageIcon(
-                        new ImageIcon(this.photoPath).getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH)));
+                newPhotoPath = "src/rupp/images/" + selectedFile.getName();
+
+                File oldPhotoFile = new File(photoPath);
+                if (oldPhotoFile.exists()) {
+                    oldPhotoFile.delete();
+                }
+
+                try {
+                    Files.copy(selectedFile.toPath(), Paths.get(newPhotoPath), StandardCopyOption.REPLACE_EXISTING);
+                    photoPath = newPhotoPath; // Update the photoPath after successful copy
+                    photoLabel.setIcon(new ImageIcon(
+                            new ImageIcon(photoPath).getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH)));
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(EditProfileDialog.this, "Failed to copy the photo file.");
+                }
             }
-        });
+        }
+    }
 
-        saveButton.addActionListener(e -> {
-            // Check if photo has changed
-            boolean photoChanged = !photoPath.equals(this.photoPath);
+    // Inner class for save button action listener
+    private class SaveButtonActionListener implements ActionListener {
+        private final JFrame parent;
+        private final String username;
 
-            // Determine if old password validation is needed
+        public SaveButtonActionListener(JFrame parent, String username) {
+            this.parent = parent;
+            this.username = username;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            boolean photoChanged = !photoPath.equals(newPhotoPath);
             boolean isPasswordChange = newPasswordField.getPassword().length > 0;
             boolean isNameChange = !newUsernameField.getText().equals(username);
 
-            // Read and validate old password only if username or password is being changed
             String inputOldPassword = null;
             boolean passwordMatched = false;
 
@@ -183,7 +232,7 @@ public class EditProfileDialog extends JDialog {
                 passwordMatched = true; // Skip password validation if only photo or username is being changed
             }
 
-            String filePath = "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\user_data.txt";
+            String filePath = "src/rupp/File/user_data.txt";
             File file = new File(filePath);
             StringBuilder fileContents = new StringBuilder();
 
@@ -197,30 +246,24 @@ public class EditProfileDialog extends JDialog {
                         String filePhotoPath = parts[2];
 
                         if (fileUsername.trim().equals(username.trim())) {
-                            // Validate old password if needed
                             if (isPasswordChange && !filePassword.trim().equals(inputOldPassword.trim())) {
                                 JOptionPane.showMessageDialog(parent, "Old password is incorrect!", "Edit Profile",
                                         JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
 
-                            // Update new username, password, and photo path
                             String newUsername = newUsernameField.getText();
                             String newPassword = new String(newPasswordField.getPassword());
-                            String newPhotoPath = this.photoPath;
+                            String newPhotoPath = photoPath;
 
-                            // Use existing password if new password fields are empty
                             if (!isPasswordChange) {
                                 newPassword = filePassword.trim();
                             }
 
-                            // Construct the updated line
                             String updatedLine = newUsername + "," + newPassword + "," + newPhotoPath;
 
-                            // Append the updated line to the StringBuilder
                             fileContents.append(updatedLine).append("\n");
                         } else {
-                            // Append the existing line as it is
                             fileContents.append(line).append("\n");
                         }
                     }
@@ -229,7 +272,6 @@ public class EditProfileDialog extends JDialog {
                 ex.printStackTrace();
             }
 
-            // Write the updated contents back to the file
             try (FileWriter writer = new FileWriter(file)) {
                 writer.write(fileContents.toString());
                 writer.flush();
@@ -240,15 +282,10 @@ public class EditProfileDialog extends JDialog {
             JOptionPane.showMessageDialog(parent, "Profile updated successfully!", "Edit Profile",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            // Call method in Dashboard to refresh profile data
-            dashboard.refreshUserProfile(newUsernameField.getText(), this.photoPath);
+            dashboard.refreshUserProfile(newUsernameField.getText(), photoPath);
 
             dispose();
-        });
-
-        cancelButton.addActionListener(e -> dispose());
-
-        setLocationRelativeTo(parent);
+        }
     }
 
     public static void main(String[] args) {
@@ -256,9 +293,9 @@ public class EditProfileDialog extends JDialog {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
         frame.setVisible(true);
-        Dashboard dashboard = new Dashboard("testUser");
-        EditProfileDialog editProfileDialog = new EditProfileDialog(frame, "testUser",
-                "D:\\RUPP\\Java Programming\\RUPP\\src\\rupp\\icon\\view.png", dashboard);
+        Dashboard dashboard = new Dashboard("Admin");
+        EditProfileDialog editProfileDialog = new EditProfileDialog(frame, "Admin",
+                "src/rupp/icon/view.png", dashboard);
         editProfileDialog.setVisible(true);
     }
 }
