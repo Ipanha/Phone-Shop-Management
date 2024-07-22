@@ -28,7 +28,7 @@ public class PhoneShopManagementSystem {
     Font font40B = new Font("Arial", Font.BOLD, 40);
 
     public PhoneShopManagementSystem() {
-        frame = new JFrame("Phone Shop Management System");
+        frame = new JFrame("Products Controller");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null); // Center the frame on the screen
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -237,8 +237,8 @@ public class PhoneShopManagementSystem {
             String usernameLogin = txtUsername.getText();
             String password = new String(txtPassword.getPassword());
             if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
-                frame.dispose();
                 SwingUtilities.invokeLater(() -> new Dashboard(usernameLogin));
+                frame.dispose();
             } else {
                 JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
                         JOptionPane.ERROR_MESSAGE);

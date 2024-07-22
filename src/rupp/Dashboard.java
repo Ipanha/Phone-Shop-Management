@@ -58,7 +58,7 @@ public class Dashboard {
 
     public Dashboard(String username) {
         this.username = username;
-        frame = new JFrame("Phone Shop Management System");
+        frame = new JFrame("Products Controller");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1920, 1080);
         frame.setLocationRelativeTo(null);
@@ -705,11 +705,12 @@ public class Dashboard {
 
         // Payment side
         String[] columnNames = { "No.", "Name", "Price", "Qty", "Discount", "Total" };
+    
         paymentTableModel = new DefaultTableModel(columnNames, 0);
         paymentTable = new JTable(paymentTableModel);
         JScrollPane paymentScrollPane = new JScrollPane(paymentTable);
         JTableHeader header = paymentTable.getTableHeader();
-        header.setFont(font17);
+        header.setFont(font17B);
         paymentTable.setFont(font17);
         paymentTable.setRowHeight(30);
 
@@ -739,7 +740,6 @@ public class Dashboard {
 
         btnClear.addActionListener((ActionEvent e) -> {
             paymentTableModel.setRowCount(0);
-            updateProductList();
             updateDashboardPanels();
             updateProductList();
             updateInventoryTable();
@@ -776,6 +776,55 @@ public class Dashboard {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.BOTH;
 
+        // Search components
+        JPanel searchContainer = new JPanel(new BorderLayout());
+        searchContainer.setBackground(null);
+        JPanel searchPanel = new JPanel(new BorderLayout());
+
+        JTextField searchField = new JTextField();
+        searchField.setFont(font20B);
+        searchField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+        JButton btnSearch = new JButton("Search");
+        btnSearch.setFont(font20);
+        btnSearch.setCursor(pointer);
+
+        btnSearch.addActionListener((ActionEvent e) -> {
+            String searchText = searchField.getText().trim();
+            updateProductList(searchText);
+        });
+
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    String searchText = searchField.getText().trim();
+                    updateProductList(searchText);
+                }
+            }
+        });
+        searchPanel.setPreferredSize(new Dimension(300, 35)); // Updated to 200px width
+        btnSearch.setFont(font20B);
+        btnSearch.setCursor(pointer);
+        btnSearch.setForeground(Color.WHITE);
+        btnSearch.setBackground(new Color(0, 122, 255));
+        btnSearch.setOpaque(true);
+        btnSearch.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(btnSearch, BorderLayout.EAST);
+
+        searchContainer.add(searchPanel, BorderLayout.WEST);
+        // Adding search panel above product list
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        centerPanel.add(lblProduct, gbc);
+
         // Payment section
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -783,11 +832,11 @@ public class Dashboard {
         gbc.weightx = 0.5;
         centerPanel.add(lblPayment, gbc);
 
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weighty = 1.0;
         centerPanel.add(paymentScrollPane, gbc);
 
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.weighty = 0;
         JPanel paymentButtonPanel = new JPanel();
         paymentButtonPanel.setBackground(Color.LIGHT_GRAY); // Match centerPanel background
@@ -801,12 +850,12 @@ public class Dashboard {
 
         // Product section
         gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weightx = 0.5;
-        centerPanel.add(lblProduct, gbc);
+        centerPanel.add(searchContainer, gbc);
 
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.weighty = 1.0;
         centerPanel.add(scrollPane, gbc);
 
@@ -817,132 +866,138 @@ public class Dashboard {
     }
 
     private void updateProductList() {
+        updateProductList("");
+    }
+
+    private void updateProductList(String searchText) {
         navProductPanel.removeAll();
 
         for (Phone phone : phonesList) {
-            JPanel productPanel = new JPanel(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
+            if (searchText.isEmpty() || phone.getName().toLowerCase().contains(searchText.toLowerCase())) {
+                JPanel productPanel = new JPanel(new GridBagLayout());
+                GridBagConstraints gbc = new GridBagConstraints();
 
-            JLabel picLabel;
-            try {
-                BufferedImage productImage = ImageIO.read(new File(phone.getImagePath()));
-                Image scaledImage = productImage.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
-                ImageIcon productIcon = new ImageIcon(scaledImage);
-                picLabel = new JLabel(productIcon);
-            } catch (IOException e) {
-                e.printStackTrace();
-                picLabel = new JLabel("Image not found");
-            }
+                JLabel picLabel;
+                try {
+                    BufferedImage productImage = ImageIO.read(new File(phone.getImagePath()));
+                    Image scaledImage = productImage.getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+                    ImageIcon productIcon = new ImageIcon(scaledImage);
+                    picLabel = new JLabel(productIcon);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    picLabel = new JLabel("Image not found");
+                }
 
-            JLabel nameLabel = new JLabel(phone.getName());
-            JLabel priceLabel = new JLabel("$" + phone.getPrice());
-            JLabel qtyLabel = new JLabel("In stock : " + String.valueOf(phone.getQty()));
-            JButton btnBuy = new JButton("Buy Now");
-            btnBuy.setCursor(pointer);
+                JLabel nameLabel = new JLabel(phone.getName());
+                JLabel priceLabel = new JLabel("$" + phone.getPrice());
+                JLabel qtyLabel = new JLabel("In stock : " + phone.getQty());
+                JButton btnBuy = new JButton("Buy Now");
+                btnBuy.setCursor(pointer);
 
-            priceLabel.setFont(font18);
-            nameLabel.setFont(font20);
+                priceLabel.setFont(font18);
+                nameLabel.setFont(font20);
 
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.gridwidth = GridBagConstraints.REMAINDER;
-            gbc.insets = new Insets(5, 0, 5, 0);
-            productPanel.add(picLabel, gbc);
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                gbc.gridwidth = GridBagConstraints.REMAINDER;
+                gbc.insets = new Insets(5, 0, 5, 0);
+                productPanel.add(picLabel, gbc);
 
-            gbc.gridy = 1;
-            productPanel.add(nameLabel, gbc);
+                gbc.gridy = 1;
+                productPanel.add(nameLabel, gbc);
 
-            gbc.gridy = 2;
-            productPanel.add(priceLabel, gbc);
+                gbc.gridy = 2;
+                productPanel.add(priceLabel, gbc);
 
-            gbc.gridy = 3;
-            productPanel.add(qtyLabel, gbc);
+                gbc.gridy = 3;
+                productPanel.add(qtyLabel, gbc);
 
-            gbc.gridy = 4;
-            productPanel.add(btnBuy, gbc);
+                gbc.gridy = 4;
+                productPanel.add(btnBuy, gbc);
 
-            productPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            productPanel.setBackground(Color.WHITE);
-            productPanel.setCursor(pointer);
+                productPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                productPanel.setBackground(Color.WHITE);
+                productPanel.setCursor(pointer);
 
-            btnBuy.addActionListener((ActionEvent e) -> {
-                // Create a custom dialog for quantity and discount input
-                JPanel dialogPanel = new JPanel(new GridLayout(0, 1));
-                JTextField quantityField = new JTextField();
-                quantityField.setFont(font20);
-                JTextField discountField = new JTextField();
-                discountField.setFont(font20);
-                JLabel Qty = new JLabel("Quantity:");
-                JLabel Dis = new JLabel("Discount (%):");
-                Qty.setFont(font20);
-                Dis.setFont(font20);
+                btnBuy.addActionListener((ActionEvent e) -> {
+                    // Create a custom dialog for quantity and discount input
+                    JPanel dialogPanel = new JPanel(new GridLayout(0, 1));
+                    JTextField quantityField = new JTextField();
+                    quantityField.setFont(font20);
+                    JTextField discountField = new JTextField();
+                    discountField.setFont(font20);
+                    JLabel Qty = new JLabel("Quantity:");
+                    JLabel Dis = new JLabel("Discount (%):");
+                    Qty.setFont(font20);
+                    Dis.setFont(font20);
 
-                dialogPanel.add(Qty);
-                dialogPanel.add(quantityField);
-                dialogPanel.add(Dis);
-                dialogPanel.add(discountField);
+                    dialogPanel.add(Qty);
+                    dialogPanel.add(quantityField);
+                    dialogPanel.add(Dis);
+                    dialogPanel.add(discountField);
 
-                JOptionPane optionPane = new JOptionPane(dialogPanel, JOptionPane.PLAIN_MESSAGE,
-                        JOptionPane.OK_CANCEL_OPTION);
-                JDialog dialog = optionPane.createDialog(frame, "Enter Quantity and Discount");
+                    JOptionPane optionPane = new JOptionPane(dialogPanel, JOptionPane.PLAIN_MESSAGE,
+                            JOptionPane.OK_CANCEL_OPTION);
+                    JDialog dialog = optionPane.createDialog(frame, "Enter Quantity and Discount");
 
-                // Set the size of the dialog
-                dialog.setSize(400, 250);
-                dialog.setResizable(false); // Optional: make the dialog non-resizable
-                dialog.setVisible(true);
+                    // Set the size of the dialog
+                    dialog.setSize(400, 250);
+                    dialog.setResizable(false); // Optional: make the dialog non-resizable
+                    dialog.setVisible(true);
 
-                int option = (Integer) optionPane.getValue();
-                if (option == JOptionPane.OK_OPTION) {
-                    // User clicked OK, process the input
-                    try {
-                        int quantity = Integer.parseInt(quantityField.getText().trim());
-                        String discountText = discountField.getText().trim();
-                        float discount = discountText.isEmpty() ? 0 : Float.parseFloat(discountText);
+                    int option = (Integer) optionPane.getValue();
+                    if (option == JOptionPane.OK_OPTION) {
+                        // User clicked OK, process the input
+                        try {
+                            int quantity = Integer.parseInt(quantityField.getText().trim());
+                            String discountText = discountField.getText().trim();
+                            float discount = discountText.isEmpty() ? 0 : Float.parseFloat(discountText);
 
-                        if (quantity <= 0) {
-                            JOptionPane.showMessageDialog(frame, "Quantity must be greater than zero.");
-                            return;
+                            if (quantity <= 0) {
+                                JOptionPane.showMessageDialog(frame, "Quantity must be greater than zero.");
+                                return;
+                            }
+                            if (quantity > phone.getQty()) {
+                                JOptionPane.showMessageDialog(frame, "Not enough stock available.");
+                                return;
+                            }
+
+                            // Calculate total with discount
+                            double priceOfOne = phone.getPrice();
+                            double discountedPrice = priceOfOne * (1 - discount / 100); // Apply discount
+                            double totalPrice = discountedPrice * quantity;
+
+                            String total = String.format("$%.2f", totalPrice);
+                            String price = String.format("$%.2f", priceOfOne);
+                            String discountFormat = String.format("%.2f%%", discount);
+
+                            // Add to payment table
+                            Object[] rowData = { paymentTableModel.getRowCount() + 1, phone.getName(), price, quantity,
+                                    discountFormat, total };
+                            paymentTableModel.addRow(rowData);
+
+                            // Update phone quantity
+                            phone.setQty(phone.getQty() - quantity);
+
+                            // Update product list display
+                            updateProductList();
+                            updateInventoryTable();
+
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Invalid input. Please enter valid numbers.");
                         }
-                        if (quantity > phone.getQty()) {
-                            JOptionPane.showMessageDialog(frame, "Not enough stock available.");
-                            return;
-                        }
-
-                        // Calculate total with discount
-                        double priceOfOne = phone.getPrice();
-                        double discountedPrice = priceOfOne * (1 - discount / 100); // Apply discount
-                        double totalPrice = discountedPrice * quantity;
-
-                        String total = String.format("$%.2f", totalPrice);
-                        String price = String.format("$%.2f", priceOfOne);
-                        String discountFormat = String.format("%.2f%%", discount);
-
-                        // Add to payment table
-                        Object[] rowData = { paymentTableModel.getRowCount() + 1, phone.getName(), price, quantity,
-                                discountFormat, total };
-                        paymentTableModel.addRow(rowData);
-
-                        // Update phone quantity
-                        phone.setQty(phone.getQty() - quantity);
-
-                        // Update product list display
+                    } else {
                         updateProductList();
                         updateInventoryTable();
-
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(frame, "Invalid input. Please enter valid numbers.");
                     }
-                } else {
-                    updateProductList();
-                    updateInventoryTable();
-                }
-            });
+                });
 
-            navProductPanel.add(productPanel);
+                navProductPanel.add(productPanel);
+            }
+
+            navProductPanel.revalidate();
+            navProductPanel.repaint();
         }
-
-        navProductPanel.revalidate();
-        navProductPanel.repaint();
     }
 
     // Generate Invoice When Click Invoice
@@ -1079,15 +1134,30 @@ public class Dashboard {
         lblImagePath.setFont(font17B);
         txtImagePath.setBounds(170, 150, 200, 30);
         txtImagePath.setFont(font12);
+
         btnBrowse.setBounds(380, 150, 100, 30);
         btnBrowse.setFont(font17B);
         btnBrowse.setCursor(pointer);
+        btnBrowse.setForeground(Color.WHITE);
+        btnBrowse.setBackground(new Color(6, 200, 0));
+        btnBrowse.setOpaque(true);
+        btnBrowse.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
         btnAdd.setBounds(170, 210, 90, 30);
         btnAdd.setFont(font17B);
         btnAdd.setCursor(pointer);
+        btnAdd.setForeground(Color.WHITE);
+        btnAdd.setBackground(new Color(0, 62, 255));
+        btnAdd.setOpaque(true);
+        btnAdd.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
         btnCancel.setBounds(280, 210, 90, 30);
         btnCancel.setFont(font17B);
         btnCancel.setCursor(pointer);
+        btnCancel.setForeground(Color.WHITE);
+        btnCancel.setBackground(new Color(255, 0, 0));
+        btnCancel.setOpaque(true);
+        btnCancel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
         dialog.add(lblName);
         dialog.add(txtName);
@@ -1591,6 +1661,9 @@ public class Dashboard {
 
         JTextField inputNameSearch = new JTextField(10); // Set preferred width for inputNameSearch
         inputNameSearch.setFont(font18B);
+        inputNameSearch.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.BLACK, 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
         JButton btnSearch = new JButton("Search");
         searchPanel.add(inputNameSearch, BorderLayout.CENTER);
         searchPanel.add(btnSearch, BorderLayout.EAST);

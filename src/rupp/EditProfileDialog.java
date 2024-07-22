@@ -55,6 +55,11 @@ public class EditProfileDialog extends JDialog {
         JButton choosePhotoButton = new JButton("Choose Photo");
         choosePhotoButton.setFont(font18B);
         choosePhotoButton.setCursor(pointer);
+        choosePhotoButton.setForeground(Color.WHITE);
+        choosePhotoButton.setBackground(new Color(6, 200, 0));
+        choosePhotoButton.setOpaque(true);
+        choosePhotoButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
         JButton saveButton = new JButton("Save");
         saveButton.setFont(font25B);
         saveButton.setCursor(pointer);
@@ -102,7 +107,7 @@ public class EditProfileDialog extends JDialog {
         btnToggleoldPasswordField.setOpaque(false);
         btnToggleoldPasswordField.setContentAreaFilled(false);
         btnToggleoldPasswordField.setBorderPainted(false);
-        btnToggleoldPasswordField.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnToggleoldPasswordField.setCursor(pointer);
 
         btnToggleoldPasswordField.addActionListener(
                 new TogglePasswordActionListener(oldPasswordField, resizedViewIcon, resizedHideIcon));
@@ -113,7 +118,7 @@ public class EditProfileDialog extends JDialog {
         btnTogglenewPasswordField.setOpaque(false);
         btnTogglenewPasswordField.setContentAreaFilled(false);
         btnTogglenewPasswordField.setBorderPainted(false);
-        btnTogglenewPasswordField.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnTogglenewPasswordField.setCursor(pointer);
 
         btnTogglenewPasswordField.addActionListener(
                 new TogglePasswordActionListener(newPasswordField, resizedViewIcon, resizedHideIcon));
@@ -124,7 +129,7 @@ public class EditProfileDialog extends JDialog {
         btnToggleconfirmNewPasswordField.setOpaque(false);
         btnToggleconfirmNewPasswordField.setContentAreaFilled(false);
         btnToggleconfirmNewPasswordField.setBorderPainted(false);
-        btnToggleconfirmNewPasswordField.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnToggleconfirmNewPasswordField.setCursor(pointer);
 
         btnToggleconfirmNewPasswordField.addActionListener(
                 new TogglePasswordActionListener(confirmNewPasswordField, resizedViewIcon, resizedHideIcon));
