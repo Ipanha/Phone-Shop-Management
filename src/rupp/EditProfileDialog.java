@@ -58,7 +58,10 @@ public class EditProfileDialog extends JDialog {
         choosePhotoButton.setForeground(Color.WHITE);
         choosePhotoButton.setBackground(new Color(6, 200, 0));
         choosePhotoButton.setOpaque(true);
-        choosePhotoButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        choosePhotoButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         JButton saveButton = new JButton("Save");
         saveButton.setFont(font25B);
@@ -66,7 +69,10 @@ public class EditProfileDialog extends JDialog {
         saveButton.setForeground(Color.WHITE);
         saveButton.setBackground(new Color(0, 62, 255));
         saveButton.setOpaque(true);
-        saveButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        saveButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setFont(font25B);
@@ -74,7 +80,10 @@ public class EditProfileDialog extends JDialog {
         cancelButton.setForeground(Color.WHITE);
         cancelButton.setBackground(new Color(255, 0, 0));
         cancelButton.setOpaque(true);
-        cancelButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        cancelButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         // Set bounds for components
         oldPasswordLabel.setBounds(30, 30, 230, 30);

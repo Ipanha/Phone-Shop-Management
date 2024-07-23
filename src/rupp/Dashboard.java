@@ -479,7 +479,10 @@ public class Dashboard {
         profileButton.setForeground(Color.WHITE);
         profileButton.setBackground(new Color(0, 62, 255));
         profileButton.setOpaque(true);
-        profileButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        profileButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
         profileButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         profileButton.addActionListener((ActionEvent e) -> {
             EditProfileDialog editProfileDialog = new EditProfileDialog(frame, userName, photoPath, this);
@@ -497,7 +500,10 @@ public class Dashboard {
         signOutButton.setForeground(Color.WHITE);
         signOutButton.setBackground(new Color(255, 0, 0));
         signOutButton.setOpaque(true);
-        signOutButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        signOutButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
         signOutButton.setPreferredSize(new Dimension(120, 40)); // Set preferred size
         signOutButton.addActionListener((ActionEvent e) -> {
             profileDialog.dispose();
@@ -706,7 +712,7 @@ public class Dashboard {
 
         // Payment side
         String[] columnNames = { "No.", "Name", "Price", "Qty", "Discount", "Total" };
-    
+
         paymentTableModel = new DefaultTableModel(columnNames, 0);
         paymentTable = new JTable(paymentTableModel);
         JScrollPane paymentScrollPane = new JScrollPane(paymentTable);
@@ -1148,7 +1154,10 @@ public class Dashboard {
         btnBrowse.setForeground(Color.WHITE);
         btnBrowse.setBackground(new Color(6, 200, 0));
         btnBrowse.setOpaque(true);
-        btnBrowse.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btnBrowse.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         btnAdd.setBounds(30, 500, 90, 35);
         btnAdd.setFont(font18B);
@@ -1156,7 +1165,10 @@ public class Dashboard {
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setBackground(new Color(0, 62, 255));
         btnAdd.setOpaque(true);
-        btnAdd.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btnAdd.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         btnCancel.setBounds(350, 500, 90, 35);
         btnCancel.setFont(font18B);
@@ -1164,7 +1176,10 @@ public class Dashboard {
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setBackground(new Color(255, 0, 0));
         btnCancel.setOpaque(true);
-        btnCancel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        btnCancel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(107, 102,
+                        102), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         dialog.add(lblName);
         dialog.add(txtName);
@@ -1381,46 +1396,69 @@ public class Dashboard {
         public EditProductDialog(JFrame parent, Phone phone) {
             super(parent, "Edit Product", true);
             setLayout(null);
-            setSize(400, 440);
+            setSize(410, 540);
             originalPhone = phone; // Initialize originalPhone with the passed phone object
 
             // Set up components
-            JLabel nameLabel = new JLabel("Name:");
-            nameLabel.setFont(font18);
-            JLabel priceLabel = new JLabel("Price:");
-            priceLabel.setFont(font18);
-            JLabel qtyLabel = new JLabel("Quantity:");
-            qtyLabel.setFont(font18);
+            JLabel nameLabel = new JLabel("Name          :");
+            nameLabel.setFont(font18B);
+            JLabel priceLabel = new JLabel("Price             :");
+            priceLabel.setFont(font18B);
+            JLabel qtyLabel = new JLabel("Quantity      :");
+            qtyLabel.setFont(font18B);
             nameField = new JTextField(phone.getName());
-            nameField.setFont(font18);
+            nameField.setFont(font18B);
             priceField = new JTextField(String.valueOf(phone.getPrice()));
-            priceField.setFont(font18);
+            priceField.setFont(font18B);
             qtyField = new JTextField(String.valueOf(phone.getQty()));
-            qtyField.setFont(font18);
+            qtyField.setFont(font18B);
             imageLabel = new JLabel(new ImageIcon(
-                    new ImageIcon(phone.getImagePath()).getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)));
+                    new ImageIcon(phone.getImagePath()).getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH)));
             imagePath = phone.getImagePath();
+
             chooseImageButton = new JButton("Choose Image");
-            chooseImageButton.setFont(font18);
+            chooseImageButton.setFont(font18B);
             chooseImageButton.setCursor(pointer);
+            chooseImageButton.setForeground(Color.WHITE);
+            chooseImageButton.setBackground(new Color(6, 200, 0));
+            chooseImageButton.setOpaque(true);
+            chooseImageButton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(107, 102,
+                            102), 1),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+
             saveButton = new JButton("Save");
-            saveButton.setFont(font18);
+            saveButton.setFont(font18B);
             saveButton.setCursor(pointer);
+            saveButton.setForeground(Color.WHITE);
+            saveButton.setBackground(new Color(0, 62, 255));
+            saveButton.setOpaque(true);
+            saveButton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(107, 102,
+                            102), 1),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)));
             cancelButton = new JButton("Cancel");
-            cancelButton.setFont(font18);
+            cancelButton.setFont(font18B);
             cancelButton.setCursor(pointer);
+            cancelButton.setForeground(Color.WHITE);
+            cancelButton.setBackground(new Color(255, 0, 0));
+            cancelButton.setOpaque(true);
+            cancelButton.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(107, 102,
+                            102), 1),
+                    BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
             // Set bounds for components
-            nameLabel.setBounds(30, 30, 100, 30);
-            nameField.setBounds(140, 30, 200, 30);
-            priceLabel.setBounds(30, 80, 100, 30);
-            priceField.setBounds(140, 80, 200, 30);
-            qtyLabel.setBounds(30, 130, 100, 30);
-            qtyField.setBounds(140, 130, 200, 30);
-            imageLabel.setBounds(30, 180, 90, 90);
-            chooseImageButton.setBounds(140, 210, 150, 30);
-            saveButton.setBounds(30, 350, 120, 30);
-            cancelButton.setBounds(220, 350, 120, 30);
+            nameLabel.setBounds(30, 30, 150, 30);
+            nameField.setBounds(160, 30, 200, 30);
+            priceLabel.setBounds(30, 80, 150, 30);
+            priceField.setBounds(160, 80, 200, 30);
+            qtyLabel.setBounds(30, 130, 150, 30);
+            qtyField.setBounds(160, 130, 200, 30);
+            imageLabel.setBounds(0, 200, 200, 200);
+            chooseImageButton.setBounds(200, 280, 150, 30);
+            saveButton.setBounds(30, 430, 120, 30);
+            cancelButton.setBounds(220, 430, 120, 30);
 
             // Add components to the dialog
             add(nameLabel);
