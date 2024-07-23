@@ -87,9 +87,9 @@ public class EditProfileDialog extends JDialog {
         confirmNewPasswordField.setBounds(270, 180, 230, 30);
 
         photoLabel.setBounds(30, 230, 200, 200);
-        choosePhotoButton.setBounds(330, 330, 160, 30);
-        saveButton.setBounds(30, 490, 120, 50);
-        cancelButton.setBounds(340, 490, 140, 50);
+        choosePhotoButton.setBounds(330, 330, 150, 40);
+        saveButton.setBounds(30, 490, 110, 40);
+        cancelButton.setBounds(340, 490, 140, 40);
 
         ImageIcon viewIcon = new ImageIcon("src/rupp/icon/hide.png");
         Image viewImg = viewIcon.getImage();

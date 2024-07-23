@@ -2,6 +2,8 @@ package rupp;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -115,6 +117,17 @@ public class PhoneShopManagementSystem {
                 }
             }
         });
+
+        // Add KeyListener to txtPassword for Enter key press
+        txtPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                    performLogin(txtUsername.getText(), new String(txtPassword.getPassword()));
+                }
+            }
+        });
+
         westGbc.gridy++;
         westPanel.add(txtPassword, westGbc);
 
@@ -233,23 +246,25 @@ public class PhoneShopManagementSystem {
         // Adding center container to login panel
         loginPanel.add(centerContainer, BorderLayout.CENTER);
 
+        // Add login action listener
         btnLogin.addActionListener((ActionEvent e) -> {
-            String usernameLogin = txtUsername.getText();
-            String password = new String(txtPassword.getPassword());
-            if (users.containsKey(usernameLogin) && users.get(usernameLogin).equals(password)) {
-                SwingUtilities.invokeLater(() -> new Dashboard(usernameLogin));
-                frame.dispose();
-            } else {
-                JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-            txtUsername.setText("");
-            txtPassword.setText("");
+            performLogin(txtUsername.getText(), new String(txtPassword.getPassword()));
         });
 
         btnSignup.addActionListener((ActionEvent e) -> {
             cardLayout.show(mainPanel, "Register");
         });
+    }
+
+    // Method to perform login action
+    private void performLogin(String username, String password) {
+        if (users.containsKey(username) && users.get(username).equals(password)) {
+            SwingUtilities.invokeLater(() -> new Dashboard(username));
+            frame.dispose();
+        } else {
+            JOptionPane.showMessageDialog(frame, "Invalid username or password", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void createRegisterPanel() {
@@ -432,7 +447,6 @@ public class PhoneShopManagementSystem {
         JPanel socialPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         socialPanel.setBackground(Color.WHITE);
         JButton btnFacebook = new JButton(
-
                 new ImageIcon(new ImageIcon("src/rupp/icon/facebook.png")
                         .getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH)));
         btnFacebook.setBackground(null);
@@ -494,7 +508,8 @@ public class PhoneShopManagementSystem {
         // Adding center container to login panel
         registerPanel.add(centerContainer, BorderLayout.CENTER);
 
-        btnRegister.addActionListener((ActionEvent e) -> {
+        // Register button action listener
+        ActionListener registerAction = (ActionEvent e) -> {
             String newUsername = txtNewUsername.getText();
             String newPassword = new String(txtNewPassword.getPassword());
             String confirmPassword = new String(txtConPassword.getPassword());
@@ -513,6 +528,19 @@ public class PhoneShopManagementSystem {
             } else {
                 JOptionPane.showMessageDialog(frame, "Passwords do not match!", "Error",
                         JOptionPane.ERROR_MESSAGE);
+            }
+        };
+
+        btnRegister.addActionListener(registerAction);
+
+        // Adding key binding for the Enter key
+        InputMap inputMap = westPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap actionMap = westPanel.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "registerAction");
+        actionMap.put("registerAction", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                registerAction.actionPerformed(e);
             }
         });
 

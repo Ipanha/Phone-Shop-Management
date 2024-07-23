@@ -54,6 +54,7 @@ public class Dashboard {
     Font font17 = new Font("Arial", Font.PLAIN, 17);
     Font font17B = new Font("Arial", Font.BOLD, 17);
     Font font12 = new Font("Arial", Font.PLAIN, 12);
+    Font font12B = new Font("Arial", Font.BOLD, 12);
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
     public Dashboard(String username) {
@@ -894,8 +895,9 @@ public class Dashboard {
                 JButton btnBuy = new JButton("Buy Now");
                 btnBuy.setCursor(pointer);
 
-                priceLabel.setFont(font18);
-                nameLabel.setFont(font20);
+                priceLabel.setFont(font18B);
+                nameLabel.setFont(font20B);
+                qtyLabel.setFont(font12B);
 
                 gbc.gridx = 0;
                 gbc.gridy = 0;
@@ -1101,58 +1103,63 @@ public class Dashboard {
     private void showAddProductDialog() {
         JDialog dialog = new JDialog(frame, "Add Product", true);
 
-        dialog.setSize(525, 400);
+        dialog.setSize(500, 600); // Increased height to accommodate the photo label
         dialog.setLocationRelativeTo(frame);
         dialog.setLayout(null);
 
-        JLabel lblName = new JLabel("Product Name:");
+        JLabel lblName = new JLabel("Product Name   :");
         JTextField txtName = new JTextField();
-        JLabel lblPrice = new JLabel("Price               :");
+        JLabel lblPrice = new JLabel("Price                  :");
         JTextField txtPrice = new JTextField();
-        JLabel lblQty = new JLabel("Quantity         :");
+        JLabel lblQty = new JLabel("Quantity            :");
         JTextField txtQty = new JTextField();
-        JLabel lblImagePath = new JLabel("Image Path     :");
+        JLabel lblImagePath = new JLabel("Image Path        :");
         JTextField txtImagePath = new JTextField();
-        JButton btnBrowse = new JButton("Browse");
+        JButton btnBrowse = new JButton("Choose Photo");
+
         JButton btnAdd = new JButton("Add");
         JButton btnCancel = new JButton("Cancel");
 
+        JLabel lblPhoto = new JLabel(); // Label to display the photo
+        lblPhoto.setBounds(30, 240, 200, 200); // Set bounds for the photo label
+        lblPhoto.setBorder(BorderFactory.createLineBorder(Color.BLACK)); // Optional: add a border to the label
+
         // Set bounds for components
         lblName.setBounds(30, 30, 150, 30);
-        lblName.setFont(font17B);
-        txtName.setBounds(170, 30, 200, 30);
-        txtName.setFont(font17B);
-        lblPrice.setBounds(30, 70, 150, 30);
-        lblPrice.setFont(font17B);
-        txtPrice.setBounds(170, 70, 200, 30);
-        txtPrice.setFont(font17B);
-        lblQty.setBounds(30, 110, 200, 30);
-        lblQty.setFont(font17B);
-        txtQty.setBounds(170, 110, 200, 30);
-        txtQty.setFont(font17B);
-        lblImagePath.setBounds(30, 150, 150, 30);
-        lblImagePath.setFont(font17B);
-        txtImagePath.setBounds(170, 150, 200, 30);
+        lblName.setFont(font18B);
+        txtName.setBounds(200, 30, 230, 35);
+        txtName.setFont(font18B);
+        lblPrice.setBounds(30, 75, 150, 30);
+        lblPrice.setFont(font18B);
+        txtPrice.setBounds(200, 75, 230, 35);
+        txtPrice.setFont(font18B);
+        lblQty.setBounds(30, 120, 200, 30);
+        lblQty.setFont(font18B);
+        txtQty.setBounds(200, 120, 230, 35);
+        txtQty.setFont(font18B);
+        lblImagePath.setBounds(30, 165, 150, 30);
+        lblImagePath.setFont(font18B);
+        txtImagePath.setBounds(200, 165, 230, 35);
         txtImagePath.setFont(font12);
 
-        btnBrowse.setBounds(380, 150, 100, 30);
-        btnBrowse.setFont(font17B);
+        btnBrowse.setBounds(279, 320, 150, 35);
+        btnBrowse.setFont(font18B);
         btnBrowse.setCursor(pointer);
         btnBrowse.setForeground(Color.WHITE);
         btnBrowse.setBackground(new Color(6, 200, 0));
         btnBrowse.setOpaque(true);
         btnBrowse.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-        btnAdd.setBounds(170, 210, 90, 30);
-        btnAdd.setFont(font17B);
+        btnAdd.setBounds(30, 500, 90, 35);
+        btnAdd.setFont(font18B);
         btnAdd.setCursor(pointer);
         btnAdd.setForeground(Color.WHITE);
         btnAdd.setBackground(new Color(0, 62, 255));
         btnAdd.setOpaque(true);
         btnAdd.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-        btnCancel.setBounds(280, 210, 90, 30);
-        btnCancel.setFont(font17B);
+        btnCancel.setBounds(350, 500, 90, 35);
+        btnCancel.setFont(font18B);
         btnCancel.setCursor(pointer);
         btnCancel.setForeground(Color.WHITE);
         btnCancel.setBackground(new Color(255, 0, 0));
@@ -1170,6 +1177,7 @@ public class Dashboard {
         dialog.add(btnBrowse);
         dialog.add(btnAdd);
         dialog.add(btnCancel);
+        dialog.add(lblPhoto); // Add the photo label to the dialog
 
         btnBrowse.addActionListener((ActionEvent e) -> {
             JFileChooser fileChooser = new JFileChooser();
@@ -1188,6 +1196,12 @@ public class Dashboard {
                     Files.copy(selectedFile.toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     // Update the image path to the new location
                     txtImagePath.setText(destinationFile.getAbsolutePath());
+
+                    // Display the image in the photo label
+                    ImageIcon imageIcon = new ImageIcon(destinationFile.getAbsolutePath());
+                    Image image = imageIcon.getImage().getScaledInstance(lblPhoto.getWidth(), lblPhoto.getHeight(),
+                            Image.SCALE_SMOOTH);
+                    lblPhoto.setIcon(new ImageIcon(image));
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(dialog, "Failed to copy the image file.");
                 }
