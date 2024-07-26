@@ -1372,6 +1372,7 @@ public class Dashboard {
             setFont(font18B); // Set your desired font
             setCursor(pointer);
             setPreferredSize(buttonSize); // Set preferred size for the button
+            setContentAreaFilled(false);
         }
 
         @Override
