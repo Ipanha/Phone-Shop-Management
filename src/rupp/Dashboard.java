@@ -11,7 +11,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
@@ -762,6 +764,7 @@ public class Dashboard {
             updateProductList();
             updateDashboardPanels();
             paymentTableModel.setRowCount(0);
+            updateSoleProductsPanel();
         });
 
         // Product side
@@ -1272,15 +1275,233 @@ public class Dashboard {
     }
 
     // ViewSale Panel
+    // Declare soleProductsPanel as a class variable
+    private JPanel soleProductsPanel;
+    // private JPanel viewSale;
+
     private JPanel createViewSale() {
         viewSale = new JPanel(new BorderLayout());
         JPanel headerPanel = navigation("View Sale");
         JPanel footerPanel = Footer();
 
+        Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
+        int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
+        float totalMoney = getTotalMoneyFromFile("src/rupp/File/recentlyBuy.txt");
+
+        String mostSoleProduct = getMostSoleProduct(productQuantities);
+        int mostSoleQuantity = productQuantities.get(mostSoleProduct);
+
+        String leastSoleProduct = getLeastSoleProduct(productQuantities);
+        int leastSoleQuantity = productQuantities.get(leastSoleProduct);
+
+        String mostSoleProductImagePath = getProductImagePath(mostSoleProduct, "src/rupp/File/products.txt");
+        String leastSoleProductImagePath = getProductImagePath(leastSoleProduct, "src/rupp/File/products.txt");
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(10, 10, 10, 10); // general insets for all components
+
+        // Sole Products box
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        gbc.weighty = 0.5;
+        soleProductsPanel = createLabelPanel("Sold Products", String.valueOf(totalQuantity));
+        centerPanel.add(soleProductsPanel, gbc);
+
+        // Sole Gained chart spanning columns 2 and 3
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.5;
+        centerPanel.add(createChartPanel(), gbc);
+
+        // Total Money box
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        gbc.weighty = 0.5;
+        centerPanel.add(createLabelPanel("Total Money", "$" + totalMoney), gbc);
+
+        // Most Sole box
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.25;
+        centerPanel.add(createProductPanel("Most Sold", mostSoleProduct, String.valueOf(mostSoleQuantity),
+                mostSoleProductImagePath), gbc);
+
+        // Less Sole box
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.25;
+        centerPanel.add(createProductPanel("Less Sold", leastSoleProduct, String.valueOf(leastSoleQuantity),
+                leastSoleProductImagePath), gbc);
+
         viewSale.add(headerPanel, BorderLayout.NORTH);
+        viewSale.add(centerPanel, BorderLayout.CENTER);
         viewSale.add(footerPanel, BorderLayout.SOUTH);
         return viewSale;
+    }
 
+    private String getLeastSoleProduct(Map<String, Integer> productQuantities) {
+        return productQuantities.entrySet()
+                .stream()
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("No Products Sold");
+    }
+
+    public void updateSoleProductsPanel() {
+        Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
+        int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
+        JLabel valueLabel = (JLabel) ((JPanel) soleProductsPanel.getComponent(1)).getComponent(0);
+        valueLabel.setText(String.valueOf(totalQuantity));
+        soleProductsPanel.revalidate();
+        soleProductsPanel.repaint();
+    }
+
+    private Map<String, Integer> getTotalQuantityFromFile(String filePath) {
+        Map<String, Integer> productQuantities = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                    String[] fields = line.split(",");
+                    String productName = fields[1].trim(); // Adjust the index based on your file structure
+                    int quantity = Integer.parseInt(fields[4].trim());
+                    productQuantities.put(productName, productQuantities.getOrDefault(productName, 0) + quantity);
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return productQuantities;
+    }
+
+    private float getTotalMoneyFromFile(String filePath) {
+        float totalMoney = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                    String[] fields = line.split(",");
+                    float money = Float.parseFloat(fields[7].trim());
+                    totalMoney += money;
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return totalMoney;
+    }
+
+    private String getMostSoleProduct(Map<String, Integer> productQuantities) {
+        return productQuantities.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("No Products Sold");
+    }
+
+    private String getProductImagePath(String productName, String productFilePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(productFilePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields[0].trim().equalsIgnoreCase(productName.trim())) {
+                    return fields[3].trim(); // Adjust the index based on your file structure
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "default.png"; // Default image if not found
+    }
+
+    private JPanel createLabelPanel(String title, String value) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding
+        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        JLabel valueLabel = new JLabel(value, JLabel.CENTER);
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(valueLabel, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private JPanel createChartPanel() {
+        // Simulated chart panel, you would use a real chart library here
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding
+        JLabel titleLabel = new JLabel("Sold Gained", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        // Placeholder for chart
+        JLabel chartLabel = new JLabel(new ImageIcon("path/to/chart/image.png"));
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(chartLabel, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private JPanel createProductPanel(String title, String productName, String sole, String imagePath) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10)); // padding
+        panel.setPreferredSize(new Dimension(300, 200));
+
+        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+
+        JLabel productLabel = new JLabel(productName, JLabel.CENTER);
+        productLabel.setBorder(new EmptyBorder(0, 0, 20, 0)); // 10px padding on the
+        productLabel.setFont(new Font("Arial", Font.BOLD, 24));
+
+        JLabel soleLabel = new JLabel("Sold: " + sole, JLabel.CENTER);
+        soleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+
+        JLabel productImage = new JLabel();
+
+        // Load and scale the image
+        try {
+            BufferedImage image = ImageIO.read(new File(imagePath));
+            if (image != null) {
+                Image scaledImage = image.getScaledInstance(250, 250, Image.SCALE_SMOOTH);
+                productImage.setIcon(new ImageIcon(scaledImage));
+            } else {
+                System.out.println("Error: Image not found at path: " + imagePath);
+                productImage.setIcon(new ImageIcon("src/rupp/P_pic/default.png")); // Placeholder for missing image
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            productImage.setIcon(new ImageIcon("src/rupp/P_pic/default.png")); // Placeholder for missing image
+        }
+
+        // Create a panel for image and text
+        JPanel imageAndTextPanel = new JPanel(new BorderLayout());
+        imageAndTextPanel.setPreferredSize(new Dimension(100, 90));
+        imageAndTextPanel.add(productImage, BorderLayout.CENTER);
+        imageAndTextPanel.add(productLabel, BorderLayout.SOUTH);
+
+        // Add padding to the left of the image
+        productImage.setBorder(new EmptyBorder(0, 150, 10, 0)); // 10px padding on the
+
+        // Create a panel for the whole content, including title and sole
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(imageAndTextPanel, BorderLayout.CENTER);
+        contentPanel.add(soleLabel, BorderLayout.SOUTH);
+
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(contentPanel, BorderLayout.CENTER);
+
+        return panel;
     }
 
     private void updateInventoryTable() {
