@@ -2,7 +2,6 @@ package rupp;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -11,14 +10,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.stream.Collectors;
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -26,6 +21,17 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+
+import javax.imageio.ImageIO;
+import javax.swing.border.EmptyBorder;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Dashboard {
 
@@ -1274,11 +1280,9 @@ public class Dashboard {
         return resizedImg;
     }
 
-    // ViewSale Panel
-    // Declare soleProductsPanel as a class variable
     private JPanel soleProductsPanel;
-    // private JPanel viewSale;
 
+    // ViewSale Panel
     private JPanel createViewSale() {
         viewSale = new JPanel(new BorderLayout());
         JPanel headerPanel = navigation("View Sale");
@@ -1300,7 +1304,7 @@ public class Dashboard {
         JPanel centerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(10, 10, 10, 10); // general insets for all components
+        gbc.insets = new Insets(10, 10, 10, 10);
 
         // Sole Products box
         gbc.gridx = 0;
@@ -1349,6 +1353,35 @@ public class Dashboard {
         return viewSale;
     }
 
+    private JPanel createChartPanel() {
+        Map<String, Integer> dailyQuantities = getTotalQuantityDailyFromFile("src/rupp/File/recentlyBuy.txt");
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for (Map.Entry<String, Integer> entry : dailyQuantities.entrySet()) {
+            String date = entry.getKey();
+            Integer quantity = entry.getValue();
+            dataset.addValue(quantity, "Sales", date);
+        }
+
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Products Sales",
+                "Name",
+                "Quantity Sold",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
+
+        ChartPanel chartPanel = new ChartPanel(barChart);
+        chartPanel.setPreferredSize(new Dimension(600, 200)); // Adjust size as needed
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(chartPanel, BorderLayout.CENTER);
+
+        return panel;
+    }
+
     private String getLeastSoleProduct(Map<String, Integer> productQuantities) {
         return productQuantities.entrySet()
                 .stream()
@@ -1365,8 +1398,26 @@ public class Dashboard {
         soleProductsPanel.revalidate();
         soleProductsPanel.repaint();
     }
+    
+    private Map<String, Integer> getTotalQuantityDailyFromFile(String filePath) {
+        Map<String, Integer> dailyQuantities = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                    String[] fields = line.split(",");
+                    String date = fields[8].trim(); // Assuming date is in the first column
+                    int quantity = Integer.parseInt(fields[4].trim()); // Assuming quantity is in the fifth column
+                    dailyQuantities.put(date, dailyQuantities.getOrDefault(date, 0) + quantity);
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return dailyQuantities;
+    }
 
-    private Map<String, Integer> getTotalQuantityFromFile(String filePath) {
+     private Map<String, Integer> getTotalQuantityFromFile(String filePath) {
         Map<String, Integer> productQuantities = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -1437,20 +1488,6 @@ public class Dashboard {
         return panel;
     }
 
-    private JPanel createChartPanel() {
-        // Simulated chart panel, you would use a real chart library here
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding
-        JLabel titleLabel = new JLabel("Sold Gained", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        // Placeholder for chart
-        JLabel chartLabel = new JLabel(new ImageIcon("path/to/chart/image.png"));
-        panel.add(titleLabel, BorderLayout.NORTH);
-        panel.add(chartLabel, BorderLayout.CENTER);
-        return panel;
-    }
-
     private JPanel createProductPanel(String title, String productName, String sole, String imagePath) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.WHITE);
@@ -1500,7 +1537,6 @@ public class Dashboard {
 
         panel.add(titleLabel, BorderLayout.NORTH);
         panel.add(contentPanel, BorderLayout.CENTER);
-
         return panel;
     }
 
