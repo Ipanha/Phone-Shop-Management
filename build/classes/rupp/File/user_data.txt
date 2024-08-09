@@ -1,2 +1,2 @@
-Panha,111,src/rupp/images/User2.png
+Panha,111,src/rupp/images/2.png
 Chet Panha,123,src/rupp/images/User1.png

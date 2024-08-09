@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -1290,310 +1291,6 @@ public class Dashboard {
         return resizedImg;
     }
 
-    private JPanel soleProductsPanel;
-
-    // ViewSale Panel
-    private JPanel createViewSale() {
-        viewSale = new JPanel(new BorderLayout());
-        JPanel headerPanel = navigation("View Sale");
-        JPanel footerPanel = Footer();
-
-        Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
-        int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
-        float totalMoney = getTotalMoneyFromFile("src/rupp/File/recentlyBuy.txt");
-
-        String mostSoleProduct = getMostSoleProduct(productQuantities);
-        int mostSoleQuantity = productQuantities.get(mostSoleProduct);
-
-        String leastSoleProduct = getLeastSoleProduct(productQuantities);
-        int leastSoleQuantity = productQuantities.get(leastSoleProduct);
-
-        String mostSoleProductImagePath = getProductImagePath(mostSoleProduct, "src/rupp/File/products.txt");
-        String leastSoleProductImagePath = getProductImagePath(leastSoleProduct, "src/rupp/File/products.txt");
-
-        JPanel centerPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(10, 10, 10, 10);
-
-        // Sole Products box
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.5;
-        gbc.weighty = 0.5;
-        soleProductsPanel = createLabelPanel("Total Sale", String.valueOf(totalQuantity));
-        centerPanel.add(soleProductsPanel, gbc);
-
-        // Sole Gained chart spanning columns 2 and 3
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.5;
-        centerPanel.add(createChartPanel(), gbc);
-
-        // Total Money box
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.5;
-        gbc.weighty = 0.5;
-        centerPanel.add(createLabelPanel("Total Money", "$" + totalMoney), gbc);
-
-        // Most Sole box
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.25;
-        centerPanel.add(createProductPanel("Most Sale", mostSoleProduct, String.valueOf(mostSoleQuantity),
-                mostSoleProductImagePath), gbc);
-
-        // Less Sole box
-        gbc.gridx = 2;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.25;
-        centerPanel.add(createProductPanel("Less Sale", leastSoleProduct, String.valueOf(leastSoleQuantity),
-                leastSoleProductImagePath), gbc);
-
-        viewSale.add(headerPanel, BorderLayout.NORTH);
-        viewSale.add(centerPanel, BorderLayout.CENTER);
-        viewSale.add(footerPanel, BorderLayout.SOUTH);
-        return viewSale;
-    }
-
-    private JPanel createChartPanel() {
-        Map<String, Integer> dailyQuantities = getTotalQuantityDailyFromFile("src/rupp/File/recentlyBuy.txt");
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        for (Map.Entry<String, Integer> entry : dailyQuantities.entrySet()) {
-            String date = entry.getKey();
-            Integer quantity = entry.getValue();
-            dataset.addValue(quantity, "Quantity Sale Products", date);
-        }
-
-        JFreeChart barChart = ChartFactory.createBarChart(
-                "Daily Sales Growth",
-                "Date",
-                "Quantity Sale",
-                dataset,
-                PlotOrientation.VERTICAL,
-                true, true, false);
-        barChart.getTitle().setFont(font20B);
-        CategoryPlot plot = barChart.getCategoryPlot();
-        CategoryAxis domainAxis = plot.getDomainAxis();
-    domainAxis.setLabelFont(font18B);
-    domainAxis.setTickLabelFont(font12B);
-    
-    ValueAxis rangeAxis = plot.getRangeAxis();
-    rangeAxis.setLabelFont(font18B);
-    rangeAxis.setTickLabelFont(font12B);
-        plot.setBackgroundPaint(Color.WHITE);
-        plot.setDomainGridlinePaint(Color.GRAY);
-        plot.setRangeGridlinePaint(Color.GRAY);
-
-        BarRenderer renderer = (BarRenderer) plot.getRenderer();
-        renderer.setSeriesPaint(0, new Color(3, 175, 0)); // Change this to your desired color
-
-        // Rotate date labels to 45 degrees
-        // CategoryAxis domainAxis = plot.getDomainAxis();
-        // domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
-
-        ChartPanel chartPanel = new ChartPanel(barChart);
-        chartPanel.setPreferredSize(new Dimension(600, 200)); // Adjust size as needed
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.add(chartPanel, BorderLayout.CENTER);
-        return panel;
-    }
-    
-    private String getLeastSoleProduct(Map<String, Integer> productQuantities) {
-        return productQuantities.entrySet()
-                .stream()
-                .min(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("No Products Sold");
-    }
-
-    public void updateSoleProductsPanel() {
-        Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
-        int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
-        JLabel valueLabel = (JLabel) ((JPanel) soleProductsPanel.getComponent(1)).getComponent(0);
-        valueLabel.setText(String.valueOf(totalQuantity));
-        soleProductsPanel.revalidate();
-        soleProductsPanel.repaint();
-    }
-
-    private Map<String, Integer> getTotalQuantityDailyFromFile(String filePath) {
-        Map<String, Integer> dailyQuantities = new TreeMap<>(); // TreeMap to sort by date
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"); // Input format including
-                                                                                               // time
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Output format for date only
-
-        List<String> lines = new LinkedList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
-                    lines.add(line);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        // Process only the last 10 lines if there are more than 10
-        int start = Math.max(0, lines.size() - 10);
-        for (int i = start; i < lines.size(); i++) {
-            String[] fields = lines.get(i).split(",");
-            try {
-                String dateTimeString = fields[8].trim(); // Assuming date and time is in the ninth column
-                int quantity = Integer.parseInt(fields[4].trim()); // Assuming quantity is in the fifth column
-
-                // Parse the full timestamp to extract the date part
-                LocalDate date = LocalDate.parse(dateTimeString, inputFormatter);
-
-                // Format the date to yyyy-MM-dd
-                String formattedDate = date.format(outputFormatter);
-
-                // Update quantities
-                dailyQuantities.put(formattedDate, dailyQuantities.getOrDefault(formattedDate, 0) + quantity);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return dailyQuantities;
-    }
-
-    private Map<String, Integer> getTotalQuantityFromFile(String filePath) {
-        Map<String, Integer> productQuantities = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
-                    String[] fields = line.split(",");
-                    String productName = fields[1].trim(); // Adjust the index based on your file structure
-                    int quantity = Integer.parseInt(fields[4].trim());
-                    productQuantities.put(productName, productQuantities.getOrDefault(productName, 0) + quantity);
-                }
-            }
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-        return productQuantities;
-    }
-
-    private float getTotalMoneyFromFile(String filePath) {
-        float totalMoney = 0;
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
-                    String[] fields = line.split(",");
-                    float money = Float.parseFloat(fields[7].trim());
-                    totalMoney += money;
-                }
-            }
-        } catch (IOException | NumberFormatException e) {
-            e.printStackTrace();
-        }
-        return totalMoney;
-    }
-
-    private String getMostSoleProduct(Map<String, Integer> productQuantities) {
-        return productQuantities.entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("No Products Sold");
-    }
-
-    private String getProductImagePath(String productName, String productFilePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(productFilePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] fields = line.split(",");
-                if (fields[0].trim().equalsIgnoreCase(productName.trim())) {
-                    return fields[3].trim(); // Adjust the index based on your file structure
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "default.png"; // Default image if not found
-    }
-
-    private JPanel createLabelPanel(String title, String value) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding
-        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
-        titleLabel.setFont(font24B);
-        JLabel valueLabel = new JLabel(value, JLabel.CENTER);
-        valueLabel.setFont(font40B);
-        panel.add(titleLabel, BorderLayout.NORTH);
-        panel.add(valueLabel, BorderLayout.CENTER);
-        return panel;
-    }
-
-    private JPanel createProductPanel(String title, String productName, String sole, String imagePath) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.WHITE);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10)); // padding
-        panel.setPreferredSize(new Dimension(300, 200));
-
-        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
-        titleLabel.setFont(font24B);
-
-        JLabel productLabel = new JLabel(productName, JLabel.CENTER);
-        productLabel.setBorder(new EmptyBorder(0, 0, 20, 0)); // 10px padding on the
-        productLabel.setFont(font24B);
-
-        JLabel soleLabel = new JLabel("Sold: " + sole, JLabel.CENTER);
-        soleLabel.setFont(font24B);
-
-        JLabel productImage = new JLabel();
-
-        // Load and scale the image
-        try {
-            BufferedImage image = ImageIO.read(new File(imagePath));
-            if (image != null) {
-                Image scaledImage = image.getScaledInstance(250, 250, Image.SCALE_SMOOTH);
-                productImage.setIcon(new ImageIcon(scaledImage));
-            } else {
-                System.out.println("Error: Image not found at path: " + imagePath);
-                productImage.setIcon(new ImageIcon("src/rupp/images/noPic.png")); // Placeholder for missing image
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            productImage.setIcon(new ImageIcon("src/rupp/images/noPic.png")); // Placeholder for missing image
-        }
-
-        // Create a panel for image and text
-        JPanel imageAndTextPanel = new JPanel(new BorderLayout());
-        imageAndTextPanel.setPreferredSize(new Dimension(100, 90));
-        imageAndTextPanel.add(productImage, BorderLayout.CENTER);
-        imageAndTextPanel.add(productLabel, BorderLayout.SOUTH);
-        imageAndTextPanel.setOpaque(false); 
-
-        // Add padding to the left of the image
-        productImage.setBorder(new EmptyBorder(0, 150, 10, 0)); // 10px padding on the
-
-        // Create a panel for the whole content, including title and sole
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.add(imageAndTextPanel, BorderLayout.CENTER);
-        contentPanel.add(soleLabel, BorderLayout.SOUTH);
-        contentPanel.setOpaque(false);
-        panel.add(titleLabel, BorderLayout.NORTH);
-        panel.add(contentPanel, BorderLayout.CENTER);
-        return panel;
-    }
-
     private void updateInventoryTable() {
         inventoryTableModel.setRowCount(0); // Clear the table
 
@@ -2136,6 +1833,323 @@ public class Dashboard {
         for (Phone phone : phonesList) {
             inventoryTableModel.addProduct(phone); // Use the updated addProduct method
         }
+    }
+
+    private JPanel soleProductsPanel;
+
+    // ViewSale Panel
+    private JPanel createViewSale() {
+        viewSale = new JPanel(new BorderLayout());
+        JPanel headerPanel = navigation("View Sale");
+        JPanel footerPanel = Footer();
+
+        Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
+        int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
+        float totalMoney = getTotalMoneyFromFile("src/rupp/File/recentlyBuy.txt");
+
+        String mostSoleProduct = getMostSoleProduct(productQuantities);
+        int mostSoleQuantity = productQuantities.get(mostSoleProduct);
+
+        String leastSoleProduct = getLeastSoleProduct(productQuantities);
+        int leastSoleQuantity = productQuantities.get(leastSoleProduct);
+
+        String mostSoleProductImagePath = getProductImagePath(mostSoleProduct, "src/rupp/File/products.txt");
+        String leastSoleProductImagePath = getProductImagePath(leastSoleProduct, "src/rupp/File/products.txt");
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        // Sole Products box
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        gbc.weighty = 0.5;
+        soleProductsPanel = createLabelPanel("Total Sale", String.valueOf(totalQuantity));
+        centerPanel.add(soleProductsPanel, gbc);
+
+        // Sole Gained chart spanning columns 2 and 3
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.5;
+        centerPanel.add(createChartPanel(), gbc);
+
+        // Total Money box
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.5;
+        gbc.weighty = 0.5;
+        centerPanel.add(createLabelPanel("Total Money", "$" + totalMoney), gbc);
+
+        // Most Sole box
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.25;
+        centerPanel.add(createProductPanel("Most Sale", mostSoleProduct, String.valueOf(mostSoleQuantity),
+                mostSoleProductImagePath), gbc);
+
+        // Less Sole box
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.25;
+        centerPanel.add(createProductPanel("Less Sale", leastSoleProduct, String.valueOf(leastSoleQuantity),
+                leastSoleProductImagePath), gbc);
+
+        viewSale.add(headerPanel, BorderLayout.NORTH);
+        viewSale.add(centerPanel, BorderLayout.CENTER);
+        viewSale.add(footerPanel, BorderLayout.SOUTH);
+        return viewSale;
+    }
+
+    private JPanel createChartPanel() {
+        Map<String, Integer> dailyQuantities = getTotalQuantityDailyFromFile("src/rupp/File/recentlyBuy.txt");
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        for (Map.Entry<String, Integer> entry : dailyQuantities.entrySet()) {
+            String date = entry.getKey();
+            Integer quantity = entry.getValue();
+            dataset.addValue(quantity, "Quantity Sale Products", date);
+        }
+
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Daily Sales Growth",
+                "Date",
+                "Quantity Sale",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
+        barChart.getTitle().setFont(font20B);
+        CategoryPlot plot = barChart.getCategoryPlot();
+        CategoryAxis domainAxis = plot.getDomainAxis();
+        domainAxis.setLabelFont(font18B);
+        domainAxis.setTickLabelFont(font12B);
+
+        ValueAxis rangeAxis = plot.getRangeAxis();
+        rangeAxis.setLabelFont(font18B);
+        rangeAxis.setTickLabelFont(font12B);
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setDomainGridlinePaint(Color.GRAY);
+        plot.setRangeGridlinePaint(Color.GRAY);
+
+        BarRenderer renderer = (BarRenderer) plot.getRenderer();
+        renderer.setSeriesPaint(0, new Color(3, 175, 0)); // Change this to your desired color
+
+        // Rotate date labels to 45 degrees
+        // CategoryAxis domainAxis = plot.getDomainAxis();
+        // domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+
+        ChartPanel chartPanel = new ChartPanel(barChart);
+        chartPanel.setPreferredSize(new Dimension(600, 200)); // Adjust size as needed
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.add(chartPanel, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private String getLeastSoleProduct(Map<String, Integer> productQuantities) {
+        return productQuantities.entrySet()
+                .stream()
+                .min(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("No Products Sold");
+    }
+
+    public void updateSoleProductsPanel() {
+        Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
+        int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
+        JLabel valueLabel = (JLabel) ((JPanel) soleProductsPanel.getComponent(1)).getComponent(0);
+        valueLabel.setText(String.valueOf(totalQuantity));
+        soleProductsPanel.revalidate();
+        soleProductsPanel.repaint();
+    }
+
+    private Map<String, Integer> getTotalQuantityDailyFromFile(String filePath) {
+        Map<String, Integer> dailyQuantities = new TreeMap<>(); // TreeMap to sort by date
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"); // Input format including
+                                                                                               // time
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Output format for date only
+
+        List<String> lines = new LinkedList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                    lines.add(line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Process only the last 10 lines if there are more than 10
+        int start = Math.max(0, lines.size() - 10);
+        for (int i = start; i < lines.size(); i++) {
+            String[] fields = lines.get(i).split(",");
+            try {
+                String dateTimeString = fields[8].trim(); // Assuming date and time is in the ninth column
+                int quantity = Integer.parseInt(fields[4].trim()); // Assuming quantity is in the fifth column
+
+                // Preprocess the dateTimeString to add leading zeros where necessary
+                String[] dateTimeParts = dateTimeString.split("-");
+                if (dateTimeParts.length == 6) {
+                    // Ensure month, day, minute, and second are two digits
+                    String year = dateTimeParts[0];
+                    String month = String.format("%02d", Integer.valueOf(dateTimeParts[1]));
+                    String day = String.format("%02d", Integer.valueOf(dateTimeParts[2]));
+                    String hour = String.format("%02d", Integer.valueOf(dateTimeParts[3]));
+                    String minute = String.format("%02d", Integer.valueOf(dateTimeParts[4]));
+                    String second = String.format("%02d", Integer.valueOf(dateTimeParts[5]));
+                    dateTimeString = String.join("-", year, month, day, hour, minute, second);
+                }
+
+                // Parse the adjusted date-time string
+                LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, inputFormatter);
+
+                // Format the date to yyyy-MM-dd
+                String formattedDate = dateTime.toLocalDate().format(outputFormatter);
+
+                // Update quantities
+                dailyQuantities.put(formattedDate, dailyQuantities.getOrDefault(formattedDate, 0) + quantity);
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException | DateTimeParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return dailyQuantities;
+    }
+
+    private Map<String, Integer> getTotalQuantityFromFile(String filePath) {
+        Map<String, Integer> productQuantities = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                    String[] fields = line.split(",");
+                    String productName = fields[1].trim(); // Adjust the index based on your file structure
+                    int quantity = Integer.parseInt(fields[4].trim());
+                    productQuantities.put(productName, productQuantities.getOrDefault(productName, 0) + quantity);
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return productQuantities;
+    }
+
+    private float getTotalMoneyFromFile(String filePath) {
+        float totalMoney = 0;
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                    String[] fields = line.split(",");
+                    float money = Float.parseFloat(fields[7].trim());
+                    totalMoney += money;
+                }
+            }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+        }
+        return totalMoney;
+    }
+
+    private String getMostSoleProduct(Map<String, Integer> productQuantities) {
+        return productQuantities.entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("No Products Sold");
+    }
+
+    private String getProductImagePath(String productName, String productFilePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(productFilePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] fields = line.split(",");
+                if (fields[0].trim().equalsIgnoreCase(productName.trim())) {
+                    return fields[3].trim(); // Adjust the index based on your file structure
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "default.png"; // Default image if not found
+    }
+
+    private JPanel createLabelPanel(String title, String value) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding
+        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+        titleLabel.setFont(font24B);
+        JLabel valueLabel = new JLabel(value, JLabel.CENTER);
+        valueLabel.setFont(font40B);
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(valueLabel, BorderLayout.CENTER);
+        return panel;
+    }
+
+    private JPanel createProductPanel(String title, String productName, String sole, String imagePath) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10)); // padding
+        panel.setPreferredSize(new Dimension(300, 200));
+
+        JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+        titleLabel.setFont(font24B);
+
+        JLabel productLabel = new JLabel(productName, JLabel.CENTER);
+        productLabel.setBorder(new EmptyBorder(0, 0, 20, 0)); // 10px padding on the
+        productLabel.setFont(font24B);
+
+        JLabel soleLabel = new JLabel("Sold: " + sole, JLabel.CENTER);
+        soleLabel.setFont(font24B);
+
+        JLabel productImage = new JLabel();
+
+        // Load and scale the image
+        try {
+            BufferedImage image = ImageIO.read(new File(imagePath));
+            if (image != null) {
+                Image scaledImage = image.getScaledInstance(250, 250, Image.SCALE_SMOOTH);
+                productImage.setIcon(new ImageIcon(scaledImage));
+            } else {
+                System.out.println("Error: Image not found at path: " + imagePath);
+                productImage.setIcon(new ImageIcon("src/rupp/images/noPic.png")); // Placeholder for missing image
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            productImage.setIcon(new ImageIcon("src/rupp/images/noPic.png")); // Placeholder for missing image
+        }
+
+        // Create a panel for image and text
+        JPanel imageAndTextPanel = new JPanel(new BorderLayout());
+        imageAndTextPanel.setPreferredSize(new Dimension(100, 90));
+        imageAndTextPanel.add(productImage, BorderLayout.CENTER);
+        imageAndTextPanel.add(productLabel, BorderLayout.SOUTH);
+        imageAndTextPanel.setOpaque(false);
+
+        // Add padding to the left of the image
+        productImage.setBorder(new EmptyBorder(0, 150, 10, 0)); // 10px padding on the
+
+        // Create a panel for the whole content, including title and sole
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(imageAndTextPanel, BorderLayout.CENTER);
+        contentPanel.add(soleLabel, BorderLayout.SOUTH);
+        contentPanel.setOpaque(false);
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(contentPanel, BorderLayout.CENTER);
+        return panel;
     }
 
     // Report
