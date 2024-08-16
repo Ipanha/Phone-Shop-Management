@@ -29,13 +29,20 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.SqlDateModel;
-
-import java.text.SimpleDateFormat;
+import org.jdatepicker.impl.UtilDateModel;
+import java.util.Calendar;
 import java.util.Properties;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.imageio.ImageIO;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
 import java.time.LocalDate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -2157,9 +2164,28 @@ public class Dashboard {
         return panel;
     }
 
+    public class DateLabelFormatter extends AbstractFormatter {
+
+    private final String datePattern = "yyyy-MM-dd";
+    private final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+    @Override
+    public Object stringToValue(String text) throws ParseException {
+        return dateFormatter.parseObject(text);
+    }
+
+    @Override
+    public String valueToString(Object value) throws ParseException {
+        if (value != null) {
+            Calendar cal = (Calendar) value;
+            return dateFormatter.format(cal.getTime());
+        }
+        return "";
+    }
+}
     // Report
     private void creatReportPanel() {
-        report = new JPanel(new BorderLayout()); // Use BorderLayout for proper alignment
+        report = new JPanel(new BorderLayout());
 
         // Get navigation header panel and footer panel
         JPanel headerPanel = navigation("Report");
@@ -2175,51 +2201,55 @@ public class Dashboard {
         report.add(contentPanel, BorderLayout.CENTER);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20); // Padding for the container (20px x and y)
+        gbc.insets = new Insets(5, 10, 5, 10);
 
-        // From Date label and text field
+        // Date picker properties
+        Properties p = new Properties();
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+
+        // From Date label and date picker
         JLabel fromDateLabel = new JLabel("From Date");
-        fromDateLabel.setFont(font17B); // Apply font
+        fromDateLabel.setFont(font17B);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         contentPanel.add(fromDateLabel, gbc);
 
-        JTextField fromDateField = new JTextField(15);
-        fromDateField.setFont(font17B); // Apply font to the text field
-        fromDateField.setPreferredSize(new Dimension(150, 30)); // Set width and height
-        fromDateField.setBorder(BorderFactory.createCompoundBorder(
-                fromDateField.getBorder(), new EmptyBorder(0, 5, 0, 5))); // Add 5px padding to left and right
+        UtilDateModel fromDateModel = new UtilDateModel();
+        JDatePanelImpl fromDatePanel = new JDatePanelImpl(fromDateModel, p);
+        JDatePickerImpl fromDatePicker = new JDatePickerImpl(fromDatePanel, new DateLabelFormatter());
+        fromDatePicker.setPreferredSize(new Dimension(150, 30));
         gbc.gridy = 1;
-        contentPanel.add(fromDateField, gbc);
+        contentPanel.add(fromDatePicker, gbc);
 
-        // To Date label and text field
+        // To Date label and date picker
         JLabel toDateLabel = new JLabel("To Date");
-        toDateLabel.setFont(font17B); // Apply font
+        toDateLabel.setFont(font17B);
         gbc.gridx = 1;
         gbc.gridy = 0;
         contentPanel.add(toDateLabel, gbc);
 
-        JTextField toDateField = new JTextField(15);
-        toDateField.setFont(font17B); // Apply font to the text field
-        toDateField.setPreferredSize(new Dimension(150, 30)); // Set width and height
-        toDateField.setBorder(BorderFactory.createCompoundBorder(
-                toDateField.getBorder(), new EmptyBorder(0, 5, 0, 5))); // Add 5px padding to left and right
+        UtilDateModel toDateModel = new UtilDateModel();
+        JDatePanelImpl toDatePanel = new JDatePanelImpl(toDateModel, p);
+        JDatePickerImpl toDatePicker = new JDatePickerImpl(toDatePanel, new DateLabelFormatter());
+        toDatePicker.setPreferredSize(new Dimension(150, 30));
         gbc.gridy = 1;
-        contentPanel.add(toDateField, gbc);
+        contentPanel.add(toDatePicker, gbc);
 
-        // By Product label and text field
+        // For instance:
         JLabel byProductLabel = new JLabel("By Product");
-        byProductLabel.setFont(font17B); // Apply font
+        byProductLabel.setFont(font17B);
         gbc.gridx = 2;
         gbc.gridy = 0;
         contentPanel.add(byProductLabel, gbc);
 
         JTextField byProductField = new JTextField(15);
-        byProductField.setFont(font17B); // Apply font to the text field
-        byProductField.setPreferredSize(new Dimension(150, 30)); // Set width and height
+        byProductField.setFont(font17B);
+        byProductField.setPreferredSize(new Dimension(150, 30));
         byProductField.setBorder(BorderFactory.createCompoundBorder(
-                byProductField.getBorder(), new EmptyBorder(0, 5, 0, 5))); // Add 5px padding to left and right
+                byProductField.getBorder(), new EmptyBorder(0, 5, 0, 5)));
         gbc.gridy = 1;
         contentPanel.add(byProductField, gbc);
 
@@ -2284,7 +2314,7 @@ public class Dashboard {
 
         contentPanel.add(buttonPanel, gbc);
 
-        // Create the table
+        // Create the table and integrate the new code
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 4;
@@ -2293,80 +2323,110 @@ public class Dashboard {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
 
-        String[] columnNames = { "No.", "Products Name", "Vendor Name", "Price", "Qty.", "Total", "Discount",
+        String[] recentColumns = { "No.", "Products Name", "Vendor Name", "Price", "Qty.", "Total", "Discount",
                 "Net Total", "Purchase Date" };
+        List<Object[]> recentDataList = new ArrayList<>();
 
-        Object[][] data = readAndSortDataFromFile("src/rupp/File/recentlyBuy.txt");
-
-        JTable table = new JTable(new DefaultTableModel(data, columnNames));
-        table.setFont(font18);
-
-        // Set padding and custom width for "No." column
-        table.getColumnModel().getColumn(0).setPreferredWidth(50); // Set width of "No." column to 50px
-        for (int i = 1; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
-                @Override
-                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                        boolean hasFocus, int row, int column) {
-                    Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
-                            column);
-
-                    // Set padding (top, left, bottom, right)
-                    ((JLabel) comp).setBorder(new EmptyBorder(20, 20, 20, 20)); // Adjust padding as needed
-
-                    return comp;
-                }
-            });
-        }
-
-        JTableHeader header = table.getTableHeader();
-        header.setFont(font18B);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        contentPanel.add(scrollPane, gbc);
-    }
-
-    private Object[][] readAndSortDataFromFile(String filePath) {
-        List<Object[]> dataList = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        try (BufferedReader br = new BufferedReader(new FileReader("src/rupp/File/recentlyBuy.txt"))) {
             String line;
-            // Read header
-            String headerLine = br.readLine();
-            // Read data
+            br.readLine(); // Skip header
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(",");
-                dataList.add(values);
+                Object[] row = {
+                        values[0],
+                        values[1],
+                        values[2],
+                        "$" + String.format("%.2f", Double.valueOf(values[3])),
+                        Integer.valueOf(values[4]),
+                        "$" + String.format("%.2f", Double.valueOf(values[5])),
+                        values[6] + "%",
+                        "$" + String.format("%.2f", Double.valueOf(values[7])),
+                        values[8]
+                };
+                recentDataList.add(row);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // Handle the error or show a message to the user
-            JOptionPane.showMessageDialog(report, "Error reading data from file", "Error", JOptionPane.ERROR_MESSAGE);
         }
 
-        // Define date format
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
+        // Sort the data by purchase date in descending order
+recentDataList.sort((Object[] o1, Object[] o2) -> {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+    try {
+        Date date1 = sdf.parse((String) o1[8]);
+        Date date2 = sdf.parse((String) o2[8]);
+        return date2.compareTo(date1); // Newer dates first
+    } catch (ParseException e) {
+        e.printStackTrace();
+        return 0;
+    }
+});
 
-        // Sort data by purchase date in descending order (newest first)
-        dataList.sort((row1, row2) -> {
-            try {
-                String dateStr1 = (String) row1[8]; // Assuming "Purchase Date" is at index 8
-                String dateStr2 = (String) row2[8];
-                Date date1 = sdf.parse(dateStr1);
-                Date date2 = sdf.parse(dateStr2);
-                return date2.compareTo(date1); // Sort in descending order
-            } catch (ParseException e) {
-                e.printStackTrace();
-                return 0;
-            }
-        });
+// Update "No." column, format purchase date, and calculate sum of "Net Total"
+double netTotalSum = 0.0;
 
-        // Reassign the "No." column
-        for (int i = 0; i < dataList.size(); i++) {
-            dataList.get(i)[0] = String.valueOf(i + 1); // Set the "No." column to 1, 2, 3, ...
-        }
+for (int i = 0; i < recentDataList.size(); i++) {
+    recentDataList.get(i)[0] = i + 1;
+    
+    // Parse and format the date
+    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+        Date date = inputFormat.parse((String) recentDataList.get(i)[8]);
+        recentDataList.get(i)[8] = outputFormat.format(date);
+    } catch (ParseException e) {
+        e.printStackTrace();
+    }
+    
+    // Sum the "Net Total" column (7th column, index 6)
+    String netTotalString = ((String) recentDataList.get(i)[7]).replace("$", "");
+    netTotalSum += Double.parseDouble(netTotalString);
+}
 
-        // Convert list to array
-        return dataList.toArray(new Object[0][]);
+// Format the total sum as a currency string
+String formattedNetTotalSum = "$" + String.format("%.2f", netTotalSum);
+
+// Add the summary row to the data list
+Object[] summaryRow = new Object[recentColumns.length];
+summaryRow[6] = "Total:"; // "Discount" column
+summaryRow[7] = formattedNetTotalSum; // "Net Total" column
+
+// Leave other columns empty or null
+for (int i = 0; i < summaryRow.length; i++) {
+    if (i != 6 && i != 7) {
+        summaryRow[i] = ""; // or summaryRow[i] = null;
+    }
+}
+
+recentDataList.add(summaryRow); // Add the summary row at the end
+
+Object[][] recentData = recentDataList.toArray(Object[][]::new);
+
+// Create the table and integrate the new code
+JTable recentTable = new JTable(recentData, recentColumns) {
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        // Make the summary row non-editable
+        return row != getRowCount() - 1;
+    }
+};
+recentTable.setFont(font18);
+recentTable.setRowHeight(30);
+
+// Set font size for table header
+JTableHeader tableHeader = recentTable.getTableHeader();
+tableHeader.setFont(font20B);
+
+// Set width for "No." and "Qty" columns
+TableColumnModel columnModel = recentTable.getColumnModel();
+columnModel.getColumn(0).setPreferredWidth(50); // Set width for "No." column to 50px
+columnModel.getColumn(4).setPreferredWidth(50); // Set width for "Qty" column to 50px
+
+// Create a JScrollPane for the table
+JScrollPane recentScrollPane = new JScrollPane(recentTable);
+recentScrollPane.setBorder(new EmptyBorder(20, 20, 20, 20)); // Add padding of 20px on all sides
+
+contentPanel.add(recentScrollPane, gbc);  // Add the table to the content panel
     }
 
     // Setting Panel
