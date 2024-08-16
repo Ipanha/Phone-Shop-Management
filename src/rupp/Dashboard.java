@@ -26,7 +26,12 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.SqlDateModel;
 
+import java.text.SimpleDateFormat;
+import java.util.Properties;
 import javax.imageio.ImageIO;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
@@ -2155,13 +2160,213 @@ public class Dashboard {
     // Report
     private void creatReportPanel() {
         report = new JPanel(new BorderLayout()); // Use BorderLayout for proper alignment
-        // Get navigation header panel
+
+        // Get navigation header panel and footer panel
         JPanel headerPanel = navigation("Report");
         JPanel footerPanel = Footer();
 
+        // Add the header and footer panels to the report panel
         report.add(headerPanel, BorderLayout.NORTH);
         report.add(footerPanel, BorderLayout.SOUTH);
 
+        // Create the main content panel
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setBackground(Color.WHITE);
+        report.add(contentPanel, BorderLayout.CENTER);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(20, 20, 20, 20); // Padding for the container (20px x and y)
+
+        // From Date label and text field
+        JLabel fromDateLabel = new JLabel("From Date");
+        fromDateLabel.setFont(font17B); // Apply font
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        contentPanel.add(fromDateLabel, gbc);
+
+        JTextField fromDateField = new JTextField(15);
+        fromDateField.setFont(font17B); // Apply font to the text field
+        fromDateField.setPreferredSize(new Dimension(150, 30)); // Set width and height
+        fromDateField.setBorder(BorderFactory.createCompoundBorder(
+                fromDateField.getBorder(), new EmptyBorder(0, 5, 0, 5))); // Add 5px padding to left and right
+        gbc.gridy = 1;
+        contentPanel.add(fromDateField, gbc);
+
+        // To Date label and text field
+        JLabel toDateLabel = new JLabel("To Date");
+        toDateLabel.setFont(font17B); // Apply font
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        contentPanel.add(toDateLabel, gbc);
+
+        JTextField toDateField = new JTextField(15);
+        toDateField.setFont(font17B); // Apply font to the text field
+        toDateField.setPreferredSize(new Dimension(150, 30)); // Set width and height
+        toDateField.setBorder(BorderFactory.createCompoundBorder(
+                toDateField.getBorder(), new EmptyBorder(0, 5, 0, 5))); // Add 5px padding to left and right
+        gbc.gridy = 1;
+        contentPanel.add(toDateField, gbc);
+
+        // By Product label and text field
+        JLabel byProductLabel = new JLabel("By Product");
+        byProductLabel.setFont(font17B); // Apply font
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        contentPanel.add(byProductLabel, gbc);
+
+        JTextField byProductField = new JTextField(15);
+        byProductField.setFont(font17B); // Apply font to the text field
+        byProductField.setPreferredSize(new Dimension(150, 30)); // Set width and height
+        byProductField.setBorder(BorderFactory.createCompoundBorder(
+                byProductField.getBorder(), new EmptyBorder(0, 5, 0, 5))); // Add 5px padding to left and right
+        gbc.gridy = 1;
+        contentPanel.add(byProductField, gbc);
+
+        // Who Sale label and text field
+        JLabel whoSaleLabel = new JLabel("Who Sale");
+        whoSaleLabel.setFont(font17B); // Apply font
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        contentPanel.add(whoSaleLabel, gbc);
+
+        JTextField whoSaleField = new JTextField(15);
+        whoSaleField.setFont(font17B); // Apply font to the text field
+        whoSaleField.setPreferredSize(new Dimension(150, 30)); // Set width and height
+        whoSaleField.setBorder(BorderFactory.createCompoundBorder(
+                whoSaleField.getBorder(), new EmptyBorder(0, 5, 0, 5))); // Add 5px padding to left and right
+        gbc.gridy = 1;
+        contentPanel.add(whoSaleField, gbc);
+
+        // Create the buttons and position them
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 4;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.setBackground(Color.WHITE);
+
+        Dimension buttonSize = new Dimension(110, 50); // Set width and height for buttons
+
+        JButton filterButton = new JButton("Filter");
+        filterButton.setPreferredSize(buttonSize);
+        filterButton.setBackground(new Color(0, 147, 202));
+        filterButton.setFont(font18B);
+        filterButton.setCursor(pointer);
+        filterButton.setForeground(Color.WHITE);
+        buttonPanel.add(filterButton);
+
+        JButton refreshButton = new JButton("Refresh");
+        refreshButton.setPreferredSize(buttonSize);
+        refreshButton.setBackground(Color.RED);
+        refreshButton.setFont(font18B);
+        refreshButton.setCursor(pointer);
+        refreshButton.setForeground(Color.WHITE);
+        buttonPanel.add(refreshButton);
+
+        JButton printButton = new JButton("Print");
+        printButton.setPreferredSize(buttonSize);
+        printButton.setBackground(new Color(214, 205, 0));
+        printButton.setFont(font18B);
+        printButton.setCursor(pointer);
+        printButton.setForeground(Color.WHITE);
+        buttonPanel.add(printButton);
+
+        JButton exportButton = new JButton("Export");
+        exportButton.setPreferredSize(buttonSize);
+        exportButton.setBackground(new Color(3, 159, 0));
+        exportButton.setFont(font18B);
+        exportButton.setCursor(pointer);
+        exportButton.setForeground(Color.WHITE);
+        buttonPanel.add(exportButton);
+
+        contentPanel.add(buttonPanel, gbc);
+
+        // Create the table
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 4;
+        gbc.gridheight = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        String[] columnNames = { "No.", "Products Name", "Vendor Name", "Price", "Qty.", "Total", "Discount",
+                "Net Total", "Purchase Date" };
+
+        Object[][] data = readAndSortDataFromFile("src/rupp/File/recentlyBuy.txt");
+
+        JTable table = new JTable(new DefaultTableModel(data, columnNames));
+        table.setFont(font18);
+
+        // Set padding and custom width for "No." column
+        table.getColumnModel().getColumn(0).setPreferredWidth(50); // Set width of "No." column to 50px
+        for (int i = 1; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(new DefaultTableCellRenderer() {
+                @Override
+                public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                        boolean hasFocus, int row, int column) {
+                    Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+                            column);
+
+                    // Set padding (top, left, bottom, right)
+                    ((JLabel) comp).setBorder(new EmptyBorder(20, 20, 20, 20)); // Adjust padding as needed
+
+                    return comp;
+                }
+            });
+        }
+
+        JTableHeader header = table.getTableHeader();
+        header.setFont(font18B);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        contentPanel.add(scrollPane, gbc);
+    }
+
+    private Object[][] readAndSortDataFromFile(String filePath) {
+        List<Object[]> dataList = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            // Read header
+            String headerLine = br.readLine();
+            // Read data
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                dataList.add(values);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle the error or show a message to the user
+            JOptionPane.showMessageDialog(report, "Error reading data from file", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Define date format
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
+
+        // Sort data by purchase date in descending order (newest first)
+        dataList.sort((row1, row2) -> {
+            try {
+                String dateStr1 = (String) row1[8]; // Assuming "Purchase Date" is at index 8
+                String dateStr2 = (String) row2[8];
+                Date date1 = sdf.parse(dateStr1);
+                Date date2 = sdf.parse(dateStr2);
+                return date2.compareTo(date1); // Sort in descending order
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return 0;
+            }
+        });
+
+        // Reassign the "No." column
+        for (int i = 0; i < dataList.size(); i++) {
+            dataList.get(i)[0] = String.valueOf(i + 1); // Set the "No." column to 1, 2, 3, ...
+        }
+
+        // Convert list to array
+        return dataList.toArray(new Object[0][]);
     }
 
     // Setting Panel
