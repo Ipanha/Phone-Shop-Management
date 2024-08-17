@@ -2166,23 +2166,24 @@ public class Dashboard {
 
     public class DateLabelFormatter extends AbstractFormatter {
 
-    private final String datePattern = "yyyy-MM-dd";
-    private final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+        private final String datePattern = "yyyy-MM-dd";
+        private final SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
 
-    @Override
-    public Object stringToValue(String text) throws ParseException {
-        return dateFormatter.parseObject(text);
-    }
-
-    @Override
-    public String valueToString(Object value) throws ParseException {
-        if (value != null) {
-            Calendar cal = (Calendar) value;
-            return dateFormatter.format(cal.getTime());
+        @Override
+        public Object stringToValue(String text) throws ParseException {
+            return dateFormatter.parseObject(text);
         }
-        return "";
+
+        @Override
+        public String valueToString(Object value) throws ParseException {
+            if (value != null) {
+                Calendar cal = (Calendar) value;
+                return dateFormatter.format(cal.getTime());
+            }
+            return "";
+        }
     }
-}
+
     // Report
     private void creatReportPanel() {
         report = new JPanel(new BorderLayout());
@@ -2350,83 +2351,153 @@ public class Dashboard {
         }
 
         // Sort the data by purchase date in descending order
-recentDataList.sort((Object[] o1, Object[] o2) -> {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
-    try {
-        Date date1 = sdf.parse((String) o1[8]);
-        Date date2 = sdf.parse((String) o2[8]);
-        return date2.compareTo(date1); // Newer dates first
-    } catch (ParseException e) {
-        e.printStackTrace();
-        return 0;
-    }
-});
+        recentDataList.sort((Object[] o1, Object[] o2) -> {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+            try {
+                Date date1 = sdf.parse((String) o1[8]);
+                Date date2 = sdf.parse((String) o2[8]);
+                return date2.compareTo(date1); // Newer dates first
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return 0;
+            }
+        });
 
-// Update "No." column, format purchase date, and calculate sum of "Net Total"
-double netTotalSum = 0.0;
+        // Update "No." column, format purchase date, and calculate sum of "Net Total"
+        double netTotalSum = 0.0;
 
-for (int i = 0; i < recentDataList.size(); i++) {
-    recentDataList.get(i)[0] = i + 1;
-    
-    // Parse and format the date
-    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
-    SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
-    try {
-        Date date = inputFormat.parse((String) recentDataList.get(i)[8]);
-        recentDataList.get(i)[8] = outputFormat.format(date);
-    } catch (ParseException e) {
-        e.printStackTrace();
-    }
-    
-    // Sum the "Net Total" column (7th column, index 6)
-    String netTotalString = ((String) recentDataList.get(i)[7]).replace("$", "");
-    netTotalSum += Double.parseDouble(netTotalString);
-}
+        for (int i = 0; i < recentDataList.size(); i++) {
+            recentDataList.get(i)[0] = i + 1;
 
-// Format the total sum as a currency string
-String formattedNetTotalSum = "$" + String.format("%.2f", netTotalSum);
+            // Parse and format the date
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd-H-m-s");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                Date date = inputFormat.parse((String) recentDataList.get(i)[8]);
+                recentDataList.get(i)[8] = outputFormat.format(date);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
-// Add the summary row to the data list
-Object[] summaryRow = new Object[recentColumns.length];
-summaryRow[6] = "Total:"; // "Discount" column
-summaryRow[7] = formattedNetTotalSum; // "Net Total" column
+            // Sum the "Net Total" column (7th column, index 6)
+            String netTotalString = ((String) recentDataList.get(i)[7]).replace("$", "");
+            netTotalSum += Double.parseDouble(netTotalString);
+        }
 
-// Leave other columns empty or null
-for (int i = 0; i < summaryRow.length; i++) {
-    if (i != 6 && i != 7) {
-        summaryRow[i] = ""; // or summaryRow[i] = null;
-    }
-}
+        // Format the total sum as a currency string
+        String formattedNetTotalSum = "$" + String.format("%.2f", netTotalSum);
 
-recentDataList.add(summaryRow); // Add the summary row at the end
+        // Add the summary row to the data list
+        Object[] summaryRow = new Object[recentColumns.length];
+        summaryRow[6] = "Total:"; // "Discount" column
+        summaryRow[7] = formattedNetTotalSum; // "Net Total" column
 
-Object[][] recentData = recentDataList.toArray(Object[][]::new);
+        // Leave other columns empty or null
+        for (int i = 0; i < summaryRow.length; i++) {
+            if (i != 6 && i != 7) {
+                summaryRow[i] = ""; // or summaryRow[i] = null;
+            }
+        }
 
-// Create the table and integrate the new code
-JTable recentTable = new JTable(recentData, recentColumns) {
-    @Override
-    public boolean isCellEditable(int row, int column) {
-        // Make the summary row non-editable
-        return row != getRowCount() - 1;
-    }
-};
-recentTable.setFont(font18);
-recentTable.setRowHeight(30);
+        recentDataList.add(summaryRow); // Add the summary row at the end
 
-// Set font size for table header
-JTableHeader tableHeader = recentTable.getTableHeader();
-tableHeader.setFont(font20B);
+        Object[][] recentData = recentDataList.toArray(Object[][]::new);
 
-// Set width for "No." and "Qty" columns
-TableColumnModel columnModel = recentTable.getColumnModel();
-columnModel.getColumn(0).setPreferredWidth(50); // Set width for "No." column to 50px
-columnModel.getColumn(4).setPreferredWidth(50); // Set width for "Qty" column to 50px
+        // Create the table and integrate the new code
+        JTable recentTable = new JTable(recentData, recentColumns) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                // Make the summary row non-editable
+                return row != getRowCount() - 1;
+            }
+        };
+        recentTable.setFont(font18);
+        recentTable.setRowHeight(30);
 
-// Create a JScrollPane for the table
-JScrollPane recentScrollPane = new JScrollPane(recentTable);
-recentScrollPane.setBorder(new EmptyBorder(20, 20, 20, 20)); // Add padding of 20px on all sides
+        // Set font size for table header
+        JTableHeader tableHeader = recentTable.getTableHeader();
+        tableHeader.setFont(font20B);
 
-contentPanel.add(recentScrollPane, gbc);  // Add the table to the content panel
+        // Set width for "No." and "Qty" columns
+        TableColumnModel columnModel = recentTable.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(50); // Set width for "No." column to 50px
+        columnModel.getColumn(4).setPreferredWidth(50); // Set width for "Qty" column to 50px
+
+        // Create a JScrollPane for the table
+        JScrollPane recentScrollPane = new JScrollPane(recentTable);
+        recentScrollPane.setBorder(new EmptyBorder(20, 20, 20, 20)); // Add padding of 20px on all sides
+
+        contentPanel.add(recentScrollPane, gbc); // Add the table to the content panel
+
+        // Add ActionListener to the Filter button
+        filterButton.addActionListener(e -> {
+            String productFilter = byProductField.getText().trim().toLowerCase();
+            String vendorFilter = whoSaleField.getText().trim().toLowerCase();
+            Date fromDate = (Date) fromDatePicker.getModel().getValue();
+            Date toDate = (Date) toDatePicker.getModel().getValue();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+            List<Object[]> filteredDataList = new ArrayList<>();
+            int rowIndex = 1; // Start row index for the "No." column
+
+            for (Object[] row : recentDataList) {
+                String productName = ((String) row[1]).toLowerCase(); // Product name is in the second column (index 1)
+                String vendorName = ((String) row[2]).toLowerCase(); // Vendor name is in the third column (index 2)
+                Date purchaseDate = null;
+
+                try {
+                    purchaseDate = sdf.parse((String) row[8]); // Purchase date is in the ninth column (index 8)
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                }
+
+                boolean productMatches = productFilter.isEmpty() || productName.equals(productFilter);
+                boolean vendorMatches = vendorFilter.isEmpty() || vendorName.equals(vendorFilter);
+                boolean dateMatches = true;
+
+                if (fromDate != null && toDate != null && purchaseDate != null) {
+                    dateMatches = !purchaseDate.before(fromDate) && !purchaseDate.after(toDate);
+                }
+
+                // Add row to the filtered list if all conditions match
+                if (productMatches && vendorMatches && dateMatches) {
+                    Object[] filteredRow = row.clone(); // Clone the row to avoid modifying the original data
+                    filteredRow[0] = rowIndex++; // Set the "No." column to the current row index
+                    filteredDataList.add(filteredRow);
+                }
+            }
+
+            // Recalculate the sum for the filtered data
+            double filteredNetTotalSum = 0.0;
+            for (Object[] row : filteredDataList) {
+                String netTotalString = ((String) row[7]).replace("$", "");
+                filteredNetTotalSum += Double.parseDouble(netTotalString);
+            }
+
+            // Format the total sum as a currency string
+            String formattedNetTotalSumNew = "$" + String.format("%.2f", filteredNetTotalSum);
+
+            // Add the summary row to the filtered data
+            Object[] summaryRowNew = new Object[recentColumns.length];
+            summaryRowNew[6] = "Total:"; // "Discount" column
+            summaryRowNew[7] = formattedNetTotalSumNew; // "Net Total" column
+
+            // Leave other columns empty or null
+            for (int i = 0; i < summaryRowNew.length; i++) {
+                if (i != 6 && i != 7) {
+                    summaryRowNew[i] = ""; // or summaryRowNew[i] = null;
+                }
+            }
+
+            filteredDataList.add(summaryRowNew); // Add the summary row at the end
+
+            // Convert the filtered list back to an array
+            Object[][] filteredData = filteredDataList.toArray(Object[][]::new);
+
+            // Update the table model with the filtered data
+            recentTable.setModel(new DefaultTableModel(filteredData, recentColumns));
+        });
+
     }
 
     // Setting Panel
