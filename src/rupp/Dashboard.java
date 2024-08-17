@@ -794,6 +794,7 @@ public class Dashboard {
             updateDashboardPanels();
             paymentTableModel.setRowCount(0);
             updateSoleProductsPanel();
+            refreshReportPanel();
         });
 
         // Product side
@@ -2184,6 +2185,15 @@ public class Dashboard {
         }
     }
 
+    private void refreshReportPanel() {
+        mainPanel.remove(report); // Remove the current report panel from the mainPanel
+        creatReportPanel(); // Re-create the report panel
+        mainPanel.add(report, "report"); // Add the new report panel back to the mainPanel
+        cardLayout.show(mainPanel, "report"); // Show the updated report panel
+        mainPanel.revalidate(); // Revalidate the mainPanel
+        mainPanel.repaint(); // Repaint the mainPanel to reflect changes
+    }
+
     // Report
     private void creatReportPanel() {
         report = new JPanel(new BorderLayout());
@@ -2453,6 +2463,7 @@ public class Dashboard {
 
                 boolean productMatches = productFilter.isEmpty() || productName.equals(productFilter);
                 boolean vendorMatches = vendorFilter.isEmpty() || vendorName.equals(vendorFilter);
+
                 boolean dateMatches = true;
 
                 if (fromDate != null && toDate != null && purchaseDate != null) {
@@ -2475,21 +2486,24 @@ public class Dashboard {
             }
 
             // Format the total sum as a currency string
-            String formattedNetTotalSumNew = "$" + String.format("%.2f", filteredNetTotalSum);
+            String formattedNetTotalSumN = "$" + String.format("%.2f", filteredNetTotalSum);
 
-            // Add the summary row to the filtered data
-            Object[] summaryRowNew = new Object[recentColumns.length];
-            summaryRowNew[6] = "Total:"; // "Discount" column
-            summaryRowNew[7] = formattedNetTotalSumNew; // "Net Total" column
+            // Create the summary row
+            Object[] summaryRowN = new Object[recentColumns.length];
+            summaryRowN[6] = "Total:"; // "Discount" column
+            summaryRowN[7] = formattedNetTotalSumN; // "Net Total" column
 
             // Leave other columns empty or null
-            for (int i = 0; i < summaryRowNew.length; i++) {
+            for (int i = 0; i < summaryRowN.length; i++) {
                 if (i != 6 && i != 7) {
-                    summaryRowNew[i] = ""; // or summaryRowNew[i] = null;
+                    summaryRowN[i] = ""; // or summaryRowNew[i] = null;
                 }
             }
 
-            filteredDataList.add(summaryRowNew); // Add the summary row at the end
+            // Ensure that the summary row is not duplicated
+            if (filteredDataList.isEmpty() || !filteredDataList.get(filteredDataList.size() - 1)[6].equals("Total:")) {
+                filteredDataList.add(summaryRowN); // Add the summary row at the end
+            }
 
             // Convert the filtered list back to an array
             Object[][] filteredData = filteredDataList.toArray(Object[][]::new);
@@ -2498,6 +2512,7 @@ public class Dashboard {
             recentTable.setModel(new DefaultTableModel(filteredData, recentColumns));
         });
 
+        refreshButton.addActionListener(e -> refreshReportPanel());
     }
 
     // Setting Panel

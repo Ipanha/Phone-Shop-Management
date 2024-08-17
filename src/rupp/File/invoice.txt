@@ -1,6 +1,6 @@
 Invoice:
 ===========================================
-IPhone 13 Pro - $899.00 x 3, Discount: 0.00%, Total: $2697.00
+IPhone 15 Pro - $1399.00 x 2, Discount: 0.00%, Total: $2798.00
 ===========================================
-Total Amount: $2697.00
+Total Amount: $2798.00
 Thank you for your purchase!

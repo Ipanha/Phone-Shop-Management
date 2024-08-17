@@ -20,3 +20,4 @@ No.,Products Name,Vendor Name,Price,Qty.,Total,Discount,Net Total,Purchase Date
 1,IPhone 12,Panha,499.00,1,499.00,0.00,499.00,2024-08-17-0-14-37
 1,IPhone 12 Pro Max,Admin,100.00,1,100.00,0.00,100.00,2024-08-17-0-23-37
 1,IPhone 13 Pro,Admin,899.00,3,2697.00,0.00,2697.00,2024-08-17-0-27-23
+1,IPhone 13 Pro,Admin,899.00,2,1798.00,0.00,1798.00,2024-08-17-8-47-53
