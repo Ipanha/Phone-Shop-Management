@@ -47,6 +47,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -1986,60 +1987,69 @@ public class Dashboard {
     }
 
     private Map<String, Integer> getTotalQuantityDailyFromFile(String filePath) {
-        Map<String, Integer> dailyQuantities = new TreeMap<>(); // TreeMap to sort by date
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"); // Input format including
-                                                                                               // time
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Output format for date only
+    Map<String, Integer> dailyQuantities = new TreeMap<>(); // TreeMap to sort by date
+    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"); // Input format including time
+    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Output format for date only
 
-        List<String> lines = new LinkedList<>();
+    List<String> lines = new LinkedList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
-                    lines.add(line);
-                }
+    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                lines.add(line);
             }
-        } catch (IOException e) {
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+
+    // Process only the last 10 lines if there are more than 10
+    int start = Math.max(0, lines.size() - 10);
+    for (int i = start; i < lines.size(); i++) {
+        String[] fields = lines.get(i).split(",");
+        try {
+            String dateTimeString = fields[8].trim(); // Assuming date and time is in the ninth column
+            int quantity = Integer.parseInt(fields[4].trim()); // Assuming quantity is in the fifth column
+
+            // Preprocess the dateTimeString to add leading zeros where necessary
+            String[] dateTimeParts = dateTimeString.split("-");
+            if (dateTimeParts.length == 6) {
+                String year = dateTimeParts[0];
+                String month = String.format("%02d", Integer.valueOf(dateTimeParts[1]));
+                String day = String.format("%02d", Integer.valueOf(dateTimeParts[2]));
+                String hour = String.format("%02d", Integer.valueOf(dateTimeParts[3]));
+                String minute = String.format("%02d", Integer.valueOf(dateTimeParts[4]));
+                String second = String.format("%02d", Integer.valueOf(dateTimeParts[5]));
+                dateTimeString = String.join("-", year, month, day, hour, minute, second);
+            }
+
+            // Parse the adjusted date-time string
+            LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, inputFormatter);
+
+            // Format the date to yyyy-MM-dd
+            String formattedDate = dateTime.toLocalDate().format(outputFormatter);
+
+            // Update quantities
+            dailyQuantities.put(formattedDate, dailyQuantities.getOrDefault(formattedDate, 0) + quantity);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | DateTimeParseException e) {
             e.printStackTrace();
         }
-
-        // Process only the last 10 lines if there are more than 10
-        int start = Math.max(0, lines.size() - 10);
-        for (int i = start; i < lines.size(); i++) {
-            String[] fields = lines.get(i).split(",");
-            try {
-                String dateTimeString = fields[8].trim(); // Assuming date and time is in the ninth column
-                int quantity = Integer.parseInt(fields[4].trim()); // Assuming quantity is in the fifth column
-
-                // Preprocess the dateTimeString to add leading zeros where necessary
-                String[] dateTimeParts = dateTimeString.split("-");
-                if (dateTimeParts.length == 6) {
-                    // Ensure month, day, minute, and second are two digits
-                    String year = dateTimeParts[0];
-                    String month = String.format("%02d", Integer.valueOf(dateTimeParts[1]));
-                    String day = String.format("%02d", Integer.valueOf(dateTimeParts[2]));
-                    String hour = String.format("%02d", Integer.valueOf(dateTimeParts[3]));
-                    String minute = String.format("%02d", Integer.valueOf(dateTimeParts[4]));
-                    String second = String.format("%02d", Integer.valueOf(dateTimeParts[5]));
-                    dateTimeString = String.join("-", year, month, day, hour, minute, second);
-                }
-
-                // Parse the adjusted date-time string
-                LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, inputFormatter);
-
-                // Format the date to yyyy-MM-dd
-                String formattedDate = dateTime.toLocalDate().format(outputFormatter);
-
-                // Update quantities
-                dailyQuantities.put(formattedDate, dailyQuantities.getOrDefault(formattedDate, 0) + quantity);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException | DateTimeParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return dailyQuantities;
     }
+
+    // Ensure we have exactly 10 plots by adding missing dates with zero quantities
+    LocalDate today = LocalDate.now();
+    for (int i = 9; i >= 0; i--) {
+        String date = today.minusDays(i).format(outputFormatter);
+        dailyQuantities.putIfAbsent(date, 0);
+    }
+
+    // Return the last 10 entries
+    return dailyQuantities.entrySet().stream()
+            .skip(Math.max(0, dailyQuantities.size() - 10))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
+}
+
 
     private Map<String, Integer> getTotalQuantityFromFile(String filePath) {
         Map<String, Integer> productQuantities = new HashMap<>();
@@ -2265,7 +2275,7 @@ public class Dashboard {
         contentPanel.add(byProductField, gbc);
 
         // Who Sale label and text field
-        JLabel whoSaleLabel = new JLabel("Who Sale");
+        JLabel whoSaleLabel = new JLabel("By Vendor");
         whoSaleLabel.setFont(font17B); // Apply font
         gbc.gridx = 3;
         gbc.gridy = 0;
