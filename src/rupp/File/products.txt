@@ -1,4 +1,4 @@
-IPhone 15 Pro Max,1499.000000,448,src/rupp/P_pic/iPhone-15-Pro-Max.png
+IPhone 15 Pro Max,1499.000000,444,src/rupp/P_pic/iPhone-15-Pro-Max.png
 IPhone 15 Pro,1399.000000,878,src/rupp/P_pic/iPhone-15-Pro.png
 IPhone 15,1299.000000,986,src/rupp/P_pic/iphone-15.png
 IPhone 14 Pro Max,1299.000000,1000,src/rupp/P_pic/iPhone-14-Pro-Max.png

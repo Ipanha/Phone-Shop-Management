@@ -1,5 +1,6 @@
 package rupp;
 
+// Java AWT Font
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -28,7 +28,6 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.SqlDateModel;
 import org.jdatepicker.impl.UtilDateModel;
 import java.util.Calendar;
 import java.util.Properties;
@@ -37,12 +36,6 @@ import javax.imageio.ImageIO;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
 import java.time.LocalDate;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -52,10 +45,18 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
+
+import javax.swing.table.TableModel;
+import javax.swing.table.DefaultTableModel;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+// Add this import at the top of your file
 
 public class Dashboard {
 
@@ -73,6 +74,7 @@ public class Dashboard {
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
     private String username;
+
     // private JScrollPane scrollPane;
     private String photoPath;
     Font font24B = new Font("Arial", Font.BOLD, 24);
@@ -794,8 +796,6 @@ public class Dashboard {
             updateProductList();
             updateDashboardPanels();
             paymentTableModel.setRowCount(0);
-            updateSoleProductsPanel();
-            refreshReportPanel();
         });
 
         // Product side
@@ -1851,6 +1851,15 @@ public class Dashboard {
 
     private JPanel soleProductsPanel;
 
+    private void refreshViewSalePanel() {
+        mainPanel.remove(viewSale); // Remove the current report panel from the mainPanel
+        createViewSale(); // Re-create the report panel
+        mainPanel.add(viewSale, "viewSale"); // Add the new report panel back to the mainPanel
+        cardLayout.show(mainPanel, "viewSale"); // Show the updated report panel
+        mainPanel.revalidate(); // Revalidate the mainPanel
+        mainPanel.repaint(); // Repaint the mainPanel to reflect changes
+    }
+
     // ViewSale Panel
     private JPanel createViewSale() {
         viewSale = new JPanel(new BorderLayout());
@@ -1977,79 +1986,70 @@ public class Dashboard {
                 .orElse("No Products Sold");
     }
 
-    public void updateSoleProductsPanel() {
-        Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
-        int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
-        JLabel valueLabel = (JLabel) ((JPanel) soleProductsPanel.getComponent(1)).getComponent(0);
-        valueLabel.setText(String.valueOf(totalQuantity));
-        soleProductsPanel.revalidate();
-        soleProductsPanel.repaint();
-    }
-
     private Map<String, Integer> getTotalQuantityDailyFromFile(String filePath) {
-    Map<String, Integer> dailyQuantities = new TreeMap<>(); // TreeMap to sort by date
-    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"); // Input format including time
-    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Output format for date only
+        Map<String, Integer> dailyQuantities = new TreeMap<>(); // TreeMap to sort by date
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"); // Input format including
+                                                                                               // time
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Output format for date only
 
-    List<String> lines = new LinkedList<>();
+        List<String> lines = new LinkedList<>();
 
-    try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-        String line;
-        while ((line = br.readLine()) != null) {
-            if (!line.trim().isEmpty() && !line.startsWith("No.")) {
-                lines.add(line);
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.trim().isEmpty() && !line.startsWith("No.")) {
+                    lines.add(line);
+                }
             }
-        }
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-
-    // Process only the last 10 lines if there are more than 10
-    int start = Math.max(0, lines.size() - 10);
-    for (int i = start; i < lines.size(); i++) {
-        String[] fields = lines.get(i).split(",");
-        try {
-            String dateTimeString = fields[8].trim(); // Assuming date and time is in the ninth column
-            int quantity = Integer.parseInt(fields[4].trim()); // Assuming quantity is in the fifth column
-
-            // Preprocess the dateTimeString to add leading zeros where necessary
-            String[] dateTimeParts = dateTimeString.split("-");
-            if (dateTimeParts.length == 6) {
-                String year = dateTimeParts[0];
-                String month = String.format("%02d", Integer.valueOf(dateTimeParts[1]));
-                String day = String.format("%02d", Integer.valueOf(dateTimeParts[2]));
-                String hour = String.format("%02d", Integer.valueOf(dateTimeParts[3]));
-                String minute = String.format("%02d", Integer.valueOf(dateTimeParts[4]));
-                String second = String.format("%02d", Integer.valueOf(dateTimeParts[5]));
-                dateTimeString = String.join("-", year, month, day, hour, minute, second);
-            }
-
-            // Parse the adjusted date-time string
-            LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, inputFormatter);
-
-            // Format the date to yyyy-MM-dd
-            String formattedDate = dateTime.toLocalDate().format(outputFormatter);
-
-            // Update quantities
-            dailyQuantities.put(formattedDate, dailyQuantities.getOrDefault(formattedDate, 0) + quantity);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | DateTimeParseException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
+        // Process only the last 10 lines if there are more than 10
+        int start = Math.max(0, lines.size() - 10);
+        for (int i = start; i < lines.size(); i++) {
+            String[] fields = lines.get(i).split(",");
+            try {
+                String dateTimeString = fields[8].trim(); // Assuming date and time is in the ninth column
+                int quantity = Integer.parseInt(fields[4].trim()); // Assuming quantity is in the fifth column
+
+                // Preprocess the dateTimeString to add leading zeros where necessary
+                String[] dateTimeParts = dateTimeString.split("-");
+                if (dateTimeParts.length == 6) {
+                    String year = dateTimeParts[0];
+                    String month = String.format("%02d", Integer.valueOf(dateTimeParts[1]));
+                    String day = String.format("%02d", Integer.valueOf(dateTimeParts[2]));
+                    String hour = String.format("%02d", Integer.valueOf(dateTimeParts[3]));
+                    String minute = String.format("%02d", Integer.valueOf(dateTimeParts[4]));
+                    String second = String.format("%02d", Integer.valueOf(dateTimeParts[5]));
+                    dateTimeString = String.join("-", year, month, day, hour, minute, second);
+                }
+
+                // Parse the adjusted date-time string
+                LocalDateTime dateTime = LocalDateTime.parse(dateTimeString, inputFormatter);
+
+                // Format the date to yyyy-MM-dd
+                String formattedDate = dateTime.toLocalDate().format(outputFormatter);
+
+                // Update quantities
+                dailyQuantities.put(formattedDate, dailyQuantities.getOrDefault(formattedDate, 0) + quantity);
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException | DateTimeParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Ensure we have exactly 10 plots by adding missing dates with zero quantities
+        LocalDate today = LocalDate.now();
+        for (int i = 9; i >= 0; i--) {
+            String date = today.minusDays(i).format(outputFormatter);
+            dailyQuantities.putIfAbsent(date, 0);
+        }
+
+        // Return the last 10 entries
+        return dailyQuantities.entrySet().stream()
+                .skip(Math.max(0, dailyQuantities.size() - 10))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
     }
-
-    // Ensure we have exactly 10 plots by adding missing dates with zero quantities
-    LocalDate today = LocalDate.now();
-    for (int i = 9; i >= 0; i--) {
-        String date = today.minusDays(i).format(outputFormatter);
-        dailyQuantities.putIfAbsent(date, 0);
-    }
-
-    // Return the last 10 entries
-    return dailyQuantities.entrySet().stream()
-            .skip(Math.max(0, dailyQuantities.size() - 10))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> b, LinkedHashMap::new));
-}
-
 
     private Map<String, Integer> getTotalQuantityFromFile(String filePath) {
         Map<String, Integer> productQuantities = new HashMap<>();
@@ -2203,6 +2203,49 @@ public class Dashboard {
         mainPanel.revalidate(); // Revalidate the mainPanel
         mainPanel.repaint(); // Repaint the mainPanel to reflect changes
     }
+
+    private void exportToExcel(JTable table, String filePath) {
+    XSSFWorkbook workbook = new XSSFWorkbook();
+    try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+        Sheet sheet = workbook.createSheet("Sheet1");
+        TableModel model = table.getModel();
+
+        // Create header row
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(model.getColumnName(i));
+        }
+
+        // Create data rows
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Row row = sheet.createRow(i + 1);
+            for (int j = 0; j < model.getColumnCount(); j++) {
+                Cell cell = row.createCell(j);
+                Object value = model.getValueAt(i, j);
+                if (value != null) {
+                    if (value instanceof Number) {
+                        cell.setCellValue(((Number) value).doubleValue());
+                    } else {
+                        cell.setCellValue(value.toString());
+                    }
+                }
+            }
+        }
+
+        workbook.write(fileOut);
+        JOptionPane.showMessageDialog(null, "Data exported successfully to " + filePath);
+    } catch (IOException ex) {
+        JOptionPane.showMessageDialog(null, "Error exporting data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    } finally {
+        try {
+            workbook.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
 
     // Report
     private void creatReportPanel() {
@@ -2523,6 +2566,22 @@ public class Dashboard {
         });
 
         refreshButton.addActionListener(e -> refreshReportPanel());
+
+        // ActionListener for Export button
+        exportButton.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Specify a file to save");
+            int userSelection = fileChooser.showSaveDialog(null);
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                String filePath = fileToSave.getAbsolutePath();
+                if (!filePath.endsWith(".xlsx")) {
+                    filePath += ".xlsx"; // Add extension if not provided
+                }
+                exportToExcel(recentTable, filePath);
+            }
+        });
+
     }
 
     // Setting Panel
