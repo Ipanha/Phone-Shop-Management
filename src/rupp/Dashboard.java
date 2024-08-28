@@ -121,8 +121,8 @@ public class Dashboard {
         creatReportPanel();
         mainPanel.add(report, "report");
 
-        createSettingPanel();
-        mainPanel.add(setting, "setting");
+        // createSettingPanel();
+        // mainPanel.add(setting, "setting");
 
         createSidebar();
 
@@ -159,8 +159,8 @@ public class Dashboard {
         creatReportPanel();
         mainPanel.add(report, "report");
 
-        createSettingPanel();
-        mainPanel.add(setting, "setting");
+        // createSettingPanel();
+        // mainPanel.add(setting, "setting");
         // createSidebar();
         // updateProductList();
         // Ensure the changes are reflected immediately
@@ -318,11 +318,11 @@ public class Dashboard {
         JButton btnNewSale = new JButton("New Sale");
         JButton btnViewSales = new JButton("View Sales");
         JButton btnReport = new JButton("Report");
-        JButton btnSettings = new JButton("Settings");
+        // JButton btnSettings = new JButton("Settings");
 
         // Array of buttons
         JButton[] buttons = { btnDashboard, btnAddProduct, btnViewInventory, btnNewSale, btnViewSales, btnReport,
-                btnSettings };
+                /* btnSettings */ };
 
         for (JButton button : buttons) {
             button.setMaximumSize(new Dimension(160, 40));
@@ -374,7 +374,7 @@ public class Dashboard {
         btnViewSales.addActionListener(e -> cardLayout.show(mainPanel, "viewSale"));
         btnViewInventory.addActionListener(e -> cardLayout.show(mainPanel, "inventoryPanel"));
         btnReport.addActionListener(e -> cardLayout.show(mainPanel, "report"));
-        btnSettings.addActionListener(e -> cardLayout.show(mainPanel, "setting"));
+        // btnSettings.addActionListener(e -> cardLayout.show(mainPanel, "setting"));
     }
 
     // Create Dashbord Pannel
@@ -2205,47 +2205,47 @@ public class Dashboard {
     }
 
     private void exportToExcel(JTable table, String filePath) {
-    XSSFWorkbook workbook = new XSSFWorkbook();
-    try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-        Sheet sheet = workbook.createSheet("Sheet1");
-        TableModel model = table.getModel();
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            Sheet sheet = workbook.createSheet("Sheet1");
+            TableModel model = table.getModel();
 
-        // Create header row
-        Row headerRow = sheet.createRow(0);
-        for (int i = 0; i < model.getColumnCount(); i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(model.getColumnName(i));
-        }
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < model.getColumnCount(); i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(model.getColumnName(i));
+            }
 
-        // Create data rows
-        for (int i = 0; i < model.getRowCount(); i++) {
-            Row row = sheet.createRow(i + 1);
-            for (int j = 0; j < model.getColumnCount(); j++) {
-                Cell cell = row.createCell(j);
-                Object value = model.getValueAt(i, j);
-                if (value != null) {
-                    if (value instanceof Number) {
-                        cell.setCellValue(((Number) value).doubleValue());
-                    } else {
-                        cell.setCellValue(value.toString());
+            // Create data rows
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Row row = sheet.createRow(i + 1);
+                for (int j = 0; j < model.getColumnCount(); j++) {
+                    Cell cell = row.createCell(j);
+                    Object value = model.getValueAt(i, j);
+                    if (value != null) {
+                        if (value instanceof Number) {
+                            cell.setCellValue(((Number) value).doubleValue());
+                        } else {
+                            cell.setCellValue(value.toString());
+                        }
                     }
                 }
             }
-        }
 
-        workbook.write(fileOut);
-        JOptionPane.showMessageDialog(null, "Data exported successfully to " + filePath);
-    } catch (IOException ex) {
-        JOptionPane.showMessageDialog(null, "Error exporting data: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    } finally {
-        try {
-            workbook.close();
+            workbook.write(fileOut);
+            JOptionPane.showMessageDialog(null, "Data exported successfully to " + filePath);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error exporting data: " + ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         }
     }
-}
-
 
     // Report
     private void creatReportPanel() {
@@ -2360,13 +2360,13 @@ public class Dashboard {
         refreshButton.setForeground(Color.WHITE);
         buttonPanel.add(refreshButton);
 
-        JButton printButton = new JButton("Print");
-        printButton.setPreferredSize(buttonSize);
-        printButton.setBackground(new Color(214, 205, 0));
-        printButton.setFont(font18B);
-        printButton.setCursor(pointer);
-        printButton.setForeground(Color.WHITE);
-        buttonPanel.add(printButton);
+        // JButton printButton = new JButton("Print");
+        // printButton.setPreferredSize(buttonSize);
+        // printButton.setBackground(new Color(214, 205, 0));
+        // printButton.setFont(font18B);
+        // printButton.setCursor(pointer);
+        // printButton.setForeground(Color.WHITE);
+        // buttonPanel.add(printButton);
 
         JButton exportButton = new JButton("Export");
         exportButton.setPreferredSize(buttonSize);
@@ -2585,16 +2585,17 @@ public class Dashboard {
     }
 
     // Setting Panel
-    private void createSettingPanel() {
-        setting = new JPanel(new BorderLayout()); // Use BorderLayout for proper alignment
-        // Get navigation header panel
-        JPanel headerPanel = navigation("Settings");
-        JPanel footerPanel = Footer();
-
-        setting.add(headerPanel, BorderLayout.NORTH);
-        setting.add(footerPanel, BorderLayout.SOUTH);
-
-    }
+    // private void createSettingPanel() {
+    // setting = new JPanel(new BorderLayout()); // Use BorderLayout for proper
+    // alignment
+    // // Get navigation header panel
+    // JPanel headerPanel = navigation("Settings");
+    // JPanel footerPanel = Footer();
+    //
+    // setting.add(headerPanel, BorderLayout.NORTH);
+    // setting.add(footerPanel, BorderLayout.SOUTH);
+    //
+    // }
 
     // Read Products From File
     private void readProductsFromFile() {
