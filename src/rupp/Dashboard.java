@@ -74,6 +74,8 @@ public class Dashboard {
     private final ArrayList<Phone> phonesList;
     private JPanel navProductPanel;
     private String username;
+    private JLabel usernameLabel;
+    private JLabel profilePhotoLabel;
 
     // private JScrollPane scrollPane;
     private String photoPath;
@@ -92,12 +94,16 @@ public class Dashboard {
     Cursor pointer = new Cursor(Cursor.HAND_CURSOR);
 
     public Dashboard(String username) {
+        
         this.username = username;
         frame = new JFrame("Products Controller");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1920, 1080);
         frame.setLocationRelativeTo(null);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        
+        usernameLabel = new JLabel(username);
+        profilePhotoLabel = new JLabel(new ImageIcon("src/rupp/icon/view.png"));
 
         phonesList = new ArrayList<>();
         readProductsFromFile();
@@ -128,6 +134,7 @@ public class Dashboard {
 
         frame.setVisible(true);
         updateProductList();
+        
 
     }
 
@@ -135,15 +142,10 @@ public class Dashboard {
         this.username = newUsername;
         this.photoPath = newPhotoPath;
 
-        // Update navigation panel
-        mainPanel.remove(dashboard);
-        mainPanel.remove(newsalePanel);
-        mainPanel.remove(viewSale);
-        mainPanel.remove(inventoryPanel);
-        mainPanel.remove(report);
-        mainPanel.remove(setting);
-        frame.add(mainPanel);
+        // Clear the existing panels
+        mainPanel.removeAll();
 
+        // Recreate panels
         createDashboardPanel();
         mainPanel.add(dashboard, "Dashboard");
 
@@ -159,16 +161,12 @@ public class Dashboard {
         creatReportPanel();
         mainPanel.add(report, "report");
 
-        // createSettingPanel();
-        // mainPanel.add(setting, "setting");
-        // createSidebar();
-        // updateProductList();
         // Ensure the changes are reflected immediately
-        frame.revalidate();
-        frame.repaint();
-        frame.setVisible(true);
-        updateProductList();
+        mainPanel.revalidate();
+        mainPanel.repaint();
 
+        // Update any other necessary data like product list
+        updateProductList();
     }
 
     // Create Navigatoin class
@@ -313,6 +311,7 @@ public class Dashboard {
 
         // Buttons setup
         JButton btnDashboard = new JButton("Dashboard");
+
         JButton btnAddProduct = new JButton("Add Product");
         JButton btnViewInventory = new JButton("Inventory");
         JButton btnNewSale = new JButton("New Sale");
@@ -364,7 +363,7 @@ public class Dashboard {
         // Add sidebar to frame
         frame.add(sidebar, BorderLayout.WEST);
 
-        // Button actions (assuming these are defined elsewhere in your class)
+        // Click Button Add product for Show dialog Add
         btnAddProduct.addActionListener(e -> showAddProductDialog());
         btnDashboard.addActionListener(e -> {
             cardLayout.show(mainPanel, "Dashboard");
@@ -1228,6 +1227,7 @@ public class Dashboard {
         dialog.add(btnCancel);
         dialog.add(lblPhoto); // Add the photo label to the dialog
 
+        // Event Click btnBrowse
         btnBrowse.addActionListener((ActionEvent e) -> {
             JFileChooser fileChooser = new JFileChooser();
             int returnValue = fileChooser.showOpenDialog(null);
@@ -1264,7 +1264,8 @@ public class Dashboard {
                 int qty = Integer.parseInt(txtQty.getText());
                 String imagePath = txtImagePath.getText();
                 String relativeImagePath = "src/rupp/P_pic/" + new File(imagePath).getName();
-                // Create a new Phone object
+
+                // Create a new
                 Phone newPhone = new Phone(name, price, qty, relativeImagePath);
 
                 // Add the new phone to the list
@@ -1589,6 +1590,7 @@ public class Dashboard {
 
     }
 
+    // Class Edit
     class ButtonEditor extends DefaultCellEditor {
         private final JButton button;
         private String label;
@@ -1720,6 +1722,7 @@ public class Dashboard {
         }
     }
 
+    // Inventory
     private JPanel createInventoryPanel() {
         inventoryPanel = new JPanel(new BorderLayout());
         JPanel headerPanel = navigation("Inventory");
@@ -1754,6 +1757,7 @@ public class Dashboard {
         // Create centerPanel to hold SearchPanel and inventoryScrollPane
         JPanel centerPanel = new JPanel(new BorderLayout());
 
+        // Header
         String[] columnNames = { "No.", "Image", "Name", "Price", "Quantity", "", " " };
         inventoryTableModel = new InventoryTableModel(columnNames, 0);
 
@@ -1851,15 +1855,6 @@ public class Dashboard {
 
     private JPanel soleProductsPanel;
 
-    private void refreshViewSalePanel() {
-        mainPanel.remove(viewSale); // Remove the current report panel from the mainPanel
-        createViewSale(); // Re-create the report panel
-        mainPanel.add(viewSale, "viewSale"); // Add the new report panel back to the mainPanel
-        cardLayout.show(mainPanel, "viewSale"); // Show the updated report panel
-        mainPanel.revalidate(); // Revalidate the mainPanel
-        mainPanel.repaint(); // Repaint the mainPanel to reflect changes
-    }
-
     // ViewSale Panel
     private JPanel createViewSale() {
         viewSale = new JPanel(new BorderLayout());
@@ -1868,8 +1863,11 @@ public class Dashboard {
 
         Map<String, Integer> productQuantities = getTotalQuantityFromFile("src/rupp/File/recentlyBuy.txt");
         int totalQuantity = productQuantities.values().stream().mapToInt(Integer::intValue).sum();
+
+        // Total Money Sale
         float totalMoney = getTotalMoneyFromFile("src/rupp/File/recentlyBuy.txt");
 
+        //
         String mostSoleProduct = getMostSoleProduct(productQuantities);
         int mostSoleQuantity = productQuantities.get(mostSoleProduct);
 
@@ -2204,6 +2202,7 @@ public class Dashboard {
         mainPanel.repaint(); // Repaint the mainPanel to reflect changes
     }
 
+    // Class for export excel
     private void exportToExcel(JTable table, String filePath) {
         XSSFWorkbook workbook = new XSSFWorkbook();
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
@@ -2302,7 +2301,7 @@ public class Dashboard {
         gbc.gridy = 1;
         contentPanel.add(toDatePicker, gbc);
 
-        // For instance:
+        // By Product
         JLabel byProductLabel = new JLabel("By Product");
         byProductLabel.setFont(font17B);
         gbc.gridx = 2;
@@ -2317,7 +2316,7 @@ public class Dashboard {
         gbc.gridy = 1;
         contentPanel.add(byProductField, gbc);
 
-        // Who Sale label and text field
+        // By Seller
         JLabel whoSaleLabel = new JLabel("By Vendor");
         whoSaleLabel.setFont(font17B); // Apply font
         gbc.gridx = 3;
@@ -2339,6 +2338,7 @@ public class Dashboard {
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Content Button
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setBackground(Color.WHITE);
 
@@ -2360,14 +2360,6 @@ public class Dashboard {
         refreshButton.setForeground(Color.WHITE);
         buttonPanel.add(refreshButton);
 
-        // JButton printButton = new JButton("Print");
-        // printButton.setPreferredSize(buttonSize);
-        // printButton.setBackground(new Color(214, 205, 0));
-        // printButton.setFont(font18B);
-        // printButton.setCursor(pointer);
-        // printButton.setForeground(Color.WHITE);
-        // buttonPanel.add(printButton);
-
         JButton exportButton = new JButton("Export");
         exportButton.setPreferredSize(buttonSize);
         exportButton.setBackground(new Color(3, 159, 0));
@@ -2387,10 +2379,12 @@ public class Dashboard {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
 
+        // Header Table
         String[] recentColumns = { "No.", "Products Name", "Vendor Name", "Price", "Qty.", "Total", "Discount",
                 "Net Total", "Purchase Date" };
         List<Object[]> recentDataList = new ArrayList<>();
 
+        // Data of Table
         try (BufferedReader br = new BufferedReader(new FileReader("src/rupp/File/recentlyBuy.txt"))) {
             String line;
             br.readLine(); // Skip header
@@ -2474,6 +2468,7 @@ public class Dashboard {
                 return row != getRowCount() - 1;
             }
         };
+
         recentTable.setFont(font18);
         recentTable.setRowHeight(30);
 
@@ -2494,6 +2489,7 @@ public class Dashboard {
 
         // Add ActionListener to the Filter button
         filterButton.addActionListener(e -> {
+            // Find condiction
             String productFilter = byProductField.getText().trim().toLowerCase();
             String vendorFilter = whoSaleField.getText().trim().toLowerCase();
             Date fromDate = (Date) fromDatePicker.getModel().getValue();
@@ -2565,6 +2561,7 @@ public class Dashboard {
             recentTable.setModel(new DefaultTableModel(filteredData, recentColumns));
         });
 
+        // Reload Panel
         refreshButton.addActionListener(e -> refreshReportPanel());
 
         // ActionListener for Export button

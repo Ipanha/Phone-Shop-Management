@@ -47,7 +47,7 @@ public class PhoneShopManagementSystem {
         frame.setVisible(true);
     }
 
-    private void createLoginPanel(){
+    private void createLoginPanel() {
         loginPanel = new JPanel(new BorderLayout());
 
         // Center container to hold both panels

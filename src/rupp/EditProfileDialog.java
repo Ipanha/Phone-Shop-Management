@@ -26,7 +26,6 @@ public class EditProfileDialog extends JDialog {
         setSize(600, 600);
 
         // Font settings
-        Font font18 = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
         Font font18B = new Font(Font.SANS_SERIF, Font.BOLD, 18);
         Font font25B = new Font(Font.SANS_SERIF, Font.BOLD, 25);
         Cursor pointer = new Cursor(Cursor.HAND_CURSOR);

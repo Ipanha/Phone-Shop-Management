@@ -1,5 +1,5 @@
-IPhone 15 Pro Max,1499.000000,444,src/rupp/P_pic/iPhone-15-Pro-Max.png
-IPhone 15 Pro,1399.000000,878,src/rupp/P_pic/iPhone-15-Pro.png
+IPhone 15 Pro Max,1499.000000,455,src/rupp/P_pic/iPhone-15-Pro-Max.png
+IPhone 15 Pro,1399.000000,868,src/rupp/P_pic/iPhone-15-Pro.png
 IPhone 15,1299.000000,986,src/rupp/P_pic/iphone-15.png
 IPhone 14 Pro Max,1299.000000,1000,src/rupp/P_pic/iPhone-14-Pro-Max.png
 IPhone 14 Pro,1199.000000,997,src/rupp/P_pic/iPhone-14-Pro.png
@@ -10,3 +10,4 @@ IPhone 13,799.000000,99,src/rupp/P_pic/iPhone-13.png
 IPhone 12 Pro Max,100.000000,683,src/rupp/P_pic/iPhone-12-Pro_Max.png
 IPhone 12 Pro,599.000000,99,src/rupp/P_pic/iPhone-12-Pro.png
 IPhone 12,499.000000,98,src/rupp/P_pic/iPhone-12.png
+Nokia 1280,100.000000,80,src/rupp/P_pic/nokia-1280.png

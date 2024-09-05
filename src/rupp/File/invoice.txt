@@ -1,6 +1,6 @@
 Invoice:
 ===========================================
-IPhone 15 Pro Max - $1499.00 x 4, Discount: 0.00%, Total: $5996.00
+Nokia 1280 - $100.00 x 10, Discount: 0.00%, Total: $1000.00
 ===========================================
-Total Amount: $5996.00
+Total Amount: $1000.00
 Thank you for your purchase!
